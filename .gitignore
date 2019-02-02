@@ -1,0 +1,7 @@
+*.log
+/images
+/.idea
+/.git
+/backup
+*.DS_Store
+/conf/send_email.php
