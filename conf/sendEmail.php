@@ -12,7 +12,7 @@ return [
         'host'    => 'smtp.qq.com',
         'port'    => '25',
         'uname'   => 'hanhyu@qq.com',
-        'pwd'     => '123456',
+        'pwd'     => 'boimitqcnpeucbac',
         'subject' => 'wlsh-baseFrame程序-开发环境（异常日志）',
         'from'    => 'hanhyu@qq.com',
         'to'      => 'hanhyu@qq.com',

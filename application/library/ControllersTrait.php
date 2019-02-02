@@ -157,8 +157,11 @@ trait ControllersTrait
 
         //如果是登录接口，则需解密接口数据
         if ($this->request->server['request_uri'] == '/system/user/login') {
+            if (!isset($data['login_data']) or !is_string($data['login_data'])) {
+                throw new \Exception('参数错误', 400);
+            }
             $decrypt = private_decrypt($data['login_data'], \Yaf\Registry::get('config')->sign->prv_key);
-            $data = json_decode($decrypt, true);
+            $data    = json_decode($decrypt, true);
         }
 
         if (!empty($data)) {

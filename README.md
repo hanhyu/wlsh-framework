@@ -2,33 +2,61 @@
 
 > 名词解释：wlsh（ 为了生活---每个字的第一个拼音 ）
 
-酷毙的码农为了生活自由，基于composer整合yaf框架与swoole等扩展开发的php内存长驻框架
+酷毙的码农为了生活自由，基于composer整合yaf框架与swoole等扩展组合而成的php内存长驻框架
 ，低耦合，使用非常少的语法糖，尽量使用原有扩展中的语法，提供最优状态以减少PHPer学习新框架的成本。
 
-### wlsh项目容器启动要求
+### wlsh组件容器启动说明
+
 * 1、启动docker start base_frame
+
 * 2、启动docker start base_mysql_8.0
+
 * 3、启动docker start base_redis_5.0
+
 * 4、宿主机的mysql的3307映射base_mysql_8.0中的3306
+
 * 5、宿主机的redis的6380映射base_redis_5.0中的6379
 
-> 后面会放出框架扩展整套docker服务运行环境
+> 后面会放出组件扩展的整套docker服务运行环境
 
-### 基本要求
+### 使用基本要求
 
-对于使用wlsh项目的开发者，需要掌握swoole基本的理念，熟悉yaf框架，熟悉composer用法及理念。对于这三点要求，我想PHPer应很容易达到。
+对于使用wlsh项目的开发者，需要掌握swoole基本的开发理念与yaf框架生命周期，熟悉composer用法;对于这三点要求，我想PHPer应很容易达到。
 
-> wlsh启动最低要求：必须已安装php 7.3、yaf 3.0.6、swoole 4.2.12、redis-5.0、mysql-8.0、inotify扩展等。
+> wlsh启动最低要求：必须已安装php 7.3、yaf 3.0.8、swoole 4.2.12、redis-5.0、mysql-8.0、inotify扩展等。
 
-> 我们的口号是：简单才是php美之所在，用最简捷、最高效、最性价比的方式获取项目资金中的利润最大化。
+> 我们的口号是：简单才是php美之所在，用最简捷、最高效、最性价比的方式获取项目资金中的利润最大化，绝对不会增加phper的学习成本。
 
-> 该框架已经历多个线上项目考验。
+> wlsh组件已经历了四年时间的考验与N个线上项目的蹂躏。
+
+### 框架特色
+
+* 1、最低php7.3版本的支持
+
+* 2、可无缝同步升级swoole最新版本
+
+* 3、完全组件化
+
+* 4、框架只定义了一个入口两个核心，其他流程都是使用方团队自己约定
+
+* 5、基于yaf与swoole扩展组件，核心都是c扩展，其实wlsh不能叫做一个框架而是一个协程组件
+
+* 6、简约快速,核心没有复杂化的流程
+
+* 7、安全，团队个性化定制、一个项目可以设定自己的一套框架流程
+
+* 8、php协程框架，在密集IO方面不低于golang、c++的处理性能
+
+* 9、非常低耦合、完全没有新的语法糖，无依赖性
 
 ### 安装
 
 git clone https://github.com/hanhyu/wlsh-framework.git  
 或
 composer create-project hanhyu/wlsh-framework wlsh dev-master
+
+### 怎样使用？ 请参照自带的System模块代码开发流程：
+![alt text](/tests/testImages/2019-02-02.png)
 
 ### 统一接口响应数据结构
 
@@ -77,9 +105,13 @@ composer create-project hanhyu/wlsh-framework wlsh dev-master
 接口文档需要配置解析到根目录下apidoc目录中即可。
 
 * 启动服务（根目录下执行命令）： php swoole.php start         （每次启动服务前使用该命令做预检）
+
 * 启动服务（根目录下执行命令）： php swoole.php start -d      （以守护进程方式启动，生产环境使用）
+
 * 启动服务（根目录下执行命令）： php swoole.php start dev     （开启debug模式，本地开发环境使用）
+
 * 启动服务（根目录下执行命令）： php swoole.php start dev -d  （以守护进程方式启动debug模式，线上开发环境与测试环境使用）
+
 * 停止服务（根目录下执行命令）： php swoole.php stop
 
 > 生成在线接口文档命令（根目录下执行）：  apidoc -i application/ -o apidoc/
@@ -120,29 +152,33 @@ wlsh-framework集成了swoole client, swoole http client, swoole websocket clien
 ```
 本框架是协程服务框架，使用时需时刻注意swoole的协程特性给代码会来什么样的运行逻辑效果。
 ```
-* 1、需要日志记录时用co_log()方法记录日志，该方法是协程方式处理日志，
-* 2、task_log方法使用swoole的task扩展进行异步非阻塞方式记录日志，该方法是处理耗时的日志任务;
-* 3、数据模型中所有的Model需要继承AbstractModel抽象类，该类中实现了从mysql数据协程连接池中自动获取一个连接后使用，等使用完后立即自动返回池子中;
-Model中的方法如有需要用到mysql连接对象时都必须设置为protected受保护类型，这样外层在正常调用数据方法操作时，会自动先请求AbstractModel中的
+* 1、需要日志记录时用co_log()方法记录日志，该方法是协程方式处理日志。
+
+* 2、task_log方法使用swoole的task扩展进行异步非阻塞方式记录日志，该方法是处理耗时的日志任务，如：发送邮件。
+
+* 3、数据模型中所有的Model需要继承各自文件中AbstractModel抽象类，该类中实现了从数据协程连接池中自动获取一个连接后使用，等使用完后立即自动返回池子中;
+Model中的方法如有需要用到数据库连接对象时都必须设置为protected受保护类型，这样外层在正常调用数据方法操作时，会自动先请求AbstractModel中的
 call魔术方法进行连接池操作的业务分流。
 
-模型字段命名：
+* 4、 修改swoole.php、application/library/Server.php与AutoReload.php三个文件需要手动重启框架服务，其他文件修改时会框架自动重载。
 
-1、暴露给前端的字段都不含表名前缀;
-如： insert、update、delete:表名是face_config,在前端传name、content等字段，后端接口在model层把传入的参数做一一对应转换（加表前缀）
+（忽略）以下是框架自带的system模块约定：
+
+* 5、暴露给前端的字段都不含表名前缀;
+如： insert、update、delete:表名是base_config,在前端传name、content等字段，后端接口在model层把传入的参数做一一对应转换（加表前缀）
 configName、configContent。
-select:表名是face_config,后端接口在model层把查询的字段做一一对应转换（去掉表前缀）configName as name、configContent as content，再传给前端。
+select:表名是base_config,后端接口在model层把查询的字段做一一对应转换（去掉表前缀）configName as name、configContent as content，再传给前端。
 
-workerProcess与taskProcess可以理解为ADM模式的A与D层的关系，同时也有点像传统的controllers与services层的关系,但又有本质的区别：
+* 6、由于在服务核心文件中使用了Throwable捕获异常，所以在程序运行中没有catch住的异常都会在最上层捕获，在关闭调试模式下会返回500服务异常提示。
+
+* 7、按照psr标准：变量和公共函数使用下划线，类中方法使用小写驼峰，类使用大写驼峰。
+
+### 更多文档说明请参考[wlsh.site](https://wlsh.site) 文档，等抽空一一说明。
+
+> workerProcess与taskProcess可以理解为ADM模式的A与D层的关系，同时也有点像传统的controllers与services层的关系,但又有本质的区别：
 不同进程之间的调度关系，
 
-* 由在服务核心文件中使用了Throwable捕获异常，所以在程序运行中没有catch住的异常都会在最上层捕获，并返回500服务异常提示。
-
-* 按照psr标准：变量和公共函数使用下划线，类中方法使用小写驼峰，类使用大写驼峰。
-注意不同模块中的类名不能重复;
-更多文档说明请参考wlsh.site文档，等抽空一一说明。
-
-### 引入phalapi框架的一段说明
+### 以下是引入phalapi框架的一段说明
 
 # Domain领域业务层与ADM模式解说
 
