@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后端运维平台</title>
+    <link rel="import" href="view/head_js.html">
+</head>
+<body>
+<div class="all">
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo"><a href="./index.html">{{title}}</a></div>
+        <div class="left_open">
+            <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+        </div>
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;"><span id="username">{{username}}</span></a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a onclick="x_admin_show('个人信息','#')">个人信息</a></dd>
+                    <dd><a onclick="x_admin_show('切换帐号','#')">切换帐号</a></dd>
+                    <dd><a @click.prevent="logout">退出</a></dd>
+                </dl>
+            </li>
+        </ul>
+
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+    <!-- 左侧菜单开始 -->
+    <div class="left-nav">
+        <div id="side-nav">
+            <ul id="nav">
+                <li v-for="item in menu" v-if="item.level == 1">
+                    <a href="javascript:;">
+                        <i class="iconfont">&#xe723;</i>
+                        <cite>{{item.name}}</cite>
+                        <i class="iconfont nav_right">&#xe697;</i>
+
+                    </a>
+                    <ul class="sub-menu">
+                        <li v-for="list in menu" v-if="list.level == 2 && list.up_id == item.id">
+                            <a v-bind:_href="list.url">
+                                <i class="iconfont">&#xe6a7;</i>
+                                <cite>{{list.name}}</cite>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+            <ul class="layui-tab-title">
+                <li class="home"><i class="layui-icon">&#xe68e;</i>我的桌面</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <iframe src='./welcome.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+    <!-- 底部开始 -->
+    <div class="footer">
+        <div class="copyright"><a target="_blank" href="https://www.wlsh.site">由wlsh提供技术支持</a></div>
+    </div>
+</div>
+</body>
+<script src="controller/index.js"></script>
+</html>

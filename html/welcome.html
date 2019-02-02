@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="static/css/font.css">
+    <link rel="stylesheet" href="static/css/xadmin.css">
+    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+    <script src="static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="static/js/xadmin.js"></script>
+    <script type="text/javascript" src="conf/axiosConfig.js"></script>
+    <script type="text/javascript" src="static/js/axios.js"></script>
+    <script type="text/javascript" src="static/js/vue.js"></script>
+</head>
+<body>
+<div class="x-body layui-anim layui-anim-up all">
+    <blockquote class="layui-elem-quote">欢迎管理员：
+        <span class="x-red" id="username"></span> ，当前时间: <span id="time"></span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:-7px;float:right"
+           href="javascript:location.replace(location.href);" title="刷新">
+            <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </blockquote>
+    <fieldset class="layui-elem-field">
+        <legend>服务运行状态</legend>
+        <div class="layui-field-box">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="layui-carousel x-admin-carousel x-admin-backlog" lay-anim="" lay-indicator="inside"
+                             lay-arrow="none" style="width: 100%; height: 190px;">
+                            <div carousel-item="">
+                                <ul class="layui-row layui-col-space10 layui-this">
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body" style="height: 155px;">
+                                            <h3>服务器启动时间</h3>
+                                            <p>
+                                                <cite>{{swoole.start_time}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>当前连接数量</h3>
+                                            <p>
+                                                <cite>{{swoole.connection_num}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>接受了多少个连接</h3>
+                                            <p>
+                                                <cite>{{swoole.accept_count}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>关闭的连接数量</h3>
+                                            <p>
+                                                <cite>{{swoole.close_count}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>正在排队的任务数</h3>
+                                            <p>
+                                                <cite>{{swoole.tasking_num}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>收到的请求次数</h3>
+                                            <p>
+                                                <cite>{{swoole.request_count}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>当前worker进程收到的请求次数</h3>
+                                            <p>
+                                                <cite>{{swoole.worker_request_count}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>当前协程数量</h3>
+                                            <p>
+                                                <cite>{{swoole.coroutine_num}}</cite></p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>接口调用状态</legend>
+        <div class="layui-field-box">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="layui-carousel x-admin-carousel x-admin-backlog" lay-anim="" lay-indicator="inside"
+                             lay-arrow="none" style="width: 100%; height: 190px;">
+                            <div carousel-item="">
+                                <ul class="layui-row layui-col-space10 layui-this">
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body" style="height: 155px;">
+                                            <h3>接口调用总次数</h3>
+                                            <p><cite>{{content.atomic}}</cite></p>
+                                        </a>
+                                    </li>
+                                    <li class="layui-col-xs2">
+                                        <a href="javascript:;" class="x-admin-backlog-body">
+                                            <h3>XXX接口调用次数</h3>
+                                            <p>
+                                                <cite>***</cite></p>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>系统信息</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>软件版本</th>
+                    <td>{{content.version}}</td>
+                </tr>
+                <tr>
+                    <th>后台地址</th>
+                    <td>{{content.before_url}}</td>
+                </tr>
+                <tr>
+                    <th>操作系统</th>
+                    <td>{{content.uname}}</td>
+                </tr>
+                <tr>
+                    <th>PHP版本</th>
+                    <td>{{content.php_v}}</td>
+                </tr>
+                <tr>
+                    <th>MYSQL版本</th>
+                    <td>{{content.mysql_v}}</td>
+                </tr>
+                <tr>
+                    <th>swoole</th>
+                    <td>{{content.swoole_v}}</td>
+                </tr>
+                <tr>
+                    <th>上传附件限制</th>
+                    <td>{{content.filesize}}</td>
+                </tr>
+                <tr>
+                    <th>php脚本执行时间限制</th>
+                    <td>{{content.exec_time}}</td>
+                </tr>
+                <tr>
+                    <th>当前程序内存使用量</th>
+                    <td>{{content.memory}}M</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+<script>
+    $(function () {
+        let name = window.location.host + '_name';
+        let time = new Date();
+        $("#username").html(localStorage.getItem(name));
+        $("#time").html(formatDate(time.getTime()));
+    });
+</script>
+</body>
+<script src="controller/welcome.js"></script>
+</html>

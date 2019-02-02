@@ -1,0 +1,31 @@
+{
+    "refsList": [
+        {
+            "ccode": "123",
+            "category": "",
+            "color": "",
+            "zn_name": "",
+            "cas": "",
+            "en_name": "",
+            "appearance": "",
+            "en_classification": "",
+            "en_alternate_name": "",
+            "chn_classification": "",
+            "chn_alternate_name": "",
+            "ramanShift": "",
+            "dark_subtr": ""
+        }
+    ],
+    "deviceList": [
+        {
+            "ccode": "",
+            "coefs_a0": "",
+            "coefs_a1": "",
+            "coefs_a2": "",
+            "coefs_a3": "",
+            "integralTime": "",
+            "laser_wavelength": "",
+            "ratio": ""
+        }
+    ]
+}

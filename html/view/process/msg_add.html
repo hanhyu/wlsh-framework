@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加提示码内容</title>
+    <link rel="import" href="../head_js.html">
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up all">
+    <form class="layui-form">
+        <div class="layui-form-item layui-form-text">
+            <label for="L_content" class="layui-form-label">
+                内容
+            </label>
+            <div class="layui-input-block">
+                <textarea id="L_content" name="content" placeholder="请输入内容" class="layui-textarea"
+                          v-model="content"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="L_repass" class="layui-form-label">
+            </label>
+            <button class="layui-btn" lay-filter="add" @click.prevent="setMsg">
+                增加
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+<script src="../../controller/process/msg_add.js"></script>
+</html>

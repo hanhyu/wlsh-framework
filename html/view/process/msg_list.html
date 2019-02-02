@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>非正常提示码</title>
+    <link rel="import" href="../head_js.html">
+</head>
+
+<body>
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">业务流程管理</a>
+        <a>
+          <cite>非正常提示码</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body all">
+    <xblock class="layui-row layui-col-md12 x-so">
+        <button id="search" class="layui-btn" @click.prevent="getMsgList">
+            <i class="layui-icon">&#xe615;</i></button>
+        <input type="text" name="id" placeholder="ID" autocomplete="on" class="layui-input" v-model="id">
+        <button class="layui-btn layui-btn-danger" style="line-height:1.6em;margin-top:3px;float:right"
+                onclick="x_admin_show('添加提示码内容','msg_add.html')"><i class="layui-icon">&#xe608;</i>添加
+        </button>
+    </xblock>
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th width="50px">ID</th>
+            <th>内容</th>
+            <th width="75px">创建时间</th>
+            <th width="75px">修改时间</th>
+            <th width="150px">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in privmessage">
+            <td>{{item.id}}</td>
+            <td>{{item.content}}</td>
+            <td>{{item.crt_dt}}</td>
+            <td v-if="item.upt_dt == '0000-00-00 00:00:00'"></td>
+            <td v-else>{{item.upt_dt}}</td>
+            <td class="td-manage">
+                <button @click.prevent="editMenu(item.id)" class="layui-btn layui-btn-sm"><i
+                        class="layui-icon">&#xe642;</i>编辑
+                </button>
+                <button @click.prevent="delMenu(item.id, item.name)" class="layui-btn layui-btn-sm"><i
+                        class="layui-icon">&#xe640;</i>删除
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="list_page"></div>
+</div>
+</body>
+<script src="../../controller/process/msg_list.js"></script>
+</html>

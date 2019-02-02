@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="import" href="../head_js.html">
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up all">
+    <table class="layui-table" lay-size="lg">
+        <colgroup>
+            <col width="50">
+            <col width="300">
+            <col>
+        </colgroup>
+        <tbody>
+        <tr>
+            <td>ID</td>
+            <td>{{info._id.$oid}}</td>
+        </tr>
+        <tr>
+            <td>提示信息</td>
+            <td>{{info.message}}</td>
+        </tr>
+        <tr>
+            <td>日志内容</td>
+            <td>{{info.context}}</td>
+        </tr>
+        <tr>
+            <td>日志等级</td>
+            <td>{{info.level_name}}</td>
+        </tr>
+        <tr>
+            <td>channel</td>
+            <td>{{info.channel}}</td>
+        </tr>
+        <tr>
+            <td>记录时间</td>
+            <td>{{info.datetime.$date.$numberLong | timestampFilter}}</td>
+        </tr>
+        <tr>
+            <td>使用内存</td>
+            <td>{{info.extra}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+<script src="../../controller/log/mongo_info.js"></script>
+</html>
