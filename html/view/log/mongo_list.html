@@ -60,7 +60,7 @@
                 <button @click.prevent="getMongo(item)" class="layui-btn layui-btn-sm"><i
                         class="layui-icon">&#xe642;</i>查看
                 </button>
-                <button @click.prevent="delUser(item.id, item.name)" class="layui-btn layui-btn-sm"><i
+                <button @click.prevent="delMongo(item._id.$oid)" class="layui-btn layui-btn-sm"><i
                         class="layui-icon">&#xe640;</i>删除
                 </button>
             </td>

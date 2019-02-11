@@ -11,8 +11,6 @@ namespace App\Models\Mongo;
  */
 class Monolog extends AbstractMongo
 {
-    private $col = 'baseFrame.monolog';
-
     /**
      * @param array $data
      *
@@ -25,13 +23,13 @@ class Monolog extends AbstractMongo
               //'level'=> 200,
           ];*/
         $options = [
-            'sort' => ['datetime' => -1],
-            'skip' => $data['curr_data'],
-            'limit' => $data['page_size'],
+            'sort'  => ['datetime' => -1],
+            'skip'  => $data['curr_data'],
+            'limit' => (int)$data['page_size'],
             //'projection' => ['_id'=>0],
         ];
-        $query = new \MongoDB\Driver\Query($data['where'], $options);
-        return $this->db->executeQuery($this->col, $query)->toArray();
+        $res     = $this->col->find($data['where'], $options);
+        return $res->toArray();
     }
 
     /**
@@ -43,9 +41,7 @@ class Monolog extends AbstractMongo
      */
     public function getMongoCount(array $where): int
     {
-        $query = new \MongoDB\Driver\Query($where, []);
-        $cursor = $this->db->executeQuery($this->col, $query);
-        return count($cursor->toArray());
+        return $this->col->countDocuments($where);
     }
 
     /**
@@ -57,8 +53,7 @@ class Monolog extends AbstractMongo
     public function getMongoInfo(string $id): array
     {
         $id = new \MongoDB\BSON\ObjectId($id);
-        $query = new \MongoDB\Driver\Query(['_id' => $id], []);
-        return $this->db->executeQuery($this->col, $query)->toArray();
+        return $this->col->findOne(['_id' => $id])->toArray();
     }
 
 }

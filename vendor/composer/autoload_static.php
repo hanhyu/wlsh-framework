@@ -14,6 +14,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
+        '3a37ebac017bc098e9a86b35401e7a68' => __DIR__ . '/..' . '/mongodb/mongodb/src/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -56,6 +57,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'M' => 
         array (
             'Monolog\\' => 8,
+            'MongoDB\\' => 8,
             'Medoo\\' => 6,
         ),
         'G' => 
@@ -166,6 +168,10 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
+        ),
+        'MongoDB\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mongodb/mongodb/src',
         ),
         'Medoo\\' => 
         array (

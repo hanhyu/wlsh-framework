@@ -19,7 +19,6 @@ new Vue({
     },
     methods: {
         getStatus() {
-            checkLogin();
             let self = this;
             this.axios({
                 method: 'get',

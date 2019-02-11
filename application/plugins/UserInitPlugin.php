@@ -56,6 +56,7 @@ class UserInitPlugin extends \Yaf\Plugin_Abstract
     public function routerShutdown(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
     {
         if (!empty($request->getRequestUri())) {
+            //标记uri中是否存在下划线
             $flg = 0;
             if (strpos($request->getRequestUri(), '_')) $flg = 1;
             $path_info = explode('/', $request->getRequestUri());

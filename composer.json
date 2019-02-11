@@ -39,6 +39,7 @@
     "friendsofphp/php-cs-fixer": "^2.14@dev",
     "phpunit/phpunit": "^7.4",
     "elasticsearch/elasticsearch": "~6.0",
-    "hightman/xunsearch": "1.4.13"
+    "hightman/xunsearch": "1.4.13",
+    "mongodb/mongodb": "1.4.2"
   }
 }

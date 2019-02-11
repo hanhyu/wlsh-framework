@@ -18,11 +18,14 @@ new Vue({
     mounted: function () {
         this.axios = axios;
         this.getMenu();
+        window.onbeforeunload = function (e) {
+            localStorage.clear();
+        }
     },
     methods: {
         getMenu() {
             let self = this;
-            this.axios({
+            axios({
                 method: 'get',
                 url: 'system/menu/get_menu_info'
             })
@@ -50,12 +53,9 @@ new Vue({
                 method: 'post'
             })
                 .then(function (response) {
+                    localStorage.clear();
                     switch (response.data.code) {
                         case 200:
-                            let name = window.location.host + '_name';
-                            let token = window.location.host + '_token';
-                            localStorage.removeItem(name);
-                            localStorage.removeItem(token);
                             location.href = 'login.html';
                             break;
                         case 300:

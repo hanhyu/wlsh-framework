@@ -1,5 +1,5 @@
 function axiosConfig() {
-    axios.defaults.timeout = 7000;
+    axios.defaults.timeout = 28000;
 
     axios.defaults.headers.common['Accept'] = '*/*';
     axios.defaults.headers.common['Authorization'] = localStorage.getItem(window.location.host + '_token');

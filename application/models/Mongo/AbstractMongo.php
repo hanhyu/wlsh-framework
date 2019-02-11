@@ -11,17 +11,21 @@ namespace App\Models\Mongo;
 abstract class AbstractMongo
 {
     /**
-     * @var \MongoDB\Driver\Manager
+     * @var \MongoDB\Client
      */
-    protected $db;
+    protected $col;
 
     /**
      * php7中mongodb扩展会自动释放连接
-     * AbstractModel constructor.
+     * AbstractMongo constructor.
+     *
+     * @param string $database
+     * @param string $col
      */
-    public function __construct()
+    public function __construct(string $database, string $col)
     {
-        $this->db = new \MongoDB\Driver\Manager(\Yaf\Registry::get('config')->log->mongo);
+        $db        = new \MongoDB\Client(\Yaf\Registry::get('config')->log->mongo);
+        $this->col = $db->selectCollection($database, $col);
     }
 
 }

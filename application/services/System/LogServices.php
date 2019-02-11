@@ -20,7 +20,7 @@ class LogServices
 
     public function __construct()
     {
-        $this->monolog = new Monolog();
+        $this->monolog = new Monolog('baseFrame', 'monolog');
     }
 
     public function getMongoList(array $data): ?array
