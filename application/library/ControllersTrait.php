@@ -48,15 +48,15 @@ trait ControllersTrait
             $req_method = $this->request->server['request_method'];
             switch ($req_method) {
                 case 'GET':
-                    co_log($this->request->get, "{$this->request->server['path_info']} client get data:");
+                    co_log($this->request->get, "{$this->request->server['request_uri']} client get data:");
                     break;
                 case 'POST':
                     $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
                     $let          = stristr($content_type, 'json');
                     if ($let) {
-                        co_log($this->request->rawContent(), "{$this->request->server['path_info']} client json data:");
+                        co_log($this->request->rawContent(), "{$this->request->server['request_uri']} client json data:");
                     } else {
-                        co_log($this->request->post, "{$this->request->server['path_info']} client post data:");
+                        co_log($this->request->post, "{$this->request->server['request_uri']} client post data:");
                     }
                     break;
                 case 'PUT':
@@ -69,15 +69,15 @@ trait ControllersTrait
                     if ($let) {
                         co_log(
                             json_encode($data) . ': request rawContent is' . $this->request->rawContent(),
-                            "{$this->request->server['path_info']} client put data:"
+                            "{$this->request->server['request_uri']} client put data:"
                         );
                     } else {
                         $data += $this->request->post;
                     }
-                    co_log($data, "{$this->request->server['path_info']} client put data:");
+                    co_log($data, "{$this->request->server['request_uri']} client put data:");
                     break;
                 case 'DELETE':
-                    co_log($this->request->get, "{$this->request->server['path_info']} client delete data:");
+                    co_log($this->request->get, "{$this->request->server['request_uri']} client delete data:");
                     break;
                 default:
                     break;

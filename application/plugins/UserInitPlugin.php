@@ -59,22 +59,22 @@ class UserInitPlugin extends \Yaf\Plugin_Abstract
             //标记uri中是否存在下划线
             $flg = 0;
             if (strpos($request->getRequestUri(), '_')) $flg = 1;
-            $path_info = explode('/', $request->getRequestUri());
+            $request_uri = explode('/', $request->getRequestUri());
 
-            if (count($path_info) > 3) {
+            if (count($request_uri) > 3) {
                 if ($flg) {
-                    $request->module     = convert_string($path_info[1], true);
-                    $request->controller = convert_string($path_info[2], true);
-                    $request->action     = convert_string($path_info[3], false);
+                    $request->module     = convert_string($request_uri[1], true);
+                    $request->controller = convert_string($request_uri[2], true);
+                    $request->action     = convert_string($request_uri[3], false);
                 } else {
-                    $request->controller = ucfirst($path_info[2]);
+                    $request->controller = ucfirst($request_uri[2]);
                 }
             } else {
                 if ($flg) {
-                    $request->controller = convert_string($path_info[1], true);
-                    $request->action     = convert_string($path_info[2], false);
+                    $request->controller = convert_string($request_uri[1], true);
+                    $request->action     = convert_string($request_uri[2], false);
                 } else {
-                    $request->controller = ucfirst($path_info[1]);
+                    $request->controller = ucfirst($request_uri[1]);
                 }
             }
         }

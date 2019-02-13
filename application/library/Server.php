@@ -78,7 +78,7 @@ class Server
             'buffer_output_size'       => 8 * 1024 * 1024,
             'ssl_cert_file'            => ROOT_PATH . '/tests/opensslRsa/cert.crt',
             'ssl_key_file'             => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
-            //'open_http2_protocol' => true,
+            'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             //'open_websocket_close_frame' => true,
         ]);
@@ -275,17 +275,16 @@ class Server
     public function onRequest(Swoole\Http\Request $request, Swoole\Http\Response $response): void
     {
         //TODO 绑定固定域名才能访问
-
         //请求过滤,会请求2次
-        if (in_array('/favicon.ico', [$request->server['path_info'], $request->server['request_uri']])) {
+        if (in_array('/favicon.ico', [$request->server['request_uri']])) {
             $response->end();
             return;
         }
 
         $response->header('Content-Type', 'application/json;charset=utf-8');
 
-        $path_info = explode('/', $request->server['path_info']);
-        if (isset($path_info[1]) AND !empty($path_info[1])) {
+        $request_uri = explode('/', $request->server['request_uri']);
+        if (isset($request_uri[1]) AND !empty($request_uri[1])) {
             $response->header('Access-Control-Allow-Methods', 'POST,DELETE,PUT,GET,OPTIONS');
             $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
             $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign');
@@ -295,7 +294,7 @@ class Server
 
             //过滤掉固定的几个模块不能在外部http直接访问，ws、task、tcp、close、finish模块
             $router = explode(',', \Yaf\Registry::get('config')->router->notHttp);
-            if (in_array($path_info[1], $router)) {
+            if (in_array($request_uri[1], $router)) {
                 $response->status(404);
                 $response->end();
                 return;
