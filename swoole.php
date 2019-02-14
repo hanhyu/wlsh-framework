@@ -10,13 +10,13 @@
 function stop(): void
 {
     if (is_file(dirname(__FILE__) . '/log/swoolePid.log')) {
-        $fp = fopen(dirname(__FILE__) . '/log/swoolePid.log', "r");
+        $fp        = fopen(dirname(__FILE__) . '/log/swoolePid.log', "r");
         $masterPid = fgets($fp);
         fclose($fp);
         //使用swoole_process::kill代替posix_kill
         if (\Swoole\Process::kill($masterPid, 0)) {
             \Swoole\Process::kill($masterPid);
-            $timeout = 60;
+            $timeout   = 60;
             $startTime = time();
             echo "=================== stop  ===================" . PHP_EOL;
             while (true) {
@@ -40,7 +40,25 @@ function stop(): void
     return;
 }
 
-function run(string $param = 'produce')
+function reload(): void
+{
+    if (is_file(dirname(__FILE__) . '/log/swoolePid.log')) {
+        $fp        = fopen(dirname(__FILE__) . '/log/swoolePid.log', "r");
+        $masterPid = fgets($fp);
+        fclose($fp);
+        if (\Swoole\Process::kill($masterPid, 0)) {
+            \Swoole\Process::kill($masterPid, SIGUSR1);
+            echo "=================== reload  ===================" . PHP_EOL;
+            sleep(1);
+            echo PHP_EOL . "================== success  =================" . PHP_EOL;
+            return;
+        }
+    }
+    echo "================= please start the first  =================" . PHP_EOL;
+    return;
+}
+
+function run(string $param = 'produce'): void
 {
     if ($param == 'dev') {
         define('APP_DEBUG', TRUE);
@@ -82,21 +100,50 @@ function run(string $param = 'produce')
     $serverObj->start();
 }
 
-function explain()
+function explain(): void
 {
     echo <<<EOT
-Usage:
-  php start.php {command} [arguments ...] [options ...]
-
-Commands:
-  start Start HTTP Server
-  stop  Stop HTTP Server
-
-Start Options:
-  dev   Start Debug
-  -d    Start Daemonize HTTP Server
-EOT;
+        Usage:
+          php start.php {command} [arguments ...] [options ...]
+        
+        Commands:
+          start     Start Swoole Server
+          stop      Stop Swoole Server
+          reload    Reload Swoole Worker Process
+        
+        Start Options:
+          dev   Start Debug
+          -d    Start Daemonize HTTP Server
+    EOT;
+    echo PHP_EOL;
     return;
+}
+
+function start(array &$argv): void
+{
+    $daemonize = false;
+    $param     = 'produce';
+    if (isset($argv[2])) {
+        if ($argv[2] == '-d') {
+            $daemonize = true;
+        } elseif ($argv[2] == 'dev') {
+            $param = 'dev';
+        } else {
+            explain();
+            return;
+        }
+    }
+    if (isset($argv[3]) AND $argv[2] != '-d') {
+        if ($argv[3] == '-d') {
+            $daemonize = true;
+        } else {
+            explain();
+            return;
+        }
+    }
+
+    define('SWOOLE_DAEMONIZE', $daemonize);
+    run($param);
 }
 
 /**
@@ -104,35 +151,24 @@ EOT;
  */
 //todo 开发模式下需要增加参数过滤掉token验证。
 if (isset($argv[1])) {
-    if ($argv[1] == 'start') {
-        $daemonize = false;
-        $param = 'produce';
-        if (isset($argv[2])) {
-            if ($argv[2] == '-d') {
-                $daemonize = true;
-            } elseif ($argv[2] == 'dev') {
-                $param = 'dev';
-            } else {
-                explain();
-                return;
-            }
-        }
-        if (isset($argv[3]) AND $argv[2] != '-d') {
-            if ($argv[3] == '-d') {
-                $daemonize = true;
-            } else {
-                explain();
-                return;
-            }
-        }
-
-        define('SWOOLE_DAEMONIZE', $daemonize);
-        run($param);
-    } elseif ($argv[1] == 'stop') {
-        stop();
+    $let = $argv;
+    switch ($argv[1]) {
+        case 'start':
+            start($argv);
+            break;
+        case 'stop':
+            stop();
+            break;
+        case 'reload':
+            reload();
+            break;
+        default:
+            explain();
+            break;
     }
     return;
 }
+
 explain();
 
 

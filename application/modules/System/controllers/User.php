@@ -160,7 +160,7 @@ class UserController extends Yaf\Controller_Abstract
                 $this->response->end(http_response(400, 'git自动更新数据失败'));
             } else { //成功
                 $this->response->end(http_response(200, ['content' => $result]));
-                //返回pull更新代码后重启服务
+                //返回pull更新代码后重载服务
                 $this->server->defer(function () {
                     $this->server->reload();
                 });

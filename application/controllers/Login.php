@@ -202,6 +202,63 @@ class LoginController extends \Yaf\Controller_Abstract
      * 98%    248
      * 99%   1296
      * 100%   3498 (longest request)
+     *
+     * ab -c 1000 -n 1000000 -k https://127.0.0.1:9770/login/test
+     * This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+     * Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+     * Licensed to The Apache Software Foundation, http://www.apache.org/
+     *
+     * Benchmarking 127.0.0.1 (be patient)
+     * Completed 100000 requests
+     * Completed 200000 requests
+     * Completed 300000 requests
+     * Completed 400000 requests
+     * Completed 500000 requests
+     * Completed 600000 requests
+     * Completed 700000 requests
+     * Completed 800000 requests
+     * Completed 900000 requests
+     * Completed 1000000 requests
+     * Finished 1000000 requests
+     *
+     *
+     * Server Software:        swoole-http-server
+     * Server Hostname:        127.0.0.1
+     * Server Port:            9770
+     * SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES256-GCM-SHA384,2048,256
+     *
+     * Document Path:          /login/test
+     * Document Length:        11 bytes
+     *
+     * Concurrency Level:      1000
+     * Time taken for tests:   22.613 seconds
+     * Complete requests:      1000000
+     * Failed requests:        0
+     * Keep-Alive requests:    1000000
+     * Total transferred:      475000000 bytes
+     * HTML transferred:       11000000 bytes
+     * Requests per second:    44222.71 [#/sec] (mean)
+     * Time per request:       22.613 [ms] (mean)
+     * Time per request:       0.023 [ms] (mean, across all concurrent requests)
+     * Transfer rate:          20513.47 [Kbytes/sec] received
+     *
+     * Connection Times (ms)
+     * min  mean[+/-sd] median   max
+     * Connect:        0    2  72.4      0    3112
+     * Processing:     7   20  24.6     19    1267
+     * Waiting:        7   20  24.6     19    1267
+     * Total:          7   23  90.3     19    3131
+     *
+     * Percentage of the requests served within a certain time (ms)
+     * 50%     19
+     * 66%     20
+     * 75%     20
+     * 80%     20
+     * 90%     20
+     * 95%     20
+     * 98%     21
+     * 99%     22
+     * 100%   3131 (longest request)
      */
     public function testAction(): void
     {
