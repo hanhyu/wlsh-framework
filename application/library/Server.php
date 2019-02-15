@@ -1,6 +1,7 @@
 <?php
 /**
  * 注意此类中的每一行代码请勿随意上下移动
+ *
  * User: hanhyu
  * Date: 16-7-25
  * Time: 上午10:19
@@ -131,16 +132,16 @@ class Server
      */
     public function onWorkerStart(\Swoole\WebSocket\Server $server, int $worker_id): void
     {
-       /* array(3) {
-                [0]=>
-          string(26) "/home/baseFrame/swoole.php"
-                [1]=>
-          string(46) "/home/baseFrame/application/library/Server.php"
-                [2]=>
-          string(50) "/home/baseFrame/application/library/AutoReload.php"
-        }
+        /* array(3) {
+                 [0]=>
+           string(26) "/home/baseFrame/swoole.php"
+                 [1]=>
+           string(46) "/home/baseFrame/application/library/Server.php"
+                 [2]=>
+           string(50) "/home/baseFrame/application/library/AutoReload.php"
+         }
 
-        var_dump(get_included_files());*/
+         var_dump(get_included_files());*/
 
         //用inotify监听mvc目录,一有变动就自动重启脚本
         if (0 == $worker_id) {
@@ -238,7 +239,7 @@ class Server
         if (!isset($res['uri']) AND empty($res['uri'])) {
             EOF:
             if ($server->exist($frame->fd))
-                $server->push($frame->fd, mtReturn('非法访问', null, 400));
+                $server->push($frame->fd, ws_response(400, null, '非法访问'));
             $server->close($frame->fd, true);
             return;
         }
@@ -307,8 +308,6 @@ class Server
         $obj_req->method = $request->server['request_method'];
 
         //注册全局信息
-        //todo 这里需要测试全局保存协程上下文时的问题是否存在
-
         /*多个协程是并发执行的，因此不能使用类静态变量/全局变量保存协程上下文内容。
         使用局部变量是安全的，因为局部变量的值会自动保存在协程栈中，
         其他协程访问不到协程的局部变量。*/

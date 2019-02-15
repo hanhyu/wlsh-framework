@@ -239,7 +239,7 @@ function get_ip(array $server): string
 }
 
 /**
- * 时间戳带上微秒（13位）
+ * php时间戳带上微秒（13位）
  * @return float
  */
 function msectime(): float
@@ -335,10 +335,12 @@ function sign(string $data): void
     //简单的sign签名，如需用app_id、app_key颁发认证签名时请放进redis中和noncestr随机数
     if (Yaf\Registry::get('config')->sign->flag) {
         $time = time();
-        /*        $sign = private_encrypt(
+        /*
+        $sign = private_encrypt(
                     md5($data . $time),
                     Yaf\Registry::get('config')->sign->prv_key
-                );*/
+                );
+        */
         $sign = md5($data . $time);
         Yaf\Registry::get('response')->header('timestamp', (string)$time);
         Yaf\Registry::get('response')->header('sign', $sign);

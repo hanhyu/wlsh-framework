@@ -43,7 +43,6 @@ class ServerStatusController extends Yaf\Controller_Abstract
         //echo http_response(200, $data);
     }
 
-    //todo 在运维平台中增加可以手动启动服务，停止服务功能
-
+    //todo 在运维平台中增加监听指定端口，可以手动发送指令启动服务，停止服务功能
 
 }

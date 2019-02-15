@@ -262,9 +262,7 @@ class LoginController extends \Yaf\Controller_Abstract
      */
     public function testAction(): void
     {
-        //echo mtReturn();
         $this->response->end('hello world');
-
     }
 
     public function leveldbAction(): void

@@ -6,7 +6,6 @@
  * Time: 上午10:15
  */
 
-//stop server
 function stop(): void
 {
     if (is_file(dirname(__FILE__) . '/log/swoolePid.log')) {
@@ -149,7 +148,6 @@ function start(array &$argv): void
 /**
  * 判断输入的参数指令
  */
-//todo 开发模式下需要增加参数过滤掉token验证。
 if (isset($argv[1])) {
     $let = $argv;
     switch ($argv[1]) {

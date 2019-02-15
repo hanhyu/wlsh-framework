@@ -107,7 +107,6 @@ class UserController extends Yaf\Controller_Abstract
      * 用户登录
      * @throws Exception
      */
-    //todo 注意所有的mtReturn方法改为http_response方法
     public function loginAction(): void
     {
         $data = $this->validator('SystemUserForms', 'userLogin');
@@ -121,7 +120,6 @@ class UserController extends Yaf\Controller_Abstract
                 $params['name'] = $info[0]['name'];
                 $params['time'] = time();
                 $token          = get_token($params);
-                //todo cookie
                 //$this->response->cookie('token', $token);
                 $this->response->end(http_response(200, ['token' => $token]));
 
