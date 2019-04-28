@@ -324,8 +324,7 @@ class Server
             }
         } catch (Throwable $e) {
             if (APP_DEBUG) {
-                $response->status($e->getCode());
-                $response->end($e->getMessage());
+                $response->end(http_response(500, $e->getMessage()));
             } else {
                 $response->status(500);
                 $response->end(http_response(500, '服务异常'));

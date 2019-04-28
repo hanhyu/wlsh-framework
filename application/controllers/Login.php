@@ -259,6 +259,36 @@ class LoginController extends \Yaf\Controller_Abstract
      * 98%     21
      * 99%     22
      * 100%   3131 (longest request)
+     *
+     * h2load -c 100 -n 300000 -m 100 -t 2  https://127.0.0.1:9770/login/test
+     * starting benchmark...
+     * spawning thread #0: 50 total client(s). 150000 total requests
+     * spawning thread #1: 50 total client(s). 150000 total requests
+     * TLS Protocol: TLSv1.2
+     * Cipher: ECDHE-RSA-AES256-GCM-SHA384
+     * Server Temp Key: ECDH P-384 384 bits
+     * Application protocol: h2
+     * progress: 10% done
+     * progress: 20% done
+     * progress: 30% done
+     * progress: 40% done
+     * progress: 50% done
+     * progress: 60% done
+     * progress: 70% done
+     * progress: 80% done
+     * progress: 90% done
+     * progress: 100% done
+     *
+     * finished in 2.91s, 102916.31 req/s, 4.33MB/s
+     * requests: 300000 total, 300000 started, 300000 done, 300000 succeeded, 0 failed, 0 errored, 0 timeout
+     * status codes: 300000 2xx, 0 3xx, 0 4xx, 0 5xx
+     * traffic: 12.62MB (13234277) total, 4.32MB (4531577) headers (space savings 96.14%), 3.15MB (3300000) data
+     * min         max         mean         sd        +/- sd
+     * time for request:     3.28ms    224.64ms     85.28ms     24.85ms    75.46%
+     * time for connect:   108.24ms    343.21ms    242.23ms     41.84ms    68.00%
+     * time to 1st byte:   232.91ms    476.04ms    328.62ms     66.44ms    65.00%
+     * req/s           :    1029.59     1144.43     1061.31       26.13    68.00%
+     *
      */
     public function testAction(): void
     {
