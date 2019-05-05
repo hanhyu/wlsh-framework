@@ -8,7 +8,7 @@
 
 namespace App\Models\Forms;
 
-class SystemBackupForms extends AbstractForms
+class SystemBackupForms
 {
     /**
      * 表单字段
@@ -18,24 +18,8 @@ class SystemBackupForms extends AbstractForms
     public function del()
     {
         return [
-            'id' => [
-                'label' => '数据ID',
-                'name' => 'id',
-                'require' => true,
-                'message' => '数据ID不能为空',
-                'validate' => [
-                    ['type' => 'int', 'min' => '1', 'msg' => '数据ID输入不正确'],
-                ],
-            ],
-            'filename' => [
-                'label' => '文件名',
-                'name' => 'filename',
-                'require' => true,
-                'message' => '文件名不能为空',
-                'validate' => [
-                    ['type' => 'string', 'min' => '1', 'max' => '50', 'msg' => '文件名输入不正确'],
-                ],
-            ],
+            'id'       => 'Required|IntGe:1',
+            'filename' => 'Required|StrLenGeLe:1,50',
         ];
     }
 

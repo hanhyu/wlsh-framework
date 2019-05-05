@@ -8,104 +8,43 @@
 
 namespace App\Models\Forms;
 
-class SystemMenuForms extends AbstractForms
+class SystemMenuForms
 {
-    public function setMenu()
+    /**
+     * id 菜单ID
+     * name 菜单名
+     * icon 图标
+     * url 菜单链接
+     * up_id 菜单上级ID
+     * level 菜单等级
+     *
+     * User: hanhyu
+     * Date: 19-5-4
+     * Time: 下午10:35
+     * @return array
+     */
+    public static function setMenu()
     {
         return [
-            'id' => [
-                'label' => '菜单ID',
-                'name' => 'id',
-                'require' => false,
-                'default' => 0,
-                'validate' => [
-                    ['type' => 'int', 'min' => '0', 'msg' => '菜单ID输入不正确'],
-                ],
-            ],
-            'name' => [
-                'label' => '菜单名',
-                'name' => 'name',
-                'require' => true,
-                'message' => '菜单名不能为空',
-                'validate' => [
-                    ['type' => 'string', 'min' => '3', 'max' => '50', 'msg' => '菜单名输入不正确'],
-                ],
-            ],
-            'icon' => [
-                'label' => '图标',
-                'name' => 'icon',
-                'require' => true,
-                'message' => '图标不能为空',
-                'validate' => [
-                    ['type' => 'string', 'min' => '1', 'max' => '50', 'msg' => '菜单图标输入不正确'],
-                ],
-            ],
-            'url' => [
-                'label' => '菜单链接',
-                'name' => 'url',
-                'require' => true,
-                'message' => '菜单链接不能为空',
-                'validate' => [
-                    ['type' => 'string', 'min' => '1', 'max' => '50', 'msg' => '菜单链接输入不正确'],
-                ],
-            ],
-            'up_id' => [
-                'label' => '菜单上级ID',
-                'name' => 'up_id',
-                'require' => true,
-                'message' => '菜单上级ID不能为空',
-                'validate' => [
-                    ['type' => 'int', 'min' => '0', 'max' => '99', 'msg' => '菜单上级ID输入不正确'],
-                ],
-            ],
-            'level' => [
-                'label' => '菜单等级',
-                'name' => 'level',
-                'require' => true,
-                'message' => '菜单等级不能为空',
-                'validate' => [
-                    ['type' => 'int', 'min' => '1', 'max' => '5', 'msg' => '菜单等级输入不正确'],
-                ],
-            ],
+            'id'    => 'IntGe:0',
+            'name'  => 'Required|StrLenGeLe:3,50',
+            'icon'  => 'Required|StrLenGeLe:1,50',
+            'url'   => 'Required|StrLenGeLe:1,50',
+            'up_id' => 'Required|IntGeLe:0,99',
+            'level' => 'Required|IntGeLe:1,5',
         ];
     }
 
-    public function getMenu()
+    public static function getMenu()
     {
-        return [
-            'id' => [
-                'label' => '菜单ID',
-                'name' => 'id',
-                'require' => true,
-                'message' => '菜单ID不能为空',
-                'validate' => [
-                    ['type' => 'int', 'min' => '1', 'msg' => '菜单ID输入不正确'],
-                ],
-            ],
-        ];
+        return ['id' => 'Required|IntGe:1'];
     }
 
-    public function getMenuList()
+    public static function getMenuList(): array
     {
         return [
-            'curr_page' => [
-                'label' => '列表页数',
-                'name' => 'curr_page',
-                'require' => false,
-                'default' => 1,
-                'validate' => [
-                    ['type' => 'int', 'min' => '1', 'msg' => '页数输入不正确'],
-                ],
-            ],
-            'page_size' => [
-                'label' => '每页显示记录数',
-                'name' => 'page_size',
-                'require' => true,
-                'message' => '每页显示记录数不能为空',
-                'validate' => [
-                    ['type' => 'int', 'min' => '1', 'msg' => '每页显示记录数不能为空'],
-                ],
-            ],
+            "curr_page" => "Required|IntGe:1",
+            "page_size" => "Required|IntGe:1",
         ];
     }
 

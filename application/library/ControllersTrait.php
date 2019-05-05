@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\library;
 
+use App\Models\Forms\FormsVali;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -152,10 +154,14 @@ trait ControllersTrait
      */
     public function validator(string $forms, string $action): array
     {
-        $res  = '参数错误';
         $data = $this->getParams();
 
+        if (empty($data)) {
+            throw new \Exception('参数错误', 400);
+        }
+
         //如果是登录接口，则需解密接口数据
+        //todo 优化到路由参数中sign的值控制是否需要进行解密操作
         if ($this->request->server['request_uri'] == '/system/user/login') {
             if (!isset($data['login_data']) or !is_string($data['login_data'])) {
                 throw new \Exception('参数错误', 400);
@@ -164,28 +170,18 @@ trait ControllersTrait
             $data    = json_decode($decrypt, true);
         }
 
-        if (!empty($data)) {
-            try {
-                $obj  = '\App\Models\Forms\\' . $forms;
-                $form = new $obj($action, $data);
-            } catch (\Exception $e) {
-                $res = $e->getMessage();
-            } finally {
-                if (isset($form)) {
-                    if (!$form->validate()) {
-                        $res = $form->getMessages();
-                    } else {
-                        $res = (array)$form->getFieldValue();
-                    }
-                }
-            }
+        //如果参数lang_code设置了，则输出对应的信息模板
+        if (isset($data['lang_code']) and !empty($data['lang_code'])) {
+            FormsVali::setLangCode($data['lang_code']);
         }
 
-        if (is_string($res)) {
-            throw new \Exception($res, 400);
-        } else {
-            return $res;
+        try {
+            $class = '\App\Models\Forms\\' . $forms;
+            $data  = FormsVali::validate($data, (new $class)::$action());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 400);
         }
+        return $data;
     }
 
     /**

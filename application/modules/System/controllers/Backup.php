@@ -47,17 +47,17 @@ class BackupController extends Yaf\Controller_Abstract
     {
         $data = $this->validator('SystemUserForms', 'pull');
         if ($data['pwd'] == 'wlsh_frame_mysql_backup_20180107') {
-            $config = \Yaf\Registry::get('config');
-            $host = $config->database->host;
-            $port = $config->database->port;
-            $username = $config->database->username;
-            $pwd = $config->database->password;
-            $database = $config->database->database;
-            $path = $config->backup->path;
-            $date = date('Y-m-d', time());
-            $rand = time();
+            $config   = \Yaf\Registry::get('config');
+            $host     = $config->mysql->host;
+            $port     = $config->mysql->port;
+            $username = $config->mysql->username;
+            $pwd      = $config->mysql->password;
+            $database = $config->mysql->database;
+            $path     = $config->backup->path;
+            $date     = date('Y-m-d', time());
+            $rand     = time();
             $filename = "{$path}/{$database}-{$date}-{$rand}.sql";
-            $res = Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
+            $res      = Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
             if ($res['code'] == 0) {
                 $arr['filename'] = "{$database}-{$date}-{$rand}.sql";
                 $arr['size'] = filesize($filename);

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use \App\Services\System\MenuServices;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu

@@ -29,7 +29,7 @@
 
 对于使用wlsh项目的开发者，需要掌握swoole基本的开发理念与yaf框架生命周期，熟悉composer用法;对于这三点要求，我想PHPer应很容易达到。
 
-> wlsh启动最低要求：必须已安装php 7.3、yaf 3.0.8、swoole 4.2.12、redis-5.0、mysql-8.0、inotify扩展等。
+> wlsh启动最低要求：必须已安装php 7.3、yaf 3.0.8、swoole 4.3.3、redis-5.0、mysql-8.0、inotify扩展等。
 
 > 我们的口号是：简单才是php美之所在，用最简捷、最高效、最性价比的方式获取项目资金中的利润最大化，绝对不会增加phper的学习成本。
 
