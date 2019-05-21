@@ -146,7 +146,10 @@ class UserInitPlugin extends \Yaf\Plugin_Abstract
         //该接口是否需要token认证
         if ($router[$uri]['auth']) {
             //验证授权token的合法性与过期时间
-            $res = validate_token();
+            $headers = Registry::get('request')->header;
+            $token   = $headers['authorization'] ?? '0';
+
+            $res = validate_token($token);
             if ($res != '0') {
                 throw new \Exception($res, 300);
             }

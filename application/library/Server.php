@@ -206,7 +206,6 @@ class Server
     }
 
     /**
-     * request中带token参数值，取得token参数后按AES解密后判定约定的相关参数（如：host）是否一致
      *
      * @param \Swoole\Http\Request  $request
      * @param \Swoole\Http\Response $response
@@ -223,7 +222,9 @@ class Server
             return false;
         }
 
-        /*$token_protocol = $request->header['sec-websocket-protocol'] ?? null;
+        /*
+         * 以子协议传递token，客户端初始化时需要传第二个参数，如： new WebSocket('ws://127.0.0.1:9751', token)
+        $token_protocol = $request->header['sec-websocket-protocol'] ?? null;
         if (!is_null($token_protocol)) {
             $res = validate_token(urldecode($token_protocol));
             if (!empty($res)) {
@@ -235,7 +236,8 @@ class Server
             $response->status(400);
             $response->end();
             return false;
-        }*/
+        }
+        */
 
         // websocket握手连接算法验证
         $secWebSocketKey = $request->header['sec-websocket-key'];
@@ -301,11 +303,10 @@ class Server
      */
     public function onMessage(Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame): void
     {
-        //if ($frame->opcode == 0x08)
         $res = json_decode($frame->data, true);
         if (!isset($res['uri']) AND empty($res['uri'])) {
             EOF:
-            if ($server->exist($frame->fd))
+            if ($server->isEstablished($frame->fd))
                 $server->push($frame->fd, ws_response(400, null, '非法访问'));
             $server->close($frame->fd, true);
             return;
@@ -314,19 +315,24 @@ class Server
         $obj_req = new Yaf\Request\Http($res['uri'], '/');
         $obj_req->setParam((array)$frame);
 
-        ob_start();
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+        } catch (Exception $e) { //业务部分手动触发的异常信息
+            if ($e->getCode() == 0) {
+                APP_DEBUG ? co_log($e->getMessage(), "onMessage error fail: ") : null;
+            } else {
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+            }
         } catch (Throwable $e) {
             if (APP_DEBUG) {
-                $error = var_export($e->getMessage(), true);
-                co_log($error, "onMessage error fail");
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
             } else {
-                goto EOF;
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response(500, null, '服务异常'));
             }
-
         }
-        ob_end_clean();
     }
 
     /**

@@ -2,7 +2,8 @@
 <meta charset="utf-8"/>
 <title>WebSocket Test</title>
 <script language="javascript" type="text/javascript">
-    var wsUri = "ws://127.0.0.1:9751";
+    //注意token需要使用encodeURIComponent方法进行转义操作
+    var wsUri = "wss://127.0.0.1:9770?token=YeQwK8fnnXsTGd9k6DZuAGRR0rdOXqD3CHdvE6Naj/nvTC2DGoICUukjaxS2PcS1";
     var output;
 
     function init() {
@@ -11,9 +12,11 @@
     }
 
     function testWebSocket() {
+        let websocket;
         try {
             websocket = new WebSocket(wsUri);
         } catch (e) {
+            console.log(e);
             writeToScreen('<span style="color: red;">ERROR:</span> ' + e.message);
         }
 
