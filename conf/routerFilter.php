@@ -53,6 +53,10 @@ return [
     '/system/menu/get_menu'      => ['auth' => true, 'method' => 'GET', 'action' => '*'],
     '/system/menu/edit_menu'     => ['auth' => true, 'method' => 'PUT', 'action' => '*'],
     '/system/menu/del_menu'      => ['auth' => true, 'method' => 'DELETE', 'action' => '*'],
+    '/system/router/get_list'    => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/router/set_router'  => ['auth' => true, 'method' => 'POST', 'action' => '*'],
+    '/system/router/del_router'  => ['auth' => true, 'method' => 'DELETE', 'action' => '*'],
+    '/system/router/edit_router' => ['auth' => true, 'method' => 'PUT', 'action' => '*'],
 
     /***************************************** 首页服务状况相关路由 *************************************/
 

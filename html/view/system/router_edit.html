@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="../head_js.html" rel="import">
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up all">
+    <form class="layui-form">
+        <input name="id" type="hidden" v-model="id"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="name">
+                <span class="x-red">*</span>路由名称
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="name" name="name"
+                       required="" type="text" v-model="name">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="url">
+                <span class="x-red">*</span>请求url
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="url" name="url"
+                       required="" type="text" v-model="url">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="auth">
+                <span class="x-red">*</span>认证
+            </label>
+            <div class="layui-input-inline">
+                <select class="valid" id="auth" ref="auth">
+                    <option v-bind:selected="auth == 0" value="0">无需认证</option>
+                    <option v-bind:selected="auth == 1" value="1">需认证</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="method">
+                <span class="x-red">*</span>请求方法
+            </label>
+            <div class="layui-input-inline">
+                <select class="valid" id="method" ref="method">
+                    <option v-bind:selected="method === 'GET'" value="GET">GET</option>
+                    <option v-bind:selected="method === 'POST'" value="POST">POST</option>
+                    <option v-bind:selected="method === 'PUT'" value="PUT">PUT</option>
+                    <option v-bind:selected="method === 'DELETE'" value="DELETE">DELETE</option>
+                    <option v-bind:selected="method === 'Cli'" value="Cli">Cli</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="action">
+                <span class="x-red">*</span>实际路由
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="action" name="action"
+                       required="" type="text" v-model="action">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                默认*匹配请求url
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="type">
+                <span class="x-red">*</span>路由类型
+            </label>
+            <div class="layui-input-inline">
+                <select class="valid" id="type" lay-filter="search_type" ref="type">
+                    <option v-bind:selected="type == 0" value="0">后台</option>
+                    <option v-bind:selected="type == 1" value="1">前台</option>
+                </select>
+            </div>
+            <div class="rule_show" v-show="show">
+                <label class="layui-form-label" for="menu_id">
+                    <span class="x-red">*</span>所属类别
+                </label>
+                <div class="layui-input-inline">
+                    <select class="valid" id="menu_id" ref="menu_id">
+                        <option value="0">---请选择</option>
+                        <option v-bind:selected="item.id == menu_id" v-bind:value="item.id"
+                                v-for="item in menu">{{item.name}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="comment">
+                <span class="x-red">*</span>说明
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="comment" name="comment"
+                       required="" type="text" v-model="comment">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="L_repass">
+            </label>
+            <button @click.prevent="editRouter" class="layui-btn" lay-filter="add">
+                修改
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+<script src="../../controller/system/router_edit.js"></script>
+<script>
+    $(function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.on('select(search_type)', function (data) {
+                if (data.value == 1) {
+                    $(".rule_show").hide();
+                } else {
+                    $(".rule_show").show();
+                }
+            });
+        });
+
+    });
+</script>
+</html>

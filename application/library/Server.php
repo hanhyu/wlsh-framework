@@ -99,6 +99,7 @@ class Server
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
         $this->server->on('workerStop', [$this, 'onWorkerStop']);
         $this->server->on('workerExit', [$this, 'onWorkerExit']);
+        $this->server->on('handShake', [$this, 'onHandShake']);
         $this->server->on('open', [$this, 'onOpen']);
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('request', [$this, 'onRequest']);
@@ -202,6 +203,72 @@ class Server
                 }
             });
         }*/
+    }
+
+    /**
+     * request中带token参数值，取得token参数后按AES解密后判定约定的相关参数（如：host）是否一致
+     *
+     * @param \Swoole\Http\Request  $request
+     * @param \Swoole\Http\Response $response
+     *
+     * @return bool
+     */
+    public function onHandShake(Swoole\Http\Request $request, Swoole\Http\Response $response): bool
+    {
+        $token = $request->get['token'] ?? '0';
+        $res   = validate_token($token);
+        if (!empty($res)) {
+            $response->status(400);
+            $response->end($res);
+            return false;
+        }
+
+        /*$token_protocol = $request->header['sec-websocket-protocol'] ?? null;
+        if (!is_null($token_protocol)) {
+            $res = validate_token(urldecode($token_protocol));
+            if (!empty($res)) {
+                $response->status(400);
+                $response->end();
+                return false;
+            }
+        } else {
+            $response->status(400);
+            $response->end();
+            return false;
+        }*/
+
+        // websocket握手连接算法验证
+        $secWebSocketKey = $request->header['sec-websocket-key'];
+        $patten          = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+        if (0 === preg_match($patten, $secWebSocketKey) || 16 !== strlen(base64_decode($secWebSocketKey))) {
+            $response->end();
+            return false;
+        }
+        $key = base64_encode(sha1(
+            $request->header['sec-websocket-key'] . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11',
+            true
+        ));
+
+        $headers = [
+            'Upgrade'               => 'websocket',
+            'Connection'            => 'Upgrade',
+            'Sec-WebSocket-Accept'  => $key,
+            'Sec-WebSocket-Version' => '13',
+            //'Sec-WebSocket-Protocol' => $token_protocol,
+        ];
+
+        if (isset($request->header['sec-websocket-protocol'])) {
+            $headers['Sec-WebSocket-Protocol'] = $request->header['sec-websocket-protocol'];
+        }
+
+        foreach ($headers as $key => $val) {
+            $response->header($key, $val);
+        }
+
+        $response->status(101);
+        $response->end();
+        //$this->server->defer([$this, 'onOpen']$this->onOpen($this->server,$request));
+        return true;
     }
 
     /**

@@ -251,14 +251,16 @@ function msectime(): float
 
 /**
  * 验证token的合法性、是否存在与过期
+ * User: hanhyu
+ * Date: 19-5-21
+ * Time: 下午4:24
+ *
+ * @param string $token
  *
  * @return string
  */
-function validate_token(): string
+function validate_token(string $token): string
 {
-    $headers = Yaf\Registry::get('request')->header;
-    $token   = $headers['authorization'] ?? 0;
-
     if (empty($token)) {
         return '请先登录';
     }
