@@ -68,16 +68,16 @@ class Server
             'log_file'                 => ROOT_PATH . '/log/swoole.log',
             'pid_file'                 => ROOT_PATH . '/log/swoolePid.log',
             'package_max_length'       => 200000,
-            'reload_async'             => true,
-            'max_wait_time'            => 7,
-            'heartbeat_idle_time'      => 600,
-            'heartbeat_check_interval' => 60,
-            'buffer_output_size'       => 8 * 1024 * 1024,
-            'ssl_cert_file'            => ROOT_PATH . '/tests/opensslRsa/cert.crt',
-            'ssl_key_file'             => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
-            'open_http2_protocol'      => true,
+            'reload_async'               => true,
+            'max_wait_time'              => 7,
+            'heartbeat_idle_time'        => 600,
+            'heartbeat_check_interval'   => 60,
+            'buffer_output_size'         => 8 * 1024 * 1024,
+            'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
+            'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            'open_http2_protocol'        => true,
             //'open_mqtt_protocol' => true,
-            //'open_websocket_close_frame' => true,
+            'open_websocket_close_frame' => true,
         ]);
 
         $this->table = new Swoole\Table(1024);
@@ -178,31 +178,21 @@ class Server
             var_dump($e);
         }
 
-
-        /*if ($worker_id == 0) {
-            //每20小时检查一次app用户登录缓存的token是否过期,如过期则删除该token缓存记录
-            $server->tick(72000000, function () {
-                try {
-                    $this->redis = \Yaf\Registry::get('redis_pool')->get();
-                } catch (\Exception $e) {
-                    co_log($e->getMessage(), 'clean tick redis数据连接失败');
-                }
-                //缓存hash格式：key,token,uid
-                $res = $this->redis->hKeys('appToken');
-                if (is_array($res)) {
-                    foreach ($res as $k => $v) {
-                        $tokenParams = get_token_params($v);
-                        if ((time() - (int)$tokenParams['time']) > (int)\Yaf\Registry::get('config')->token->expTime) {
-                            $res = $this->redis->hDel('appToken', $v);
-                        }
-                    }
-                }
-                \Yaf\Registry::get('redis_pool')->put($this->redis);
-                if ($res === false) {
-                    co_log('用户登录token缓存过期删除失败', 'clean tick redis 删除缓存失败');
+        if ($worker_id == 0) {
+            /*
+             * 每30秒向websocket客户端发送一个ping帧
+             * 配合heartbeat_idle_time=>600与heartbeat_check_interval=>60两个参数
+             * 说明：wlsh默认配置为每60秒检测一遍所有客户端fd（http、websocket等tcp连接标识符），
+             *      如发现该fd在600秒之内没有发送一条消息，则关闭该连接; 此处设置表示http长连接最多保活10分钟。
+             */
+            $server->tick(30000, function () use ($server) {
+                foreach ($server->connections as $fd) {
+                    if ($this->server->isEstablished($fd))
+                        $this->server->push($fd, true, 9);
                 }
             });
-        }*/
+        }
+
     }
 
     /**
@@ -214,6 +204,7 @@ class Server
      */
     public function onHandShake(Swoole\Http\Request $request, Swoole\Http\Response $response): bool
     {
+        //以get参数传递token，如： new WebSocket(`wss://127.0.0.1:9770?token=${token}`)
         $token = $request->get['token'] ?? '0';
         $res   = validate_token($token);
         if (!empty($res)) {
@@ -223,7 +214,7 @@ class Server
         }
 
         /*
-         * 以子协议传递token，客户端初始化时需要传第二个参数，如： new WebSocket('ws://127.0.0.1:9751', token)
+         * 以子协议传递token，客户端初始化时需要传第二个参数，如： new WebSocket('wss://127.0.0.1:9770', token)
         $token_protocol = $request->header['sec-websocket-protocol'] ?? null;
         if (!is_null($token_protocol)) {
             $res = validate_token(urldecode($token_protocol));
@@ -269,7 +260,9 @@ class Server
 
         $response->status(101);
         $response->end();
-        //$this->server->defer([$this, 'onOpen']$this->onOpen($this->server,$request));
+        $this->server->defer(function () use ($request) {
+            $this->onOpen($this->server, $request);
+        });
         return true;
     }
 
@@ -281,17 +274,12 @@ class Server
      */
     public function onOpen(Swoole\WebSocket\Server $server, Swoole\Http\Request $request): void
     {
-        //TODO 绑定固定域名才能握手
         /*
         Yaf\Registry::get('table')->set($request->fd, ['uid' => intval($request->get['uid'])]);
-         if ($server->exist($request->fd))
+         if ($server->isEstablished($request->fd))
              $server->push($request->fd, ws_response(200, "wsConnect", '连接成功'));
         */
-        //echo '===============' . date("Y-m-d H:i:s", time()) . '欢迎' . $request->fd . '进入==============' . PHP_EOL;
-        if ($server->exist($request->fd)) {
-            $server->push($request->fd, '非法连接');
-            $server->close($request->fd);
-        }
+        echo '===============' . date("Y-m-d H:i:s", time()) . '欢迎' . $request->fd . '进入==============' . PHP_EOL;
     }
 
     /**
@@ -303,34 +291,42 @@ class Server
      */
     public function onMessage(Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame): void
     {
-        $res = json_decode($frame->data, true);
-        if (!isset($res['uri']) AND empty($res['uri'])) {
-            EOF:
-            if ($server->isEstablished($frame->fd))
-                $server->push($frame->fd, ws_response(400, null, '非法访问'));
-            $server->close($frame->fd, true);
-            return;
-        }
+        /* $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
+   fwrite($fp, var_export($server, true));
+   fclose($fp);*/
 
-        $obj_req = new Yaf\Request\Http($res['uri'], '/');
-        $obj_req->setParam((array)$frame);
-
-        try {
-            $this->obj_yaf->getDispatcher()->dispatch($obj_req);
-        } catch (Exception $e) { //业务部分手动触发的异常信息
-            if ($e->getCode() == 0) {
-                APP_DEBUG ? co_log($e->getMessage(), "onMessage error fail: ") : null;
-            } else {
+        if ($frame->opcode == 0x08) {
+            //echo "Close frame received: Code {$frame->code} Reason {$frame->reason}\n";
+        } else {
+            $res = json_decode($frame->data, true);
+            if (!isset($res['uri']) AND empty($res['uri'])) {
+                EOF:
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+                    $server->push($frame->fd, ws_response(400, null, '非法访问'));
+                $server->close($frame->fd, true);
+                return;
             }
-        } catch (Throwable $e) {
-            if (APP_DEBUG) {
-                if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
-            } else {
-                if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response(500, null, '服务异常'));
+
+            $obj_req = new Yaf\Request\Http($res['uri'], '/');
+            $obj_req->setParam((array)$frame);
+
+            try {
+                $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+            } catch (Exception $e) { //业务部分手动触发的异常信息
+                if ($e->getCode() == 0) {
+                    APP_DEBUG ? co_log($e->getMessage(), "onMessage error fail: ") : null;
+                } else {
+                    if ($server->isEstablished($frame->fd))
+                        $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+                }
+            } catch (Throwable $e) {
+                if (APP_DEBUG) {
+                    if ($server->isEstablished($frame->fd))
+                        $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+                } else {
+                    if ($server->isEstablished($frame->fd))
+                        $server->push($frame->fd, ws_response(500, null, '服务异常'));
+                }
             }
         }
     }
@@ -344,6 +340,10 @@ class Server
      */
     public function onRequest(Swoole\Http\Request $request, Swoole\Http\Response $response): void
     {
+        /* $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
+   fwrite($fp, var_export($server, true));
+   fclose($fp);*/
+
         //TODO 绑定固定域名才能访问
         //请求过滤,会请求2次
         if (in_array('/favicon.ico', [$request->server['request_uri']])) {
@@ -422,14 +422,12 @@ class Server
         $obj_req   = new Yaf\Request\Http($res['uri'], '/');
         $obj_req->setParam($res);
 
-        ob_start();
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
         } catch (Throwable $e) {
             $error = var_export($e->getMessage(), true);
             co_log($error, "onReceive error fail");
         }
-        ob_end_clean();
     }
 
     /**
@@ -479,7 +477,6 @@ class Server
                 unset($res['uri']);
                 $obj_req->setParam((array)$res);
 
-                ob_start();
                 try {
                     $this->obj_yaf->getDispatcher()->dispatch($obj_req);
                 } catch (Throwable $e) {
@@ -488,7 +485,6 @@ class Server
                         co_log($error, "onFinish error fail");
                     }
                 }
-                ob_end_clean();
             }
         }
     }
@@ -510,7 +506,6 @@ class Server
         $obj_req = new Yaf\Request\Http($res['uri'], '/');
         $obj_req->setParam((array)$res);
 
-        ob_start();
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
         } catch (Throwable $e) {
@@ -519,7 +514,6 @@ class Server
                 co_log($error, "onClose error fail");
             }
         }
-        ob_end_clean();
     }
 
     /**

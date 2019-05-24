@@ -3,8 +3,10 @@
 <title>WebSocket Test</title>
 <script language="javascript" type="text/javascript">
     //注意token需要使用encodeURIComponent方法进行转义操作
-    var wsUri = "wss://127.0.0.1:9770?token=YeQwK8fnnXsTGd9k6DZuAGRR0rdOXqD3CHdvE6Naj/nvTC2DGoICUukjaxS2PcS1";
+    var token = encodeURIComponent('YeQwK8fnnXsTGd9k6DZuAGRR0rdOXqD3CHdvE6Naj/l4LbadfuljO+krjAlZ4CMo');
+    var wsUri = "ws://127.0.0.1:9751?token=" + token;
     var output;
+    let websocket;
 
     function init() {
         output = document.getElementById("output");
@@ -12,9 +14,9 @@
     }
 
     function testWebSocket() {
-        let websocket;
         try {
             websocket = new WebSocket(wsUri);
+            //websocket.binaryType = 'arraybuffer';
         } catch (e) {
             console.log(e);
             writeToScreen('<span style="color: red;">ERROR:</span> ' + e.message);
@@ -36,7 +38,12 @@
 
     function onOpen(evt) {
         writeToScreen("CONNECTED");
-        doSend("WebSocket rocks");
+        // doSend("WebSocket rocks");
+        let msg = JSON.stringify({
+            "uri": "/liveapi/live_room/get_room_list",
+            "data": {"uid": 1, "page": 0}
+        });
+        doSend(msg);
     }
 
     function onClose(evt) {
@@ -45,15 +52,18 @@
 
     function onMessage(evt) {
         writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
-        websocket.close();
+        //websocket.close();
     }
 
     function onError(evt) {
+        console.log('onError evt:' + JSON.stringify(evt));
         writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
     }
 
     function doSend(message) {
         writeToScreen("SENT: " + message);
+        //var a = new Uint8Array([9]);
+        //websocket.send(a.buffer);
         websocket.send(message);
     }
 
