@@ -32,10 +32,10 @@ class UserInitPlugin extends \Yaf\Plugin_Abstract
          */
         if ($uri) {
             $router = Registry::get('router_filter_config')->toArray();
-            if (!isset($router[$uri])) { //请求的路由没有配置
-                $request->setRequestUri('/Error/fail');
-            } else if ($method !== $router[$uri]['method']) { //请求的方法是否正确
-                $request->setRequestUri('/Error/fail');
+            if (!isset($router[$uri])) { //请求的路由错误
+                $request->setRequestUri('/error/router');
+            } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
+                $request->setRequestUri('/error/method');
             } else if ('*' === $router[$uri]['action']) { //默认转发请求的路由
                 $this->authToken($router, $uri);
                 $request->setRequestUri($uri);

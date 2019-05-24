@@ -1,5 +1,7 @@
 <?php
 
+use Yaf\Registry;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -15,7 +17,7 @@ class ErrorController extends Yaf\Controller_Abstract
 
     public function init()
     {
-        $this->response = \Yaf\Registry::get('response');
+        $this->response = Registry::get('response');
     }
 
     /**
@@ -28,11 +30,40 @@ class ErrorController extends Yaf\Controller_Abstract
     }
 
     /**
-     * 触发此路由条件：请求的接口方法或接口请求的method不正确
+     * 触发此路由条件：请求的接口路由不正确
+     * User: hanhyu
+     * Date: 19-5-24
+     * Time: 下午4:09
      */
-    public function failAction(): void
+    public function routerAction(): void
     {
-        $this->response->end(http_response(400, '请求的接口不存在'));
+        $fd     = $this->getRequest()->getParam('fd');
+        $server = Registry::get('server');
+
+        if ($server->isEstablished($fd)) {
+            $server->push($fd, ws_response(400, null, '请求的接口不存在'));
+        } else {
+            $this->response->end(http_response(400, '请求的接口不存在'));
+        }
     }
+
+    /**
+     * 接口请求的method
+     * User: hanhyu
+     * Date: 19-5-24
+     * Time: 下午4:09
+     */
+    public function methodAction(): void
+    {
+        $fd     = $this->getRequest()->getParam('fd');
+        $server = Registry::get('server');
+
+        if ($server->isEstablished($fd)) {
+            $server->push($fd, ws_response(400, null, '请求的方法不正确'));
+        } else {
+            $this->response->end(http_response(400, '请求的方法不正确'));
+        }
+    }
+
 
 }

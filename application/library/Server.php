@@ -295,10 +295,6 @@ class Server
      */
     public function onMessage(Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame): void
     {
-        /* $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
-   fwrite($fp, var_export($server, true));
-   fclose($fp);*/
-
         if ($frame->opcode == 0x08) {
             //echo "Close frame received: Code {$frame->code} Reason {$frame->reason}\n";
         } else {
@@ -344,10 +340,6 @@ class Server
      */
     public function onRequest(Swoole\Http\Request $request, Swoole\Http\Response $response): void
     {
-        /* $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
-   fwrite($fp, var_export($server, true));
-   fclose($fp);*/
-
         //TODO 绑定固定域名才能访问
         //请求过滤,会请求2次
         if (in_array('/favicon.ico', [$request->server['request_uri']])) {
