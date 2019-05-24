@@ -68,14 +68,14 @@ class Server
             'log_file'                 => ROOT_PATH . '/log/swoole.log',
             'pid_file'                 => ROOT_PATH . '/log/swoolePid.log',
             'package_max_length'       => 200000,
-            'reload_async'               => true,
-            'max_wait_time'              => 7,
-            'heartbeat_idle_time'        => 600,
-            'heartbeat_check_interval'   => 60,
-            'buffer_output_size'         => 8 * 1024 * 1024,
-            'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
-            'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
-            'open_http2_protocol'        => true,
+            'reload_async'             => true,
+            'max_wait_time'            => 7,
+            'heartbeat_idle_time'      => 600,
+            'heartbeat_check_interval' => 60,
+            'buffer_output_size'       => 8 * 1024 * 1024,
+            'ssl_cert_file'            => ROOT_PATH . '/tests/opensslRsa/cert.crt',
+            'ssl_key_file'             => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,
         ]);
@@ -178,13 +178,17 @@ class Server
             var_dump($e);
         }
 
+        /*
+         * 默认第一个工作进程发送websocket控制流0x9 ping帧，
+         * js客户端websocket底层会自动回复pong包，这样就不用上游业务层做心跳包检测。
+         *
+         * 下面设置了每30秒向websocket客户端发送一个ping帧，
+         * 配合heartbeat_idle_time=>600与heartbeat_check_interval=>60两个参数。
+         * 说明：wlsh默认配置为每60秒检测一遍所有客户端fd（http、websocket等tcp连接标识符），
+         * 如发现该fd在600秒之内没有发送一条消息，则关闭该连接; 此处设置表示http长连接最多保活10分钟。
+         *
+         */
         if ($worker_id == 0) {
-            /*
-             * 每30秒向websocket客户端发送一个ping帧
-             * 配合heartbeat_idle_time=>600与heartbeat_check_interval=>60两个参数
-             * 说明：wlsh默认配置为每60秒检测一遍所有客户端fd（http、websocket等tcp连接标识符），
-             *      如发现该fd在600秒之内没有发送一条消息，则关闭该连接; 此处设置表示http长连接最多保活10分钟。
-             */
             $server->tick(30000, function () use ($server) {
                 foreach ($server->connections as $fd) {
                     if ($this->server->isEstablished($fd))
