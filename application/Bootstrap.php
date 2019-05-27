@@ -46,7 +46,10 @@ class Bootstrap extends Yaf\Bootstrap_Abstract
         $mysql_pool = new PdoPool('mysql');
         Yaf\Registry::set('mysql_pool', $mysql_pool);
 
+
         //如需主从、读写库请在这里自行配置添加
+        //$mysql_master = new PdoPool('mysql_master');
+        //$mysql_slave = new PdoPool('mysql_slave');
 
         //添加pgsql数据库连接池
         $pgsql_pool = new PdoPool('pgsql');

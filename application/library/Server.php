@@ -55,8 +55,8 @@ class Server
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
         $this->server->set([
             //'reactor_num' => 16,
-            'worker_num'               => 32,
-            'task_worker_num'          => 32,
+            'worker_num'               => 8,
+            'task_worker_num'          => 8,
             'task_enable_coroutine'    => true,
             'daemonize'                => SWOOLE_DAEMONIZE,
             'max_request'              => 300000,

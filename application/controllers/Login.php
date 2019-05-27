@@ -364,7 +364,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $this->redis = \Yaf\Registry::get('redis_pool')->get();
         //$this->redis->select(1);
         $this->response->end($this->redis->get('key'));
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
+        //\Yaf\Registry::get('redis_pool')->put($this->redis);
     }
 
     public function publisherRedisAction(): void
@@ -372,15 +372,12 @@ class LoginController extends \Yaf\Controller_Abstract
         $this->redis = \Yaf\Registry::get('redis_pool')->get();
         $let         = $this->redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
         $this->response->end($let);
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
     }
 
     public function consumerRedisAction(): void
     {
         $this->redis = \Yaf\Registry::get('redis_pool')->get();
         var_dump($this->redis->xRange('channel1', '-', '+'));
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
-
     }
 
     public function ackRedisAction(): void
@@ -392,8 +389,6 @@ class LoginController extends \Yaf\Controller_Abstract
         //$let = array_keys($res);
         var_dump(array_keys($res['channel1']));
         $this->redis->xAck('channel1', 'chgroup4', array_keys($res['channel1']));
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
-
     }
 
     public function delRedisAction(): void
@@ -401,7 +396,6 @@ class LoginController extends \Yaf\Controller_Abstract
         $this->redis = \Yaf\Registry::get('redis_pool')->get();
         $res         = $this->redis->xRange('channel1', '-', '+');
         $this->redis->xDel('channel1', array_keys($res));
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
     }
 
     /**
@@ -864,7 +858,6 @@ class LoginController extends \Yaf\Controller_Abstract
         $mysql = Yaf\Registry::get('mysql_pool')->get();
         $get   = $mysql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $this->response->end(http_response(200, $get));
-        Yaf\Registry::get('mysql_pool')->put($mysql);
     }
 
     public function swPgsqlAction():void {
@@ -875,7 +868,6 @@ class LoginController extends \Yaf\Controller_Abstract
 
         $get   = $pgsql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $this->response->end(http_response(200, $get));
-        Yaf\Registry::get('pgsql_pool')->put($pgsql);
 
     }
 
@@ -1012,7 +1004,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $stmt  = $mysql->prepare($sql);
         $get = $stmt->execute([1]);
         $this->response->end(http_response(200, $get));
-        Yaf\Registry::get('co_mysql_pool')->put($mysql);
+
     }
 
 }

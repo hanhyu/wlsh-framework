@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use Yaf\Registry;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -27,17 +29,13 @@ class AbstractRedis
     public function __call($method, $args)
     {
         try {
-            $this->db = \Yaf\Registry::get('redis_pool')->get();
+            $this->db = Registry::get('redis_pool')->get();
         } catch (\Exception $e) {
             co_log($e->getMessage(), "redis数据连接异常", 'alert');
             throw new \Exception('redis数据连接异常', 500);
         }
 
         $data = call_user_func_array([$this, $method], $args);
-
-        if (!empty($this->db)) {
-            \Yaf\Registry::get('redis_pool')->put($this->db);
-        }
 
         return $data;
     }

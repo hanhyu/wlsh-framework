@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+use Swoole\Coroutine\Channel;
+use Yaf\Registry;
+use Medoo\Medoo;
+
 /**
  * Created by PhpStorm.
  * User: hanhui
@@ -9,37 +13,30 @@ declare(strict_types=1);
  */
 class PdoPool
 {
+    /**
+     * @var bool 连接池可用状态
+     */
     protected $available = true;
     /**
-     * @var \Swoole\Coroutine\Channel
+     * @var Channel
      */
     protected $ch;
     private $config;
 
     public function __construct(string $db_type)
     {
-        $this->ch     = new \Swoole\Coroutine\Channel(300);
-        $this->config = \Yaf\Registry::get('config')->$db_type;
-    }
-
-    /**
-     * 向连接池中存入连接对象，让后面的客户端可以复用则连接。
-     *
-     * @param \Medoo\Medoo $mysql
-     */
-    public function put(\Medoo\Medoo $mysql): void
-    {
-        $this->ch->push($mysql);
+        $this->ch     = new Channel(300);
+        $this->config = Registry::get('config')->$db_type;
     }
 
     /**
      * 获取mysql连接，如池子内有连接就取一个，连接不够则新建一个。
-     * @return \Medoo\Medoo
+     * @return Medoo
      */
-    public function get(): \Medoo\Medoo
+    public function get(): Medoo
     {
         //有空闲连接
-        if ($this->available and $this->ch->stats()['queue_num'] > 0) {
+        if ($this->available and ($this->ch->length() > 0)) {
             $db = $this->ch->pop(3);
             /**
              * 判断此空闲连接是否已被断开，已断开就重新请求连接，
@@ -51,7 +48,7 @@ class PdoPool
             if ($db === false or $this->ping($db->pdo)) goto EOF;
         } else {
             EOF:
-            $db = new \Medoo\Medoo([
+            $db = new Medoo([
                 'database_type' => $this->config['driver'],
                 'database_name' => $this->config['database'],
                 'server'        => $this->config['host'],
@@ -74,6 +71,11 @@ class PdoPool
             ]);
 
         }
+
+        defer(function () use ($db) {
+            $this->ch->push($db);
+        });
+
         return $db;
     }
 

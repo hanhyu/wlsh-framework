@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+use Swoole\Coroutine\Channel;
+use Yaf\Registry;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -11,23 +14,13 @@ class RedisPool
 {
     protected $available = true;
     /**
-     * @var \Swoole\Coroutine\Channel
+     * @var Channel
      */
     protected $ch;
 
     public function __construct()
     {
-        $this->ch = new \Swoole\Coroutine\Channel(300);
-    }
-
-    /**
-     * 向连接池中存入连接对象，让后面的客户端可以复用则连接。
-     *
-     * @param \Redis $redis
-     */
-    public function put(\Redis $redis): void
-    {
-        $this->ch->push($redis);
+        $this->ch = new Channel(300);
     }
 
     /**
@@ -46,15 +39,19 @@ class RedisPool
              * 此功能依赖于redis的timeout参数值。
              */
             if ($db === false or $this->ping($db)) goto EOF;
-            return $db;
         } else {
             EOF:
-            $redis = new \Redis();
-            $redis->connect(\Yaf\Registry::get('config')->cache->host, (int)\Yaf\Registry::get('config')->cache->port);
-            $redis->auth(\Yaf\Registry::get('config')->cache->auth);
-
-            return $redis;
+            $db = new \Redis();
+            $db->connect(Registry::get('config')->cache->host, (int)Registry::get('config')->cache->port);
+            $db->auth(Registry::get('config')->cache->auth);
         }
+
+        //向连接池中存入连接对象，让后面的客户端可以复用则连接。
+        defer(function () use ($db) {
+            $this->ch->push($db);
+        });
+
+        return $db;
     }
 
     /**
