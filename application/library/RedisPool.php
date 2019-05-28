@@ -12,7 +12,6 @@ use Yaf\Registry;
  */
 class RedisPool
 {
-    protected $available = true;
     /**
      * @var Channel
      */
@@ -30,7 +29,7 @@ class RedisPool
     public function get(): \Redis
     {
         //有空闲连接
-        if ($this->available and $this->ch->stats()['queue_num'] > 0) {
+        if ($this->ch->length() > 0) {
             $db = $this->ch->pop(3);
             /**
              * 判断此空闲连接是否已被断开，已断开就重新请求连接，
@@ -72,15 +71,5 @@ class RedisPool
         }
         return false;
     }
-
-    public function destruct()
-    {
-        // 连接池销毁, 置不可用状态, 防止新的客户端进入常驻连接池, 导致服务器无法平滑退出
-        $this->available = false;
-        while (!$this->ch->isEmpty()) {
-            $this->ch->pop();
-        }
-    }
-
 
 }

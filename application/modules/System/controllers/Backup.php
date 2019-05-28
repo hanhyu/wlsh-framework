@@ -47,23 +47,24 @@ class BackupController extends Yaf\Controller_Abstract
     {
         $data = $this->validator('SystemUserForms', 'pull');
         if ($data['pwd'] == 'wlsh_frame_mysql_backup_20180107') {
-            $config   = \Yaf\Registry::get('config');
-            $host     = $config->mysql->host;
-            $port     = $config->mysql->port;
-            $username = $config->mysql->username;
-            $pwd      = $config->mysql->password;
-            $database = $config->mysql->database;
-            $path     = $config->backup->path;
-            $date     = date('Y-m-d', time());
-            $rand     = time();
-            $filename = "{$path}/{$database}-{$date}-{$rand}.sql";
-            $res      = Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
+            $config      = \Yaf\Registry::get('config');
+            $host        = $config->mysql->host;
+            $port        = $config->mysql->port;
+            $username    = $config->mysql->username;
+            $pwd         = $config->mysql->password;
+            $database    = $config->mysql->database;
+            $path        = $config->backup->path;
+            $date        = date('Y-m-d', time());
+            $rand        = time();
+            $yaf_environ = ini_get('yaf.environ');
+            $filename    = "{$path}/{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
+            $res         = Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
             if ($res['code'] == 0) {
-                $arr['filename'] = "{$database}-{$date}-{$rand}.sql";
-                $arr['size'] = filesize($filename);
-                $arr['md5'] = hash_file('md5', $filename);
-                $arr['rand'] = $rand;
-                $let = $this->backup_m->setBackup($arr);
+                $arr['filename'] = "{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
+                $arr['size']     = filesize($filename);
+                $arr['md5']      = hash_file('md5', $filename);
+                $arr['rand']     = $rand;
+                $let             = $this->backup_m->setBackup($arr);
                 if (empty($let)) {
                     $this->response->end(http_response(400, '存入数据失败'));
                 } else {

@@ -15,7 +15,7 @@ class SystemBackupForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public function del()
+    public static function del()
     {
         return [
             'id'       => 'Required|IntGe:1',
