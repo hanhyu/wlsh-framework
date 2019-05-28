@@ -232,7 +232,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         ),
         'App\\Domain\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/application/Domain',
+            0 => __DIR__ . '/../..' . '/application/domain',
         ),
     );
 
