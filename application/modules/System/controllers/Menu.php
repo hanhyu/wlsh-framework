@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use \App\Services\System\MenuServices;
+use \App\Domain\System\Menu;
 
 /**
  * Created by PhpStorm.
@@ -13,14 +13,14 @@ class MenuController extends Yaf\Controller_Abstract
 {
     use \App\Library\ControllersTrait;
     /**
-     * @var MenuServices
+     * @var Menu
      */
     private $menu;
 
     public function init()
     {
         $this->beforeInit();
-        $this->menu = new MenuServices();
+        $this->menu = new Menu();
     }
 
     /**

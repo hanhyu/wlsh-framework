@@ -8,14 +8,14 @@ declare(strict_types=1);
  * Time: 下午5:45
  */
 
-namespace App\Services\System;
+namespace App\Domain\System;
 
 use App\Models\Mysql\{
     SystemMsg as Msg,
 };
 
 
-class ProcessServices
+class Process
 {
     /**
      * @var Msg

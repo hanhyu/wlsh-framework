@@ -7,11 +7,11 @@ declare(strict_types=1);
  * Time: 下午2:58
  */
 
-namespace App\Services\System;
+namespace App\Domain\System;
 
 use App\Models\Mongo\Monolog;
 
-class LogServices
+class Log
 {
     /**
      * @var Monolog

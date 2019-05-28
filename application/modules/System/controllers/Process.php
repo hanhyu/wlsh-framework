@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Services\System\ProcessServices;
+use App\Domain\System\Process;
 
 /**
  * Created by PhpStorm.
@@ -14,14 +14,14 @@ class ProcessController extends Yaf\Controller_Abstract
     use \App\Library\ControllersTrait;
 
     /**
-     * @var ProcessServices
+     * @var Process
      */
     private $msg;
 
     public function init()
     {
         $this->beforeInit();
-        $this->msg = new ProcessServices();
+        $this->msg = new Process();
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Services\System\UserServices;
+use App\Domain\System\User;
 
 /**
  * 登录日志
@@ -14,14 +14,14 @@ class LogUserController extends Yaf\Controller_Abstract
     use \App\Library\ControllersTrait;
 
     /**
-     * @var UserServices
+     * @var User
      */
     private $log;
 
     public function init()
     {
         $this->beforeInit();
-        $this->log = new UserServices();
+        $this->log = new User();
     }
 
     /**

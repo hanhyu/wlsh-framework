@@ -6,10 +6,10 @@
  * Time: 下午9:25
  */
 
-namespace App\Services\Index;
+namespace App\Domain\Index;
 
 
-class LoginServices
+class Login
 {
 
 }

@@ -551,7 +551,7 @@ class LoginController extends \Yaf\Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Services\System\UserServices();
+        $user              = new \App\Services\System\User();
         $res               = $user->getInfoList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -622,7 +622,7 @@ class LoginController extends \Yaf\Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Services\System\LogServices();
+        $user              = new \App\Services\System\Log();
         $res               = $user->getMongoList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -694,7 +694,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Services\System\UserServices();
+        $user               = new \App\Services\System\User();
         $res                = $user->getLogList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -767,7 +767,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Services\System\UserServices();
+        $user               = new \App\Services\System\User();
         $res                = $user->getLogViewList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));

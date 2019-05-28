@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use App\Services\System\LogServices;
+use App\Domain\System\Log;
 
 /**
  * Created by PhpStorm.
@@ -14,14 +14,14 @@ class LogMongoController extends Yaf\Controller_Abstract
     use \App\Library\ControllersTrait;
 
     /**
-     * @var LogServices
+     * @var Log
      */
     private $log;
 
     public function init()
     {
         $this->beforeInit();
-        $this->log = new LogServices();
+        $this->log = new Log();
     }
 
     /**

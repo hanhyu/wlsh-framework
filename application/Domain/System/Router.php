@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Services\System;
+namespace App\Domain\System;
 
 use App\Models\Mysql\SystemRouter;
 
-class RouterServices
+class Router
 {
     /**
      * @var SystemRouter

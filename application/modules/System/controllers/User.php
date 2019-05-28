@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use \App\Services\System\UserServices;
+use \App\Domain\System\User;
 
 /**
  * Created by PhpStorm.
@@ -14,14 +14,14 @@ class UserController extends Yaf\Controller_Abstract
     use \App\Library\ControllersTrait;
 
     /**
-     * @var UserServices
+     * @var User
      */
     private $user;
 
     public function init()
     {
         $this->beforeInit();
-        $this->user = new UserServices();
+        $this->user = new User();
     }
 
     /**

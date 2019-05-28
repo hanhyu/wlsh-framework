@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Services\System;
+namespace App\Domain\System;
 
 use App\Models\Mysql\{
-    SystemUser as User,
+    SystemUser,
     SystemUserLog as UserLog,
     UserLogView as UserV,
 };
@@ -16,10 +16,10 @@ use App\Models\Mysql\{
  * Date: 19-1-3
  * Time: 下午11:36
  */
-class UserServices
+class User
 {
     /**
-     * @var User
+     * @var SystemUser
      */
     private $user;
     /**
@@ -33,7 +33,7 @@ class UserServices
 
     public function __construct()
     {
-        $this->user     = new User();
+        $this->user     = new SystemUser();
         $this->user_log = new UserLog();
         $this->user_v   = new UserV();
     }

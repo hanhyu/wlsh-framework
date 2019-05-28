@@ -8,11 +8,11 @@ declare(strict_types=1);
  * Time: 下午5:43
  */
 
-namespace App\Services\System;
+namespace App\Domain\System;
 
 use App\Models\Mysql\SystemMenu;
 
-class MenuServices
+class Menu
 {
     /**
      * @var SystemMenu

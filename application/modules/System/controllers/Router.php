@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-use \App\Services\System\RouterServices;
+use \App\Domain\System\Router;
 
 class RouterController extends Yaf\Controller_Abstract
 {
     use \App\Library\ControllersTrait;
     /**
-     * @var RouterServices
+     * @var Router
      */
     private $router;
 
     public function init()
     {
         $this->beforeInit();
-        $this->router = new RouterServices();
+        $this->router = new Router();
     }
 
     /**
