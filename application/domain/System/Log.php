@@ -41,6 +41,8 @@ class Log
             ];
         }
 
+        if (!empty($data['channel'])) $data['where']['channel'] = $data['channel'];
+
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan, $data) { //获取总数
             try {

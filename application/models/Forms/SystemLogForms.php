@@ -28,6 +28,7 @@ class SystemLogForms
             'curr_page' => 'Required|IntGe:1',
             'page_size' => 'Required|IntGe:1',
             'log_time'  => ['Date', 'StrIn:'],
+            'channel'   => ['StrLenGeLe:3,50', 'StrIn:'],
         ];
     }
 

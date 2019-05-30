@@ -70,6 +70,7 @@ function ws_response(int $code = 200, ?string $uri = null, $data = ''): string
  *
  * @param  mixed $content
  * @param string $info
+ * @param string $channel
  * @param string $level <p>debug (100): 详细的debug信息</p></P>
  *                      <p>info (200): 有意义的事件，比如用户登录、SQL日志.</P>
  *                      <p>notice (250): 普通但是重要的事件</P>
@@ -80,7 +81,7 @@ function ws_response(int $code = 200, ?string $uri = null, $data = ''): string
  *                      <p>emergency (600): 紧急请求：系统不可用了</P>
  *
  */
-function co_log($content, string $info, string $level = 'info'): void
+function co_log($content, string $info, string $channel = 'system', string $level = 'info'): void
 {
     if ($level == 'critica' or $level == 'alert' or $level == 'emergency') {
         go(function () use ($content, $info) {
@@ -88,8 +89,8 @@ function co_log($content, string $info, string $level = 'info'): void
         });
     }
     if (APP_DEBUG) {
-        go(function () use ($content, $info, $level) {
-            $let = monolog_by_mongodb($content, $info, $level);
+        go(function () use ($content, $info, $channel, $level) {
+            $let = monolog_by_mongodb($content, $info, $channel, $level);
             if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
                 monolog_by_file($content, $info, $level);
             }
@@ -103,13 +104,14 @@ function co_log($content, string $info, string $level = 'info'): void
  *
  * @param        $content
  * @param string $info
+ * @param string $channel
  * @param string $level
  *
  * @return bool
  */
-function monolog_by_mongodb($content, string $info, string $level): bool
+function monolog_by_mongodb($content, string $info, string $channel, string $level): bool
 {
-    $log = new \Monolog\Logger(ini_get('yaf.environ'));
+    $log = new \Monolog\Logger($channel);
     $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
         new \MongoDB\Driver\Manager(Yaf\Registry::get('config')->log->mongo),
         Yaf\Registry::get('config')->log->database,

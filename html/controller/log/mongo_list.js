@@ -43,7 +43,8 @@ new Vue({
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size,
-                    log_time: $("#log_time").val()
+                    log_time: $("#log_time").val(),
+                    channel: $("#channel").val()
                 }
             })
                 .then(function (response) {
