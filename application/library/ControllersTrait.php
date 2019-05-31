@@ -5,6 +5,12 @@ namespace App\library;
 
 use App\Models\Forms\FormsVali;
 
+use Swoole\Atomic;
+use Swoole\Http\Request;
+use Swoole\Http\Response;
+use Swoole\WebSocket\Server;
+use Yaf\Registry;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -14,19 +20,19 @@ use App\Models\Forms\FormsVali;
 trait ControllersTrait
 {
     /**
-     * @var \Swoole\WebSocket\Server
+     * @var Server
      */
     private $server;
     /**
-     * @var \Swoole\Http\Request
+     * @var Request
      */
     private $request;
     /**
-     * @var \Swoole\Http\Response
+     * @var Response
      */
     private $response;
     /**
-     * @var \Swoole\Atomic
+     * @var Atomic
      */
     private $atomic;
     /**
@@ -41,24 +47,30 @@ trait ControllersTrait
      */
     public function beforeInit($log = true): void
     {
-        $this->server   = \Yaf\Registry::get('server');
-        $this->request  = \Yaf\Registry::get('request');
-        $this->response = \Yaf\Registry::get('response');
-        $this->atomic   = \Yaf\Registry::get('atomic');
+        $this->server   = Registry::get('server');
+        $this->request  = Registry::get('request');
+        $this->response = Registry::get('response');
+        $this->atomic   = Registry::get('atomic');
 
         if ($log) {
-            $req_method = $this->request->server['request_method'];
+            $req_method  = $this->request->server['request_method'];
+            $request_uri = explode('/', $this->request->server['request_uri']);
+            $channel     = $request_uri[1] ?? 'system';
             switch ($req_method) {
                 case 'GET':
-                    co_log($this->request->get, "{$this->request->server['request_uri']} client get data:");
+                    co_log($this->request->get, "{$this->request->server['request_uri']} client get data:", $channel);
                     break;
                 case 'POST':
                     $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
                     $let          = stristr($content_type, 'json');
                     if ($let) {
-                        co_log($this->request->rawContent(), "{$this->request->server['request_uri']} client json data:");
+                        co_log(
+                            $this->request->rawContent(),
+                            "{$this->request->server['request_uri']} client json data:",
+                            $channel
+                        );
                     } else {
-                        co_log($this->request->post, "{$this->request->server['request_uri']} client post data:");
+                        co_log($this->request->post, "{$this->request->server['request_uri']} client post data:", $channel);
                     }
                     break;
                 case 'PUT':
@@ -71,15 +83,16 @@ trait ControllersTrait
                     if ($let) {
                         co_log(
                             json_encode($data) . ': request rawContent is' . $this->request->rawContent(),
-                            "{$this->request->server['request_uri']} client put data:"
+                            "{$this->request->server['request_uri']} client put data:",
+                            $channel
                         );
                     } else {
                         $data += $this->request->post;
                     }
-                    co_log($data, "{$this->request->server['request_uri']} client put data:");
+                    co_log($data, "{$this->request->server['request_uri']} client put data:", $channel);
                     break;
                 case 'DELETE':
-                    co_log($this->request->get, "{$this->request->server['request_uri']} client delete data:");
+                    co_log($this->request->get, "{$this->request->server['request_uri']} client delete data:", $channel);
                     break;
                 default:
                     break;
@@ -166,7 +179,7 @@ trait ControllersTrait
             if (!isset($data['login_data']) or !is_string($data['login_data'])) {
                 throw new \Exception('参数错误', 400);
             }
-            $decrypt = private_decrypt($data['login_data'], \Yaf\Registry::get('config')->sign->prv_key);
+            $decrypt = private_decrypt($data['login_data'], Registry::get('config')->sign->prv_key);
             $data    = json_decode($decrypt, true);
         }
 
@@ -182,72 +195,6 @@ trait ControllersTrait
             throw new \Exception($e->getMessage(), 400);
         }
         return $data;
-    }
-
-    /**
-     * 根据用户登录的token设置缓存
-     *
-     * @param string $cache_key 缓存key，手机app默认缓存key为appToken
-     * @param string $value     用户登录token
-     */
-    public function setTokenCache(string $cache_key, string $value): void
-    {
-        $token_params = get_token_params($value);
-        try {
-            $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        } catch (\Exception $e) {
-            co_log($e->getMessage(), 'setTokenCache redis数据连接失败');
-        }
-        $res = $this->redis->hSet($cache_key, $value, $token_params['id']);
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
-        if ($res === false) {
-            co_log('用户登录token缓存失败', 'setTokenCache 存入缓存失败');
-        }
-    }
-
-    /**
-     * 根据用户登录token删除缓存中的用户登录token信息
-     *
-     * @param string $cache_key 缓存key，手机app默认缓存key为appToken
-     * @param string $value     用户登录的token
-     */
-    public function delTokenCache(string $cache_key, string $value): void
-    {
-        try {
-            $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        } catch (\Exception $e) {
-            co_log($e->getMessage(), 'delTokenCache redis数据连接失败');
-        }
-        $res = $this->redis->hDel($cache_key, $value);
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
-        if ($res === false) {
-            co_log('用户登录token缓存删除失败', 'delTokenCache 删除缓存失败');
-        }
-    }
-
-    /**
-     * 根据用户ID删除缓存中的用户登录token信息
-     *
-     * @param string $cache_key 缓存key，手机app默认缓存key为appToken
-     * @param int    $id        用户表ID
-     */
-    public function delUserCache(string $cache_key, int $id): void
-    {
-        try {
-            $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        } catch (\Exception $e) {
-            co_log($e->getMessage(), 'delUserCache redis数据连接失败');
-        }
-        $res = $this->redis->hGetAll($cache_key);
-        foreach ($res as $k => $v) {
-            if ($v == $id) {
-                $this->redis->hDel($cache_key, $k);
-            }
-        }
-        \Yaf\Registry::get('redis_pool')->put($this->redis);
-        if ($res === false) {
-            co_log('获取用户登录token缓存失败', 'delUserCache 获取缓存失败');
-        }
     }
 
 }

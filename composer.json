@@ -33,7 +33,8 @@
       "App\\Models\\": "application/models",
       "App\\Domain\\": "application/domain",
       "App\\Library\\": "application/library",
-      "App\\Plugins\\": "application/plugins"
+      "App\\Plugins\\": "application/plugins",
+      "Tests\\": "tests/"
     }
   },
   "require-dev": {

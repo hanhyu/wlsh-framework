@@ -31,6 +31,10 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
             'Webmozart\\Assert\\' => 17,
             'WebGeeker\\Validation\\' => 21,
         ),
+        'T' => 
+        array (
+            'Tests\\' => 6,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php72\\' => 23,
@@ -109,6 +113,10 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'WebGeeker\\Validation\\' => 
         array (
             0 => __DIR__ . '/..' . '/webgeeker/validation/src/Validation',
+        ),
+        'Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
         ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
