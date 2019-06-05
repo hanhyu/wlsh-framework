@@ -54,7 +54,7 @@ class PdoPool
                 'password'      => $this->config['password'],
                 'charset'       => $this->config['charset'],
                 'prefix'        => $this->config['prefix'],
-                'logging'       => true,
+                'logging'       => false,
                 'option'        => [
                     PDO::ATTR_CASE                     => PDO::CASE_NATURAL,
                     PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
