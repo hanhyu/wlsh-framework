@@ -76,7 +76,7 @@ new Vue({
                             layer.msg(response.data.data);
                         }
                         if (response.data.code === 200) {
-                            self.logList('slow.log');
+                            self.logList('swoole.log');
                             layer.msg(`数据已清空!`, {icon: 1, time: 1000});
                         }
                         if (response.data.code === 300) {

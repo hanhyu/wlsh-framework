@@ -39,18 +39,21 @@ trait WebsocketTrait
     /**
      * 接口（表单）参数验证过滤器
      *
-     * @param string $forms  请求验证的表单类名
-     * @param string $action 请求验证的具体方法名
+     * @param array $validations
      *
      * @return array 返回验证过滤后的数据
      * @throws \Exception
      */
-    public function validator(string $forms, string $action): array
+    public function validator(array $validations): array
     {
         try {
             $data = json_decode($this->data, true, 512, JSON_THROW_ON_ERROR);
         } catch (\Throwable $e) {
             $data = [];
+        }
+
+        if (empty($data) or !isset($data['data'])) {
+            throw new \Exception('参数错误', 400);
         }
 
         //todo 优化到路由参数中sign的值控制是否需要进行解密操作,数据加密与数据验证操作
@@ -68,12 +71,14 @@ trait WebsocketTrait
         }
 
         try {
-            $class = '\App\Models\Forms\\' . $forms;
-            $data  = FormsVali::validate($data, (new $class)::$action());
+            $vali_data = FormsVali::validate($data['data'], $validations);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }
-        return $data;
+        //url参数在入口判断过
+        $this->uri = $data['uri'];
+
+        return $vali_data;
     }
 
 }

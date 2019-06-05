@@ -289,6 +289,15 @@ class LoginController extends \Yaf\Controller_Abstract
      * time to 1st byte:   232.91ms    476.04ms    328.62ms     66.44ms    65.00%
      * req/s           :    1029.59     1144.43     1061.31       26.13    68.00%
      *
+     * ./wrk -t4 -c1000 -d10s https://127.0.0.1:9770/login/test
+     * Running 10s test @ https://127.0.0.1:9770/login/test
+     * 4 threads and 1000 connections
+     * Thread Stats   Avg      Stdev     Max   +/- Stdev
+     * Latency    25.53ms   80.85ms   1.11s    97.31%
+     * Req/Sec    15.81k     3.06k   26.88k    79.57%
+     * 529140 requests in 10.08s, 239.70MB read
+     * Requests/sec:  52473.98
+     * Transfer/sec:     23.77MB
      */
     public function testAction(): void
     {
@@ -551,7 +560,7 @@ class LoginController extends \Yaf\Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Services\System\User();
+        $user              = new \App\Domain\System\User();
         $res               = $user->getInfoList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -694,7 +703,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Services\System\User();
+        $user               = new \App\Domain\System\User();
         $res                = $user->getLogList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -854,19 +863,20 @@ class LoginController extends \Yaf\Controller_Abstract
  WHERE (`user_name` = 'ceshi001')
  ORDER BY `id` DESC
  LIMIT 10 OFFSET 0";*/
-
         $mysql = Yaf\Registry::get('mysql_pool')->get();
         $get   = $mysql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
         $this->response->end(http_response(200, $get));
     }
 
-    public function swPgsqlAction():void {
+    public function swPgsqlAction(): void
+    {
         $sql = "SELECT * FROM users WHERE id=1 LIMIT 1 ";
         //$sql = "select * from users";
 
         $pgsql = Yaf\Registry::get('pgsql_pool')->get();
 
-        $get   = $pgsql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $get = $pgsql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $this->response->end(http_response(200, $get));
 
     }
@@ -931,78 +941,78 @@ class LoginController extends \Yaf\Controller_Abstract
      *
      *
      *
-    开启预处理
-     ab -c 1000 -n 200000 -k http://127.0.0.1:9770/login/co_mysql
-    This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
-    Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-    Licensed to The Apache Software Foundation, http://www.apache.org/
-
-    Benchmarking 127.0.0.1 (be patient)
-    Completed 20000 requests
-    Completed 40000 requests
-    Completed 60000 requests
-    Completed 80000 requests
-    Completed 100000 requests
-    Completed 120000 requests
-    Completed 140000 requests
-    Completed 160000 requests
-    Completed 180000 requests
-    Completed 200000 requests
-    Finished 200000 requests
-
-
-    Server Software:        swoole-http-server
-    Server Hostname:        127.0.0.1
-    Server Port:            9770
-
-    Document Path:          /login/co_mysql
-    Document Length:        88 bytes
-
-    Concurrency Level:      1000
-    Time taken for tests:   10.346 seconds
-    Complete requests:      200000
-    Failed requests:        74810
-    (Connect: 0, Receive: 0, Length: 74810, Exceptions: 0)
-    Keep-Alive requests:    200000
-    Total transferred:      96311400 bytes
-    HTML transferred:       13111400 bytes
-    Requests per second:    19331.03 [#/sec] (mean)
-    Time per request:       51.730 [ms] (mean)
-    Time per request:       0.052 [ms] (mean, across all concurrent requests)
-    Transfer rate:          9090.81 [Kbytes/sec] received
-
-    Connection Times (ms)
-    min  mean[+/-sd] median   max
-    Connect:        0    0   1.7      0      28
-    Processing:     1   48 110.6     33    1091
-    Waiting:        1   48 110.6     33    1091
-    Total:          1   48 110.6     33    1091
-
-    Percentage of the requests served within a certain time (ms)
-    50%     33
-    66%     42
-    75%     47
-    80%     50
-    90%     60
-    95%     75
-    98%     96
-    99%   1024
-    100%   1091 (longest request)
+     * 开启预处理
+     * ab -c 1000 -n 200000 -k http://127.0.0.1:9770/login/co_mysql
+     * This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+     * Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+     * Licensed to The Apache Software Foundation, http://www.apache.org/
+     *
+     * Benchmarking 127.0.0.1 (be patient)
+     * Completed 20000 requests
+     * Completed 40000 requests
+     * Completed 60000 requests
+     * Completed 80000 requests
+     * Completed 100000 requests
+     * Completed 120000 requests
+     * Completed 140000 requests
+     * Completed 160000 requests
+     * Completed 180000 requests
+     * Completed 200000 requests
+     * Finished 200000 requests
+     *
+     *
+     * Server Software:        swoole-http-server
+     * Server Hostname:        127.0.0.1
+     * Server Port:            9770
+     *
+     * Document Path:          /login/co_mysql
+     * Document Length:        88 bytes
+     *
+     * Concurrency Level:      1000
+     * Time taken for tests:   10.346 seconds
+     * Complete requests:      200000
+     * Failed requests:        74810
+     * (Connect: 0, Receive: 0, Length: 74810, Exceptions: 0)
+     * Keep-Alive requests:    200000
+     * Total transferred:      96311400 bytes
+     * HTML transferred:       13111400 bytes
+     * Requests per second:    19331.03 [#/sec] (mean)
+     * Time per request:       51.730 [ms] (mean)
+     * Time per request:       0.052 [ms] (mean, across all concurrent requests)
+     * Transfer rate:          9090.81 [Kbytes/sec] received
+     *
+     * Connection Times (ms)
+     * min  mean[+/-sd] median   max
+     * Connect:        0    0   1.7      0      28
+     * Processing:     1   48 110.6     33    1091
+     * Waiting:        1   48 110.6     33    1091
+     * Total:          1   48 110.6     33    1091
+     *
+     * Percentage of the requests served within a certain time (ms)
+     * 50%     33
+     * 66%     42
+     * 75%     47
+     * 80%     50
+     * 90%     60
+     * 95%     75
+     * 98%     96
+     * 99%   1024
+     * 100%   1091 (longest request)
      */
     public function coMysqlAction(): void
     {
-       /* $sql = "select * from `users` where id=1 limit 1 ";
+        /* $sql = "select * from `users` where id=1 limit 1 ";
 
-        $mysql = Yaf\Registry::get('co_mysql_pool')->get();
-        $get   = $mysql->query($sql);
-        $this->response->end(http_response(200, $get));
-        Yaf\Registry::get('co_mysql_pool')->put($mysql);*/
+         $mysql = Yaf\Registry::get('co_mysql_pool')->get();
+         $get   = $mysql->query($sql);
+         $this->response->end(http_response(200, $get));
+         Yaf\Registry::get('co_mysql_pool')->put($mysql);*/
 
-        $sql   = "select * from `users` where id=? limit 1 ";
+        $sql = "select * from `users` where id=? limit 1 ";
 
         $mysql = Yaf\Registry::get('co_mysql_pool')->get();
         $stmt  = $mysql->prepare($sql);
-        $get = $stmt->execute([1]);
+        $get   = $stmt->execute([1]);
         $this->response->end(http_response(200, $get));
 
     }

@@ -23,29 +23,22 @@ class SystemMenuForms
      * Time: 下午10:35
      * @return array
      */
-    public static function setMenu()
-    {
-        return [
-            'id'    => 'IntGe:0',
-            'name'  => 'Required|StrLenGeLe:3,50',
-            'icon'  => 'Required|StrLenGeLe:1,50',
-            'url'   => 'Required|StrLenGeLe:1,50',
-            'up_id' => 'Required|IntGeLe:0,99',
-            'level' => 'Required|IntGeLe:1,5',
-        ];
-    }
+    public static $setMenu = [
+        'id'    => 'IntGe:0',
+        'name'  => 'Required|StrLenGeLe:3,50',
+        'icon'  => 'Required|StrLenGeLe:1,50',
+        'url'   => 'Required|StrLenGeLe:1,50',
+        'up_id' => 'Required|IntGeLe:0,99',
+        'level' => 'Required|IntGeLe:1,5',
+    ];
 
-    public static function getMenu()
-    {
-        return ['id' => 'Required|IntGe:1'];
-    }
+    public static $getMenu = [
+        'id' => 'Required|IntGe:1',
+    ];
 
-    public static function getMenuList(): array
-    {
-        return [
-            "curr_page" => "Required|IntGe:1",
-            "page_size" => "Required|IntGe:1",
-        ];
-    }
+    public static $getMenuList = [
+        "curr_page" => "Required|IntGe:1",
+        "page_size" => "Required|IntGe:1",
+    ];
 
 }

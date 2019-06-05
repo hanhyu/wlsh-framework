@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 class ServerStatusController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
     public function init()
     {
         $this->beforeInit();

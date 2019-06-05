@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Domain\System\Log;
+use App\Models\Forms\SystemLogForms;
 
 /**
  * Created by PhpStorm.
@@ -11,7 +12,7 @@ use App\Domain\System\Log;
  */
 class LogMongoController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
 
     /**
      * @var Log
@@ -30,8 +31,8 @@ class LogMongoController extends Yaf\Controller_Abstract
      */
     public function getMongoListAction(): void
     {
-        $data = $this->validator('SystemLogForms', 'getMongoList');
-        $res = $this->log->getMongoList($data);
+        $data = $this->validator(SystemLogForms::$getMongoList);
+        $res  = $this->log->getMongoList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
         } else {
@@ -45,8 +46,8 @@ class LogMongoController extends Yaf\Controller_Abstract
      */
     public function getMongoInfoAction()
     {
-        $data = $this->validator('SystemLogForms', 'getMongoInfo');
-        $res = $this->log->getMongoById($data['id']);
+        $data = $this->validator(SystemLogForms::$getMongoInfo);
+        $res  = $this->log->getMongoById($data['id']);
         if ($res) {
             $this->response->end(http_response(200, $res));
         }

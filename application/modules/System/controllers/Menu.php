@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use \App\Domain\System\Menu;
+use App\Domain\System\Menu;
+use App\Models\Forms\SystemMenuForms;
 
 /**
  * Created by PhpStorm.
@@ -11,7 +12,7 @@ use \App\Domain\System\Menu;
  */
 class MenuController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
     /**
      * @var Menu
      */
@@ -29,8 +30,8 @@ class MenuController extends Yaf\Controller_Abstract
      */
     public function getMenuListAction(): void
     {
-        $data = $this->validator('SystemMenuForms', 'getMenuList');
-        $res = $this->menu->getList($data);
+        $data = $this->validator(SystemMenuForms::$getMenuList);
+        $res  = $this->menu->getList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
         } else {
@@ -50,8 +51,8 @@ class MenuController extends Yaf\Controller_Abstract
      */
     public function setMenuAction(): void
     {
-        $data = $this->validator('SystemMenuForms', 'setMenu');
-        $res = $this->menu->setMenu($data);
+        $data = $this->validator(SystemMenuForms::$setMenu);
+        $res  = $this->menu->setMenu($data);
         if ($res) {
             $this->response->end(http_response(200, $data['name'] . '菜单添加成功'));
         } else {
@@ -65,8 +66,8 @@ class MenuController extends Yaf\Controller_Abstract
      */
     public function getMenuAction(): void
     {
-        $data = $this->validator('SystemMenuForms', 'getMenu');
-        $res = $this->menu->getMenuById((int)$data['id']);
+        $data = $this->validator(SystemMenuForms::$getMenu);
+        $res  = $this->menu->getMenuById((int)$data['id']);
         if ($res) {
             $this->response->end(http_response(200, $res));
             return;
@@ -81,8 +82,8 @@ class MenuController extends Yaf\Controller_Abstract
      */
     public function editMenuAction(): void
     {
-        $data = $this->validator('SystemMenuForms', 'setMenu');
-        $res = $this->menu->editMenu($data);
+        $data = $this->validator(SystemMenuForms::$setMenu);
+        $res  = $this->menu->editMenu($data);
         if ($res) {
             $this->response->end(http_response(200, $data['name'] . '修改成功'));
         } else {
@@ -96,8 +97,8 @@ class MenuController extends Yaf\Controller_Abstract
      */
     public function delMenuAction(): void
     {
-        $data = $this->validator('SystemMenuForms', 'getMenu');
-        $res = $this->menu->delMenu((int)$data['id']);
+        $data = $this->validator(SystemMenuForms::$getMenu);
+        $res  = $this->menu->delMenu((int)$data['id']);
         if ($res) {
             $this->response->end(http_response(200, ['id' => $data['id']]));
         } else {

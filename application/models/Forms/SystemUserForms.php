@@ -15,44 +15,29 @@ class SystemUserForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public static function userLogin()
-    {
-        return [
-            'name'   => 'Required|StrLenGeLe:1,50',
-            'pwd'    => 'Required|StrLenGeLe:3,20',
-            'remark' => 'StrLenGeLe:1,50',
-        ];
-    }
+    public static $userLogin = [
+        'name'   => 'Required|StrLenGeLe:1,50',
+        'pwd'    => 'Required|StrLenGeLe:3,20',
+        'remark' => 'StrLenGeLe:1,50',
+    ];
 
-    public static function getUser()
-    {
-        return [
-            'id' => 'Required|IntGe:1',
-        ];
-    }
+    public static $getUser = [
+        'id' => 'Required|IntGe:1',
+    ];
 
-    public static function editUser()
-    {
-        return [
-            'id'     => 'Required|IntGe:1',
-            'status' => 'Required|IntGeLe:10,250',
-            'remark' => 'StrLenGeLe:1,50',
-        ];
-    }
+    public static $editUser = [
+        'id'     => 'Required|IntGe:1',
+        'status' => 'Required|IntGeLe:10,250',
+        'remark' => 'StrLenGeLe:1,50',
+    ];
 
-    public static function pull()
-    {
-        return [
-            'pwd' => 'Required|StrLenGeLe:3,50',
-        ];
-    }
+    public static $pull = [
+        'pwd' => 'Required|StrLenGeLe:3,50',
+    ];
 
-    public static function getUserList()
-    {
-        return [
-            'curr_page' => 'IntGe:1',
-            'page_size' => 'Required|IntGe:1',
-        ];
-    }
+    public static $getUserList = [
+        'curr_page' => 'IntGe:1',
+        'page_size' => 'Required|IntGe:1',
+    ];
 
 }

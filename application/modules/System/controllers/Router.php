@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-use \App\Domain\System\Router;
+use App\Domain\System\Router;
+use App\Models\Forms\SystemRouterForms;
 
 class RouterController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
     /**
      * @var Router
      */
@@ -23,7 +24,7 @@ class RouterController extends Yaf\Controller_Abstract
      */
     public function getListAction(): void
     {
-        $data = $this->validator('SystemRouterForms', 'getList');
+        $data = $this->validator(SystemRouterForms::$getList);
         $res  = $this->router->getList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -39,7 +40,7 @@ class RouterController extends Yaf\Controller_Abstract
      */
     public function setRouterAction(): void
     {
-        $data = $this->validator('SystemRouterForms', 'setRouter');
+        $data = $this->validator(SystemRouterForms::$setRouter);
         $res  = $this->router->setRouter($data);
         if ($res) {
             $this->response->end(http_response(200, '路由添加成功'));
@@ -55,7 +56,7 @@ class RouterController extends Yaf\Controller_Abstract
      */
     public function editRouterAction(): void
     {
-        $data = $this->validator('SystemRouterForms', 'editRouter');
+        $data = $this->validator(SystemRouterForms::$editRouter);
         $res  = $this->router->editRouter($data);
         if ($res) {
             $this->response->end(http_response(200, "{$data['name']}修改成功"));
@@ -70,7 +71,7 @@ class RouterController extends Yaf\Controller_Abstract
      */
     public function delRouterAction(): void
     {
-        $data = $this->validator('SystemRouterForms', 'delRouter');
+        $data = $this->validator(SystemRouterForms::$delRouter);
         $res  = $this->router->delRouter((int)$data['id']);
         if ($res) {
             $this->response->end(http_response(200, ['id' => $data['id']]));

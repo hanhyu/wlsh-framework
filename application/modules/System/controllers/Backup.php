@@ -9,11 +9,13 @@ declare(strict_types=1);
  */
 
 use App\Models\Mysql\SystemBackup;
+use App\Models\Forms\SystemUserForms;
+use App\Models\Forms\SystemBackupForms;
 
 //todo 数据备份类未整理完
 class BackupController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
     /**
      * @var SystemBackup
      */
@@ -45,7 +47,7 @@ class BackupController extends Yaf\Controller_Abstract
      */
     public function addAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'pull');
+        $data = $this->validator(SystemUserForms::$pull);
         if ($data['pwd'] == 'wlsh_frame_mysql_backup_20180107') {
             $config      = \Yaf\Registry::get('config');
             $host        = $config->mysql->host;
@@ -94,8 +96,8 @@ class BackupController extends Yaf\Controller_Abstract
     //todo 下载链接直接在前端拼接，无需在后端操作，但是在后端操作有个好处是需要登录认证后才能下载，否则不能用url直接下载。
     public function downAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'getUser');
-        $res = $this->backup_m->getFileName($data['id']);
+        $data = $this->validator(SystemUserForms::$getUser);
+        $res  = $this->backup_m->getFileName($data['id']);
         if (!empty($res)) {
             $res[0]['file_name'] = \Yaf\Registry::get('config')->backup->downUrl . $res[0]['file_name'];
             $this->response->end(http_response(200, $res[0]));
@@ -108,7 +110,7 @@ class BackupController extends Yaf\Controller_Abstract
      */
     public function delAction(): void
     {
-        $data = $this->validator('SystemBackupForms', 'del');
+        $data = $this->validator(SystemBackupForms::$del);
 
         //$id = intval($data['id'] ?? 0);
         //$fileName = strval($data['fileName'] ?? 0);

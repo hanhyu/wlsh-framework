@@ -159,13 +159,12 @@ trait ControllersTrait
     /**
      * 接口（表单）参数验证过滤器
      *
-     * @param string $forms  请求验证的表单类名
-     * @param string $action 请求验证的具体方法名
+     * @param array $validations
      *
      * @return array 返回验证过滤后的数据
      * @throws \Exception
      */
-    public function validator(string $forms, string $action): array
+    public function validator(array $validations): array
     {
         $data = $this->getParams();
 
@@ -189,8 +188,7 @@ trait ControllersTrait
         }
 
         try {
-            $class = '\App\Models\Forms\\' . $forms;
-            $data  = FormsVali::validate($data, (new $class)::$action());
+            $data = FormsVali::validate($data, $validations);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }

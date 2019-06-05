@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Domain\System\User;
+use App\Models\Forms\SystemLogForms;
 
 /**
  * 登录日志
@@ -11,7 +12,7 @@ use App\Domain\System\User;
  */
 class LogUserController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
 
     /**
      * @var User
@@ -30,7 +31,7 @@ class LogUserController extends Yaf\Controller_Abstract
      */
     public function getUserListAction(): void
     {
-        $data = $this->validator('SystemLogForms', 'getUserList');
+        $data = $this->validator(SystemLogForms::$getUserList);
         //$data['uid'] = get_token_params($this->request->header['authorization'])['id'];
         $res = $this->log->getLogList($data);
         if ($res) {

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use App\Models\Forms\SystemLogForms;
+
 /**
  * 获取日志类
  * User: hanhyu
@@ -9,7 +11,7 @@ declare(strict_types=1);
  */
 class LogSwooleController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
 
     public function init()
     {
@@ -22,8 +24,8 @@ class LogSwooleController extends Yaf\Controller_Abstract
      */
     public function getInfoAction(): void
     {
-        $data = $this->validator('SystemLogForms', 'info');
-        $fp = fopen(ROOT_PATH . '/log/' . $data['name'], "r");
+        $data    = $this->validator(SystemLogForms::$info);
+        $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], "r");
         $content = Swoole\Coroutine::fread($fp);
         fclose($fp);
         $this->response->end(http_response(200, ['content' => $content]));
@@ -35,8 +37,8 @@ class LogSwooleController extends Yaf\Controller_Abstract
      */
     public function cleanLogAction(): void
     {
-        $data = $this->validator('SystemLogForms', 'info');
-        if ($data['name'] == 'slow.log' || $data['name'] == 'swoole.log' || $data['name'] == 'swoolePid.log') {
+        $data = $this->validator(SystemLogForms::$info);
+        if ($data['name'] == 'swoole.log' || $data['name'] == 'swoolePid.log') {
             $fp = fopen(ROOT_PATH . '/log/' . $data['name'], "w+");
         } else { //monolog日志
             $fp = fopen(ROOT_PATH . '/log/monolog/' . $data['name'], "w+");
@@ -52,7 +54,7 @@ class LogSwooleController extends Yaf\Controller_Abstract
      */
     public function getMonologAction(): void
     {
-        $data = $this->validator('SystemLogForms', 'info');
+        $data = $this->validator(SystemLogForms::$info);
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
             $fp = fopen($file, "r");

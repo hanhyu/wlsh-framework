@@ -299,8 +299,7 @@ class Server
             //echo "Close frame received: Code {$frame->code} Reason {$frame->reason}\n";
         } else {
             $res = json_decode($frame->data, true);
-            if (!isset($res['uri']) AND empty($res['uri'])) {
-                EOF:
+            if (!isset($res['uri']) and empty($res['uri'])) {
                 if ($server->isEstablished($frame->fd))
                     $server->push($frame->fd, ws_response(400, null, '非法访问'));
                 $server->close($frame->fd, true);

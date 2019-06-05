@@ -15,24 +15,18 @@ class SystemProcessForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public static function setMsg()
-    {
-        return [
-            'content' => 'Required|StrLenGeLe:1,1000',
-        ];
-    }
+    public static $setMsg = [
+        'content' => 'Required|StrLenGeLe:1,1000',
+    ];
 
     /**
      * 获取内容列表
      * @return array
      */
-    public static function getMsgList()
-    {
-        return [
-            'curr_page' => 'Required|IntGe:1',
-            'page_size' => 'Required|IntGe:1',
-            'id'        => ['IntGe:1', 'StrIn:'],
-        ];
-    }
+    public static $getMsgList = [
+        'curr_page' => 'Required|IntGe:1',
+        'page_size' => 'Required|IntGe:1',
+        'id'        => ['IntGe:1', 'StrIn:'],
+    ];
 
 }

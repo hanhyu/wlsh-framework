@@ -15,42 +15,33 @@ class SystemLogForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public static function info()
-    {
-        return [
-            'name' => 'Required|StrLenGeLe:1,50',
-        ];
-    }
+    public static $info = [
+        'name' => 'Required|StrLenGeLe:1,50',
+    ];
 
-    public static function getMongoList()
-    {
-        return [
-            'curr_page' => 'Required|IntGe:1',
-            'page_size' => 'Required|IntGe:1',
-            'log_time'  => ['Date', 'StrIn:'],
-            'channel'   => ['StrLenGeLe:3,50', 'StrIn:'],
-        ];
-    }
 
-    public static function getMongoInfo()
-    {
-        return [
-            'id' => 'Required|Str',
-        ];
-    }
+    public static $getMongoList = [
+        'curr_page' => 'Required|IntGe:1',
+        'page_size' => 'Required|IntGe:1',
+        'log_time'  => ['Date', 'StrIn:'],
+        'channel'   => ['StrLenGeLe:3,50', 'StrIn:'],
+    ];
+
+
+    public static $getMongoInfo = [
+        'id' => 'Required|Str',
+    ];
+
 
     /**
      * 用户登录日志
      * @return array
      */
-    public static function getUserList()
-    {
-        return [
-            'curr_page'  => 'Required|IntGe:1',
-            'page_size'  => 'Required|IntGe:1',
-            'login_time' => ['Date', 'StrIn:'],
-            'uname'      => ['StrLenGeLe:3,50', 'StrIn:'],
-        ];
-    }
+    public static $getUserList = [
+        'curr_page'  => 'Required|IntGe:1',
+        'page_size'  => 'Required|IntGe:1',
+        'login_time' => ['Date', 'StrIn:'],
+        'uname'      => ['StrLenGeLe:3,50', 'StrIn:'],
+    ];
 
 }

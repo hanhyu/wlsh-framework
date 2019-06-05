@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use \App\Domain\System\User;
+use App\Domain\System\User;
+use App\Models\Forms\SystemUserForms;
 
 /**
  * Created by PhpStorm.
@@ -11,7 +12,7 @@ use \App\Domain\System\User;
  */
 class UserController extends Yaf\Controller_Abstract
 {
-    use \App\Library\ControllersTrait;
+    use App\Library\ControllersTrait;
 
     /**
      * @var User
@@ -30,7 +31,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function setUserAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'userLogin');
+        $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->getInfoByName($data['name']);
         if (!empty($info)) {
             $this->response->end(http_response(400, '该用户名已存在'));
@@ -51,7 +52,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function getUserListAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'getUserList');
+        $data = $this->validator(SystemUserForms::$getUserList);
         $res  = $this->user->getInfoList($data);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -66,7 +67,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function delUserAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'getUser');
+        $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->delUser((int)$data['id']);
         if ($res) {
             $this->response->end(http_response(200, ['id' => $data['id']]));
@@ -81,7 +82,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function getUserAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'getUser');
+        $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->getUserById((int)$data['id']);
         if ($res) {
             $this->response->end(http_response(200, $res));
@@ -94,7 +95,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function editUserAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'editUser');
+        $data = $this->validator(SystemUserForms::$editUser);
         $res  = $this->user->editUser($data);
         if ($res) {
             $this->response->end(http_response(200, $data['id'] . '修改成功'));
@@ -109,7 +110,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function loginAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'userLogin');
+        $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->getInfoByName($data['name']);
         if (!empty($info)) {
             if ($info[0]['status'] == 0) {
@@ -149,7 +150,7 @@ class UserController extends Yaf\Controller_Abstract
      */
     public function pullAction(): void
     {
-        $data = $this->validator('SystemUserForms', 'pull');
+        $data = $this->validator(SystemUserForms::$pull);
         //执行钩子方法，让程序自动更新git项目
         if ($data['pwd'] == 'wlsh_base_frame') {
             $shell = "cd /home/baseFrame/ && git pull";
