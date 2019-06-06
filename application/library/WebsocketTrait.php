@@ -72,6 +72,7 @@ trait WebsocketTrait
 
         try {
             $vali_data = FormsVali::validate($data['data'], $validations);
+            $vali_data = array_intersect_key($vali_data, $validations);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }

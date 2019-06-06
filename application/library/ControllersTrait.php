@@ -189,6 +189,7 @@ trait ControllersTrait
 
         try {
             $data = FormsVali::validate($data, $validations);
+            $data = array_intersect_key($data, $validations);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }

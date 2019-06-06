@@ -54,6 +54,7 @@ class PdoPool
                 'password'      => $this->config['password'],
                 'charset'       => $this->config['charset'],
                 'prefix'        => $this->config['prefix'],
+                //此参数在连接池功能中必须设置为false，否则会造成内存泄露。
                 'logging'       => false,
                 'option'        => [
                     PDO::ATTR_CASE                     => PDO::CASE_NATURAL,
@@ -63,6 +64,9 @@ class PdoPool
                     PDO::ATTR_TIMEOUT                  => 3,
                     //PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     //PDO::ATTR_PERSISTENT => true
+                ],
+                'command'       => [
+                    'SET SQL_MODE=ANSI_QUOTES',
                 ],
             ]);
 
