@@ -33,11 +33,12 @@ class Log
         }
         $data['where'] = [];
 
-        if (!empty($data['log_time'])) {
-            $int_start_time            = strtotime($data['log_time']);
+        if (!empty($data['start_time'])) {
+            $start_time_int            = strtotime($data['start_time']);
+            $end_time_int              = strtotime($data['end_time']);
             $data['where']['datetime'] = [
-                '$gte' => new \MongoDB\BSON\UTCDateTime($int_start_time * 1000),
-                '$lt'  => new \MongoDB\BSON\UTCDateTime(strtotime("+1 day", $int_start_time) * 1000),
+                '$gte' => new \MongoDB\BSON\UTCDateTime($start_time_int * 1000),
+                '$lt'  => new \MongoDB\BSON\UTCDateTime($end_time_int * 1000),
             ];
         }
 

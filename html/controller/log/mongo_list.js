@@ -25,7 +25,12 @@ new Vue({
             let laydate = layui.laydate;
             //执行一个laydate实例
             laydate.render({
-                elem: '#log_time', //指定元素
+                elem: '#start_time', //指定元素
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#end_time', //指定元素
+                type: 'datetime'
             });
         });
 
@@ -34,6 +39,19 @@ new Vue({
     methods: {
         //列表
         mongoList() {
+            let start_time = $("#start_time").val();
+            let end_time = $("#end_time").val();
+
+            if (start_time && !end_time) {
+                layer.msg('结束时间不能为空', {icon: 5, time: 1000});
+                return;
+            }
+
+            if (end_time && start_time > end_time) {
+                layer.msg('结束时间不能小于开始时间', {icon: 5, time: 1000});
+                return;
+            }
+
             let self = this;
             self.dis = 'disabled';
             let loadIndex = layer.load(2, {time: 30 * 1000});
@@ -43,8 +61,9 @@ new Vue({
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size,
-                    log_time: $("#log_time").val(),
-                    channel: $("#channel").val()
+                    start_time: start_time,
+                    end_time: end_time,
+                    channel: $("#channel").val().trim()
                 }
             })
                 .then(function (response) {
@@ -76,6 +95,12 @@ new Vue({
         getMongo(item) {
             let info = encodeURI(JSON.stringify(item));
             x_admin_show('详细信息', "mongo_info.html?info=" + info, 800, 700);
+        },
+        //清空查询条件
+        cleanSearch() {
+            $("#start_time").val('');
+            $("#end_time").val('');
+            $("#channel").val('');
         }
     },
     watch: {

@@ -22,9 +22,11 @@
 <div class="x-body all">
     <div class="layui-row">
         <form class="layui-form layui-col-md12 x-so">
-            <input class="layui-input" placeholder="记录时间" name="start" id="log_time">
+            <input class="layui-input" id="start_time" name="start" placeholder="开始时间">
+            <input class="layui-input" id="end_time" name="end" placeholder="结束时间">
             <input class="layui-input" id="channel" name="channel" placeholder="channel">
             <button id="search" class="layui-btn" @click.prevent="mongoList"><i class="layui-icon"></i>查询</button>
+            <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>
         </form>
     </div>
     <table class="layui-table">

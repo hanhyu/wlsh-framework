@@ -21,10 +21,11 @@ class SystemLogForms
 
 
     public static $getMongoList = [
-        'curr_page' => 'Required|IntGe:1',
-        'page_size' => 'Required|IntGe:1',
-        'log_time'  => ['Date', 'StrIn:'],
-        'channel'   => ['StrLenGeLe:3,50', 'StrIn:'],
+        'curr_page'  => 'Required|IntGe:1',
+        'page_size'  => 'Required|IntGe:1',
+        'start_time' => ['DateTime|Alias:开始时间', 'StrIn:'],
+        'end_time'   => ['DateTime|Alias:结束时间', 'StrIn:'],
+        'channel'    => ['StrLenGeLe:3,50', 'StrIn:'],
     ];
 
 
