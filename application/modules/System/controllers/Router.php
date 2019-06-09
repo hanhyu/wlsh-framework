@@ -1,21 +1,24 @@
 <?php
 declare(strict_types=1);
 
-use App\Domain\System\Router;
-use App\Models\Forms\SystemRouterForms;
+namespace App\Modules\System\Controllers;
 
-class RouterController extends Yaf\Controller_Abstract
+use App\Domain\System\Router as RouterDomain;
+use App\Models\Forms\SystemRouterForms;
+use Exception;
+
+class Router extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
     /**
-     * @var Router
+     * @var RouterDomain
      */
     private $router;
 
     public function init()
     {
         $this->beforeInit();
-        $this->router = new Router();
+        $this->router = new RouterDomain();
     }
 
     /**

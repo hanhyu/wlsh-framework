@@ -1,8 +1,16 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Controllers;
+
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Yaf\{
+    Controller_Abstract,
+    Registry,
+};
+use Swoole\WebSocket\Server;
+use Swoole\Http\Response;
 
 /**
  * 测试用例
@@ -10,25 +18,25 @@ use PhpAmqpLib\Message\AMQPMessage;
  * Date: 18-7-25
  * Time: 上午10:24
  */
-class LoginController extends \Yaf\Controller_Abstract
+class Login extends Controller_Abstract
 {
     /**
-     * @var \Swoole\WebSocket\Server
+     * @var Server
      */
     private $server;
     /**
-     * @var Swoole\Http\Response
+     * @var Response
      */
     private $response;
     /**
-     * @var Redis
+     * @var \Redis
      */
     private $redis;
 
     public function init()
     {
-        $this->server   = Yaf\Registry::get('server');
-        $this->response = \Yaf\Registry::get('response');
+        $this->server   = Registry::get('server');
+        $this->response = Registry::get('response');
     }
 
     /**
@@ -563,7 +571,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $user              = new \App\Domain\System\User();
         $res               = $user->getInfoList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -634,7 +642,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $user              = new \App\Services\System\Log();
         $res               = $user->getMongoList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -706,7 +714,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $user               = new \App\Domain\System\User();
         $res                = $user->getLogList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -779,7 +787,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $user               = new \App\Services\System\User();
         $res                = $user->getLogViewList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -866,7 +874,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $mysql = Yaf\Registry::get('mysql_pool')->get();
         $get   = $mysql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-        $this->response->end(http_response(200, $get));
+        $this->response->end(http_response(200, '', $get));
     }
 
     public function swPgsqlAction(): void
@@ -877,7 +885,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $pgsql = Yaf\Registry::get('pgsql_pool')->get();
 
         $get = $pgsql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-        $this->response->end(http_response(200, $get));
+        $this->response->end(http_response(200, '', $get));
 
     }
 
@@ -1013,7 +1021,7 @@ class LoginController extends \Yaf\Controller_Abstract
         $mysql = Yaf\Registry::get('co_mysql_pool')->get();
         $stmt  = $mysql->prepare($sql);
         $get   = $stmt->execute([1]);
-        $this->response->end(http_response(200, $get));
+        $this->response->end(http_response(200, '', $get));
 
     }
 

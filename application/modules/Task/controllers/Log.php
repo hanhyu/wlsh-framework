@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\Tash\Controllers;
+
 /**
  * 操作日志类
  * User: hanhyu
  * Date: 18-10-22
  * Time: 下午5:00
  */
-class LogController extends Yaf\Controller_Abstract
+class LogController extends \Yaf\Controller_Abstract
 {
     /**
      * @param        $content

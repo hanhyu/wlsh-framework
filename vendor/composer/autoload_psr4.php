@@ -40,6 +40,5 @@ return array(
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
     'App\\Plugins\\' => array($baseDir . '/application/plugins'),
     'App\\Models\\' => array($baseDir . '/application/models'),
-    'App\\Library\\' => array($baseDir . '/application/library'),
     'App\\Domain\\' => array($baseDir . '/application/domain'),
 );

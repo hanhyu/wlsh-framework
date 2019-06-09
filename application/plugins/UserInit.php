@@ -10,7 +10,7 @@ namespace App\Plugins;
 
 use Yaf\Registry;
 
-class UserInitPlugin extends \Yaf\Plugin_Abstract
+class UserInit extends \Yaf\Plugin_Abstract
 {
     /**
      *

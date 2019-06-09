@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
-use App\Domain\System\Process;
+namespace App\Modules\System\Controllers;
+
+use App\Domain\System\Process as ProcessDomain;
 use App\Models\Forms\SystemProcessForms;
+use Exception;
 
 /**
  * Created by PhpStorm.
@@ -10,19 +13,19 @@ use App\Models\Forms\SystemProcessForms;
  * Date: 19-2-1
  * Time: 下午5:38
  */
-class ProcessController extends Yaf\Controller_Abstract
+class Process extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
 
     /**
-     * @var Process
+     * @var ProcessDomain
      */
     private $msg;
 
     public function init()
     {
         $this->beforeInit();
-        $this->msg = new Process();
+        $this->msg = new ProcessDomain();
     }
 
     /**

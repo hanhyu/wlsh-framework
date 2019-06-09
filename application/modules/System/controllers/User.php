@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use App\Domain\System\User;
+namespace App\Modules\System\Controllers;
+
+use App\Domain\System\User as UserDomain;
 use App\Models\Forms\SystemUserForms;
 
 /**
@@ -10,19 +12,19 @@ use App\Models\Forms\SystemUserForms;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class UserController extends Yaf\Controller_Abstract
+class User extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
 
     /**
-     * @var User
+     * @var UserDomain
      */
     private $user;
 
     public function init()
     {
         $this->beforeInit();
-        $this->user = new User();
+        $this->user = new UserDomain();
     }
 
     /**

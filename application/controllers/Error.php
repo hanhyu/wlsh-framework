@@ -1,5 +1,6 @@
 <?php
 
+namespace App\Controllers;
 use Yaf\Registry;
 
 /**
@@ -8,7 +9,7 @@ use Yaf\Registry;
  * Date: 18-7-25
  * Time: 上午10:38
  */
-class ErrorController extends Yaf\Controller_Abstract
+class Error extends \Yaf\Controller_Abstract
 {
     /**
      * @var Swoole\Http\Response

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\System\Controllers;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -11,11 +13,12 @@ declare(strict_types=1);
 use App\Models\Mysql\SystemBackup;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Forms\SystemBackupForms;
+use Exception;
 
 //todo 数据备份类未整理完
-class BackupController extends Yaf\Controller_Abstract
+class Backup extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
     /**
      * @var SystemBackup
      */
@@ -49,7 +52,7 @@ class BackupController extends Yaf\Controller_Abstract
     {
         $data = $this->validator(SystemUserForms::$pull);
         if ($data['pwd'] == 'wlsh_frame_mysql_backup_20180107') {
-            $config      = \Yaf\Registry::get('config');
+            $config = \Yaf\Registry::get('config');
             $host        = $config->mysql->host;
             $port        = $config->mysql->port;
             $username    = $config->mysql->username;
@@ -60,7 +63,7 @@ class BackupController extends Yaf\Controller_Abstract
             $rand        = time();
             $yaf_environ = ini_get('yaf.environ');
             $filename    = "{$path}/{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
-            $res         = Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
+            $res = \Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
             if ($res['code'] == 0) {
                 $arr['filename'] = "{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
                 $arr['size']     = filesize($filename);

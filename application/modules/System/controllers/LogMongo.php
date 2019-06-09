@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\System\Controllers;
+
 use App\Domain\System\Log;
 use App\Models\Forms\SystemLogForms;
+use Exception;
 
 /**
  * Created by PhpStorm.
@@ -10,9 +13,9 @@ use App\Models\Forms\SystemLogForms;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class LogMongoController extends Yaf\Controller_Abstract
+class LogMongo extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
 
     /**
      * @var Log

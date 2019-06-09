@@ -1,16 +1,18 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\System\Controllers;
+
 /**
  * 查看服务器各种状态信息
  * User: hanhyu
  * Date: 18-12-10
  * Time: 上午9:44
  */
-
-class ServerStatusController extends Yaf\Controller_Abstract
+class ServerStatus extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
+
     public function init()
     {
         $this->beforeInit();
@@ -23,21 +25,21 @@ class ServerStatusController extends Yaf\Controller_Abstract
      */
     public function getStatusAction(): void
     {
-        $swoole = $this->server->stats();
-        $content['version'] = \Yaf\Registry::get('config')->version;
+        $swoole                = $this->server->stats();
+        $content['version']    = \Yaf\Registry::get('config')->version;
         $content['before_url'] = \Yaf\Registry::get('config')->before_url;
-        $content['uname'] = php_uname();
-        $content['swoole_v'] = SWOOLE_VERSION;
+        $content['uname']      = php_uname();
+        $content['swoole_v']   = SWOOLE_VERSION;
         //exec('nginx -v', $content['nginxV']);
         //$content['nginxV'] = fgets(STDIN);
-        $content['php_v'] = PHP_VERSION;
-        $content['mysql_v'] = Swoole\Coroutine::exec('mysql -V')['output'];
-        $content['filesize'] = ini_get('upload_max_filesize');
+        $content['php_v']     = PHP_VERSION;
+        $content['mysql_v']   = \Swoole\Coroutine::exec('mysql -V')['output'];
+        $content['filesize']  = ini_get('upload_max_filesize');
         $content['exec_time'] = ini_get('max_execution_time');
-        $content['memory'] = round(memory_get_usage()/1024/1024, 2);
-        $content['atomic'] = $this->atomic->get();
+        $content['memory']    = round(memory_get_usage()/1024/1024, 2);
+        $content['atomic']    = $this->atomic->get();
 
-        $data['swoole'] = $swoole;
+        $data['swoole']  = $swoole;
         $data['content'] = $content;
         $this->response->end(http_response(200, '', $data));
         //echo http_response(200, $data);

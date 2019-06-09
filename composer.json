@@ -32,7 +32,6 @@
     "psr-4": {
       "App\\Models\\": "application/models",
       "App\\Domain\\": "application/domain",
-      "App\\Library\\": "application/library",
       "App\\Plugins\\": "application/plugins",
       "Tests\\": "tests/"
     }

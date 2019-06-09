@@ -1,6 +1,14 @@
 <?php
 
-use Yaf\Dispatcher;
+namespace App;
+
+use Yaf\{
+    Bootstrap_Abstract,
+    Dispatcher,
+    Loader,
+    Registry
+};
+
 
 /**
  * Created by PhpStorm.
@@ -8,17 +16,13 @@ use Yaf\Dispatcher;
  * Date: 18-7-25
  * Time: 上午10:17
  */
-class Bootstrap extends Yaf\Bootstrap_Abstract
+class Bootstrap extends Bootstrap_Abstract
 {
     private $config;
 
     public function _initLoader()
     {
-        // Yaf\Loader::import(ROOT_PATH . '/vendor/autoload.php');
-        Yaf\Loader::import(LIBRARY_PATH . '/PdoPool');
-        Yaf\Loader::import(LIBRARY_PATH . '/RedisPool.php');
-        Yaf\Loader::import(LIBRARY_PATH . '/CoMysqlPool.php');
-        Yaf\Loader::import(LIBRARY_PATH . '/Language.php');
+        Loader::import(CONF_PATH . '/language.php');
     }
 
     public function _initConfig(Dispatcher $dispatcher)
@@ -27,44 +31,44 @@ class Bootstrap extends Yaf\Bootstrap_Abstract
         $dispatcher->disableView();
 
         //把配置保存起来
-        $this->config = Yaf\Application::app()->getConfig();
-        Yaf\Registry::set('config', $this->config);
+        $this->config = \Yaf\Application::app()->getConfig();
+        Registry::set('config', $this->config);
 
-        //new Yaf\Config\Ini();
+        //new \Yaf\Config\Ini();
         //添加路由过滤配置
         $router_filter = include CONF_PATH . '/routerFilter.php';
-        Yaf\Registry::set('router_filter_config', new Yaf\Config\Simple($router_filter));
+        Registry::set('router_filter_config', new \Yaf\Config\Simple($router_filter));
 
         //发送邮件配置
         $email = include CONF_PATH . '/sendEmail.php';
-        Yaf\Registry::set('email_config', new Yaf\Config\Simple($email));
+        Registry::set('email_config', new \Yaf\Config\Simple($email));
 
         //添加redis连接池
-        $redis_pool = new RedisPool();
-        Yaf\Registry::set('redis_pool', $redis_pool);
+        $redis_pool = new \RedisPool();
+        Registry::set('redis_pool', $redis_pool);
 
         //添加mysql数据库连接池
-        $mysql_pool = new PdoPool('mysql');
-        Yaf\Registry::set('mysql_pool', $mysql_pool);
+        $mysql_pool = new \PdoPool('mysql');
+        Registry::set('mysql_pool', $mysql_pool);
 
 
         //如需主从、读写库请在这里自行配置添加
-        //$mysql_master = new PdoPool('mysql_master');
-        //$mysql_slave = new PdoPool('mysql_slave');
+        //$mysql_master = new \PdoPool('mysql_master');
+        //$mysql_slave = new \PdoPool('mysql_slave');
 
         //添加pgsql数据库连接池
-        $pgsql_pool = new PdoPool('pgsql');
-        Yaf\Registry::set('pgsql_pool', $pgsql_pool);
+        $pgsql_pool = new \PdoPool('pgsql');
+        Registry::set('pgsql_pool', $pgsql_pool);
 
         //添加协程mysql数据库连接池
-        $co_mysql_pool = new CoMysqlPool();
-        Yaf\Registry::set('co_mysql_pool', $co_mysql_pool);
+        $co_mysql_pool = new \CoMysqlPool();
+        Registry::set('co_mysql_pool', $co_mysql_pool);
     }
 
     public function _initPlugin(Dispatcher $dispatcher)
     {
         //注册一个自定义路由插件
-        $user_init_plugin = new \App\Plugins\UserInitPlugin();
+        $user_init_plugin = new \App\Plugins\UserInit();
         $dispatcher->registerPlugin($user_init_plugin);
     }
 
@@ -72,7 +76,7 @@ class Bootstrap extends Yaf\Bootstrap_Abstract
     {
         //在这里注册自己的路由协议,默认使用简单路由
         $router = $dispatcher::getInstance()->getRouter();
-        $route  = new Yaf\Route\Supervar("r");
+        $route  = new \Yaf\Route\Supervar("r");
         $router->addRoute("name", $route);
     }
 
@@ -82,7 +86,7 @@ class Bootstrap extends Yaf\Bootstrap_Abstract
     public function _initLocalName()
     {
         //申明, 凡是以Foo和Local开头的类, 都是本地类
-        //$loader = Yaf_Loader::getIgnstance();
+        //$loader = \Yaf_Loader::getIgnstance();
         //$loader->registerLocalNamespace(array("Foo", "Local"));
     }
 

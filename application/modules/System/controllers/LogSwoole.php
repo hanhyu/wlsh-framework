@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\System\Controllers;
+
 use App\Models\Forms\SystemLogForms;
+use Exception;
 
 /**
  * 获取日志类
@@ -9,9 +12,9 @@ use App\Models\Forms\SystemLogForms;
  * Date: 18-9-29
  * Time: 下午3:02
  */
-class LogSwooleController extends Yaf\Controller_Abstract
+class LogSwoole extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
 
     public function init()
     {
@@ -26,7 +29,7 @@ class LogSwooleController extends Yaf\Controller_Abstract
     {
         $data    = $this->validator(SystemLogForms::$info);
         $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], "r");
-        $content = Swoole\Coroutine::fread($fp);
+        $content = \Swoole\Coroutine::fread($fp);
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -43,7 +46,7 @@ class LogSwooleController extends Yaf\Controller_Abstract
         } else { //monolog日志
             $fp = fopen(ROOT_PATH . '/log/monolog/' . $data['name'], "w+");
         }
-        $content = Swoole\Coroutine::fwrite($fp, '日志已清空。。。');
+        $content = \Swoole\Coroutine::fwrite($fp, '日志已清空。。。');
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -57,8 +60,8 @@ class LogSwooleController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemLogForms::$info);
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
-            $fp = fopen($file, "r");
-            $content = Swoole\Coroutine::fread($fp);
+            $fp      = fopen($file, "r");
+            $content = \Swoole\Coroutine::fread($fp);
             fclose($fp);
             $this->response->end(http_response(200, '', ['content' => $content]));
         } else {

@@ -1,8 +1,17 @@
 <?php
 declare(strict_types=1);
 
-use App\Domain\System\Menu;
+namespace App\Modules\System\Controllers;
+
+use App\Domain\System\Menu as MenuDomain;
 use App\Models\Forms\SystemMenuForms;
+
+use Yaf\{
+    Controller_Abstract,
+    Registry
+};
+
+use Exception;
 
 /**
  * Created by PhpStorm.
@@ -10,18 +19,18 @@ use App\Models\Forms\SystemMenuForms;
  * Date: 18-8-31
  * Time: 下午4:09
  */
-class MenuController extends Yaf\Controller_Abstract
+class Menu extends Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
     /**
-     * @var Menu
+     * @var MenuDomain
      */
     private $menu;
 
     public function init()
     {
         $this->beforeInit();
-        $this->menu = new Menu();
+        $this->menu = new MenuDomain();
     }
 
     /**
@@ -40,8 +49,8 @@ class MenuController extends Yaf\Controller_Abstract
     }
 
     public function getMenuInfoAction():void {
-        $data['menu'] = $this->menu->getInfo();
-        $data['title'] = Yaf\Registry::get('config')->page->title;
+        $data['menu']  = $this->menu->getInfo();
+        $data['title'] = Registry::get('config')->page->title;
         $this->response->end(http_response(200, '', $data));
     }
 

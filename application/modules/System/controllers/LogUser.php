@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Modules\System\Controllers;
+
 use App\Domain\System\User;
 use App\Models\Forms\SystemLogForms;
+use Exception;
 
 /**
  * 登录日志
@@ -10,9 +13,9 @@ use App\Models\Forms\SystemLogForms;
  * Date: 19-1-15
  * Time: 下午2:49
  */
-class LogUserController extends Yaf\Controller_Abstract
+class LogUser extends \Yaf\Controller_Abstract
 {
-    use App\Library\ControllersTrait;
+    use \ControllersTrait;
 
     /**
      * @var User

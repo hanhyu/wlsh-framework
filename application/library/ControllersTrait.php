@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace App\library;
-
 use App\Models\Forms\FormsVali;
 
 use Swoole\Atomic;
