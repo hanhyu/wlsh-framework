@@ -39,7 +39,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                 })
                 .catch(function (error) {
@@ -62,7 +62,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                     layer.close(loadIndex);
                 })

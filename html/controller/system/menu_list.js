@@ -50,7 +50,7 @@ new Vue({
                             top.location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data, function () {
+                            layer.msg(response.data.msg, function () {
                                 self.dis = false;
                             });
                     }
@@ -85,7 +85,7 @@ new Vue({
                                 location.href = 'login.html';
                                 break;
                             default:
-                                layer.msg(response.data.data);
+                                layer.msg(response.data.msg);
                         }
                         layer.close(loadIndex);
                     })

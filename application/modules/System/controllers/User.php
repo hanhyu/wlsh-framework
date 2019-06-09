@@ -55,7 +55,7 @@ class UserController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemUserForms::$getUserList);
         $res  = $this->user->getInfoList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -70,7 +70,7 @@ class UserController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->delUser((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, ['id' => $data['id']]));
+            $this->response->end(http_response(200, '', ['id' => $data['id']]));
         } else {
             $this->response->end(http_response(400, "{$data['id']}删除失败"));
         }
@@ -85,7 +85,7 @@ class UserController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->getUserById((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         }
     }
 
@@ -122,7 +122,7 @@ class UserController extends Yaf\Controller_Abstract
                 $params['time'] = time();
                 $token          = get_token($params);
                 //$this->response->cookie('token', $token);
-                $this->response->end(http_response(200, ['token' => $token]));
+                $this->response->end(http_response(200, '', ['token' => $token]));
 
                 $params['ip'] = ip2long(get_ip($this->request->server));
                 $this->user->setLoginLog($params);
@@ -158,7 +158,7 @@ class UserController extends Yaf\Controller_Abstract
             if ($status) {
                 $this->response->end(http_response(400, 'git自动更新数据失败'));
             } else { //成功
-                $this->response->end(http_response(200, ['content' => $result]));
+                $this->response->end(http_response(200, '', ['content' => $result]));
                 //返回pull更新代码后重载服务
                 $this->server->defer(function () {
                     $this->server->reload();

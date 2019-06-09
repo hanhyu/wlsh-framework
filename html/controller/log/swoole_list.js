@@ -37,7 +37,7 @@ new Vue({
             })
                 .then(function (response) {
                     if (response.data.code === 400 || response.data.code === 500) {
-                        layer.msg(response.data.data);
+                        layer.msg(response.data.msg);
                     }
                     if (response.data.code === 200) {
                         self.dirName = dirName;
@@ -73,7 +73,7 @@ new Vue({
                     .then(function (response) {
                         console.log(response.data);
                         if (response.data.code === 400 || response.data.code === 500) {
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                         }
                         if (response.data.code === 200) {
                             self.logList('swoole.log');
@@ -109,7 +109,7 @@ new Vue({
             })
                 .then(function (response) {
                     if (response.data.code === 400 || response.data.code === 500) {
-                        layer.msg(response.data.data);
+                        layer.msg(response.data.msg);
                     }
                     if (response.data.code === 200) {
                         self.dirName = startTime + '.log';

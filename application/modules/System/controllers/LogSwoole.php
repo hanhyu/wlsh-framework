@@ -28,7 +28,7 @@ class LogSwooleController extends Yaf\Controller_Abstract
         $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], "r");
         $content = Swoole\Coroutine::fread($fp);
         fclose($fp);
-        $this->response->end(http_response(200, ['content' => $content]));
+        $this->response->end(http_response(200, '', ['content' => $content]));
     }
 
     /**
@@ -45,7 +45,7 @@ class LogSwooleController extends Yaf\Controller_Abstract
         }
         $content = Swoole\Coroutine::fwrite($fp, '日志已清空。。。');
         fclose($fp);
-        $this->response->end(http_response(200, ['content' => $content]));
+        $this->response->end(http_response(200, '', ['content' => $content]));
     }
 
     /**
@@ -60,9 +60,9 @@ class LogSwooleController extends Yaf\Controller_Abstract
             $fp = fopen($file, "r");
             $content = Swoole\Coroutine::fread($fp);
             fclose($fp);
-            $this->response->end(http_response(200, ['content' => $content]));
+            $this->response->end(http_response(200, '', ['content' => $content]));
         } else {
-            $this->response->end(http_response(200, ['content' => '查询目录不存在']));
+            $this->response->end(http_response(200, '', ['content' => '查询目录不存在']));
         }
     }
 

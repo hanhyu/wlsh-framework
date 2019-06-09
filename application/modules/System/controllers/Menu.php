@@ -33,7 +33,7 @@ class MenuController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemMenuForms::$getMenuList);
         $res  = $this->menu->getList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -42,7 +42,7 @@ class MenuController extends Yaf\Controller_Abstract
     public function getMenuInfoAction():void {
         $data['menu'] = $this->menu->getInfo();
         $data['title'] = Yaf\Registry::get('config')->page->title;
-        $this->response->end(http_response(200, $data));
+        $this->response->end(http_response(200, '', $data));
     }
 
     /**
@@ -69,7 +69,7 @@ class MenuController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->getMenuById((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
             return;
         } else {
             $this->response->end(http_response(500, '获取菜单失败'));
@@ -100,7 +100,7 @@ class MenuController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->delMenu((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, ['id' => $data['id']]));
+            $this->response->end(http_response(200, '', ['id' => $data['id']]));
         } else {
             $this->response->end(http_response(500, "{$data['id']}删除失败"));
         }

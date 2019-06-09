@@ -34,7 +34,7 @@ class ProcessController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemProcessForms::$getMsgList);
         $res  = $this->msg->getMsgList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }

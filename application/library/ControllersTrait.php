@@ -182,10 +182,8 @@ trait ControllersTrait
             $data    = json_decode($decrypt, true);
         }
 
-        //如果参数lang_code设置了，则输出对应的信息模板
-        if (isset($data['lang_code']) and !empty($data['lang_code'])) {
-            FormsVali::setLangCode($data['lang_code']);
-        }
+        $lang_code = $this->request->header['language'] ?? '';
+        if ($lang_code) FormsVali::setLangCode($lang_code);
 
         try {
             $data = FormsVali::validate($data, $validations);

@@ -47,7 +47,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data, function () {
+                            layer.msg(response.data.msg, function () {
                                 self.dis = false;
                             });
                     }
@@ -78,7 +78,7 @@ new Vue({
                 })
                     .then(function (response) {
                         if (response.data.code === 400 || response.data.code === 500) {
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                         }
                         if (response.data.code === 200) {
                             self.pwd = '';
@@ -114,7 +114,7 @@ new Vue({
                 })
                     .then(function (response) {
                         if (response.data.code === 400 || response.data.code === 500) {
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                         }
                         if (response.data.code === 200) {
                             let size = response.data.data.file_size;
@@ -152,7 +152,7 @@ new Vue({
                     .then(function (response) {
                         console.log(response.data);
                         if (response.data.code === 400 || response.data.code === 500) {
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                         }
                         if (response.data.code === 200) {
                             layer.msg('数据已删除成功!', {icon: 1, time: 2000}, function () {

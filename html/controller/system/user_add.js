@@ -56,7 +56,7 @@ new Vue({
                 .then(function (response) {
                     switch (response.data.code) {
                         case 200:
-                            layer.alert(response.data.data, {icon: 6}, function () {
+                            layer.alert(response.data.msg, {icon: 6}, function () {
                                 x_admin_close();
                                 //刷新用户列表信息
                                 parent.$("#search").click();
@@ -66,7 +66,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                     layer.close(loadIndex);
                 })

@@ -39,7 +39,7 @@ class ServerStatusController extends Yaf\Controller_Abstract
 
         $data['swoole'] = $swoole;
         $data['content'] = $content;
-        $this->response->end(http_response(200, $data));
+        $this->response->end(http_response(200, '', $data));
         //echo http_response(200, $data);
     }
 

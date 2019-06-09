@@ -27,7 +27,7 @@ class RouterController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemRouterForms::$getList);
         $res  = $this->router->getList($data);
         if ($res) {
-            $this->response->end(http_response(200, $res));
+            $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -74,7 +74,7 @@ class RouterController extends Yaf\Controller_Abstract
         $data = $this->validator(SystemRouterForms::$delRouter);
         $res  = $this->router->delRouter((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, ['id' => $data['id']]));
+            $this->response->end(http_response(200, '', ['id' => $data['id']]));
         } else {
             $this->response->end(http_response(500, "{$data['id']}删除失败"));
         }
@@ -84,7 +84,7 @@ class RouterController extends Yaf\Controller_Abstract
     {
         $res = $this->router->getInfo();
         if ($res) {
-            $this->response->end(http_response(200, ['list' => $res]));
+            $this->response->end(http_response(200, '', ['list' => $res]));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }

@@ -38,7 +38,7 @@ class BackupController extends Yaf\Controller_Abstract
     public function indexAction(): void
     {
         $res = $this->backup_m->getTables();
-        echo http_response(200, $res);
+        echo http_response(200, '', $res);
     }
 
     /**
@@ -86,7 +86,7 @@ class BackupController extends Yaf\Controller_Abstract
     public function getListAction(): void
     {
         $list = $this->backup_m->getList();
-        $this->response->end(http_response(200, $list));
+        $this->response->end(http_response(200, '', $list));
     }
 
     /**
@@ -100,7 +100,7 @@ class BackupController extends Yaf\Controller_Abstract
         $res  = $this->backup_m->getFileName($data['id']);
         if (!empty($res)) {
             $res[0]['file_name'] = \Yaf\Registry::get('config')->backup->downUrl . $res[0]['file_name'];
-            $this->response->end(http_response(200, $res[0]));
+            $this->response->end(http_response(200, '', $res[0]));
         }
     }
 
@@ -121,7 +121,7 @@ class BackupController extends Yaf\Controller_Abstract
             if (is_file($linkname)) {
                 //删除备份文件
                 $unFile = unlink($linkname);
-                if ($unFile) $this->response->end(http_response(200, ['id' => $data['id']]));
+                if ($unFile) $this->response->end(http_response(200, '', ['id' => $data['id']]));
             } else {
                 $this->response->end(http_response(400, "{$data['id']}-删除失败"));
             }

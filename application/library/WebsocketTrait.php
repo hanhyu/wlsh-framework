@@ -66,8 +66,9 @@ trait WebsocketTrait
         }
 
         //如果参数lang_code设置了，则输出对应的信息模板
-        if (isset($data['lang_code']) and !empty($data['lang_code'])) {
-            FormsVali::setLangCode($data['lang_code']);
+        if (isset($data['language']) and !empty($data['language'])) {
+            Registry::set('ws_language', $data['language']);
+            FormsVali::setLangCode($data['language']);
         }
 
         try {

@@ -9,28 +9,34 @@ declare(strict_types=1);
 
 /**
  * http协议以固定json格式返回信息
- * php 7.3 版本
  *
- * @param int          $code
- * @param string|array $data
- * @param int          $msg 注意：此参数值默认为0,不返回给客户端，只有在设置了数值时才参与返回数据
- *                          <p>此参数作为非正常数据返回时带上的提示码，便于测试、运维人员在后台直接查看出现异常的原因</P>
- *                          <p>设置的值必须是<b>运维平台“非正常提示码”的相关ID</b></P>
+ * @param int    $code
+ * @param string $msg
+ * @param array  $data
  *
  * @return string
  */
-function http_response(int $code = 200, $data = '', int $msg = 0): string
+function http_response(int $code = 200, string $msg = '', array $data = []): string
 {
     $result         = [];
     $result['code'] = $code;
+
+    $lang_code = \Yaf\Registry::get('request')->header['language'] ?? '';
+    if ($msg and $lang_code) {
+        $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
+    } else {
+        $result['msg'] = $msg;
+    }
+
     $result['data'] = $data;
-    if ($msg !== 0) $result['msg'] = $msg;
     try {
         $res = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     } catch (Throwable $e) {
         $result['code'] = 400;
-        $result['data'] = $e->getMessage();
+        $result['msg']  = $e->getMessage();
+        $result['data'] = [];
         $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
+        return $res;
     }
     sign(stripslashes($res));
     //debug_print_backtrace();
@@ -40,27 +46,40 @@ function http_response(int $code = 200, $data = '', int $msg = 0): string
 /**
  * ws协议以固定json格式返回信息
  *
- * @param int         $code
- * @param string|null $uri
- * @param mixed       $data
+ * @param int    $code
+ * @param string $uri
+ * @param string $msg
+ * @param array  $data
  *
  * @return string
  */
-function ws_response(int $code = 200, ?string $uri = null, $data = ''): string
+function ws_response(int $code = 200, string $uri = '', string $msg = '', array $data = []): string
 {
     $result         = [];
     $result['code'] = $code;
     $result['uri']  = $uri;
+
+    $lang_code = \Yaf\Registry::get('ws_language') ?? '';
+    if ($msg and $lang_code) {
+        $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
+    } else {
+        $result['msg'] = $msg;
+    }
+
     $result['data'] = $data;
     try {
         $res = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     } catch (Throwable $e) {
         $result['code'] = 400;
-        $result['data'] = $e->getMessage();
+        $result['msg']  = $e->getMessage();
+        $result['data'] = [];
         $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
+        return $res;
     }
+    sign(stripslashes($res));
     return $res;
 }
+
 
 /**
  * 协程记录日志信息
@@ -68,7 +87,7 @@ function ws_response(int $code = 200, ?string $uri = null, $data = ''): string
  * 推荐在请求的路由生命周期内都使用task_log记录日志，
  * critica、alert、emergency三种日志类型默认添加邮件通知。
  *
- * @param  mixed $content
+ * @param mixed  $content
  * @param string $info
  * @param string $channel
  * @param string $level <p>debug (100): 详细的debug信息</p></P>

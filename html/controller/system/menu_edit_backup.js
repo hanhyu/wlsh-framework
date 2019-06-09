@@ -48,7 +48,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                 })
                 .catch(function (error) {
@@ -78,7 +78,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                 })
                 .catch(function (error) {
@@ -122,7 +122,7 @@ new Vue({
                 .then(function (response) {
                     switch (response.data.code) {
                         case 200:
-                            layer.alert(response.data.data, {icon: 6}, function () {
+                            layer.alert(response.data.msg, {icon: 6}, function () {
                                 // 获得frame索引
                                 var index = parent.layer.getFrameIndex(window.name);
                                 //关闭当前frame
@@ -135,7 +135,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                     }
                     layer.close(loadIndex)
                 })

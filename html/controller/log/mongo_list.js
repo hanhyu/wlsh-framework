@@ -79,7 +79,7 @@ new Vue({
                             location.href = 'login.html';
                             break;
                         default:
-                            layer.msg(response.data.data, function () {
+                            layer.msg(response.data.msg, function () {
                                 self.dis = false;
                             });
                     }

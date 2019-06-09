@@ -18,6 +18,7 @@ class Bootstrap extends Yaf\Bootstrap_Abstract
         Yaf\Loader::import(LIBRARY_PATH . '/PdoPool');
         Yaf\Loader::import(LIBRARY_PATH . '/RedisPool.php');
         Yaf\Loader::import(LIBRARY_PATH . '/CoMysqlPool.php');
+        Yaf\Loader::import(LIBRARY_PATH . '/Language.php');
     }
 
     public function _initConfig(Dispatcher $dispatcher)

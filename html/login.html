@@ -74,7 +74,7 @@ CwIDAQAB
                             localStorage.setItem(token, response.data.data.token);
                             location.href = 'index.html';
                         } else {
-                            layer.msg(response.data.data);
+                            layer.msg(response.data.msg);
                         }
                     })
                     .catch(function (error) {

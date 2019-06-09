@@ -55,23 +55,23 @@ class Server
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
         $this->server->set([
             //'reactor_num' => 16,
-            'worker_num'                 => 8,
-            'task_worker_num'            => 8,
-            'task_enable_coroutine'      => true,
-            'daemonize'                  => SWOOLE_DAEMONIZE,
-            'max_request'                => 300000,
-            'max_coroutine'              => 100000,
-            'dispatch_mode'              => 2,
-            'enable_reuse_port'          => true,
-            'log_level'                  => SWOOLE_LOG_LEVEL,
-            'trace_flags'                => SWOOLE_TRACE_ALL,
-            'log_file'                   => ROOT_PATH . '/log/swoole.log',
-            'pid_file'                   => ROOT_PATH . '/log/swoolePid.log',
-            'package_max_length'         => 200000,
-            'reload_async'               => true,
-            'max_wait_time'              => 7,
-            'heartbeat_idle_time'        => 600,
-            'heartbeat_check_interval'   => 60,
+            'worker_num'               => 8,
+            'task_worker_num'          => 8,
+            'task_enable_coroutine'    => true,
+            'daemonize'                => SWOOLE_DAEMONIZE,
+            'max_request'              => 300000,
+            'max_coroutine'            => 100000,
+            'dispatch_mode'            => 2,
+            'enable_reuse_port'        => false,
+            'log_level'                => SWOOLE_LOG_LEVEL,
+            'trace_flags'              => SWOOLE_TRACE_ALL,
+            'log_file'                 => ROOT_PATH . '/log/swoole.log',
+            'pid_file'                 => ROOT_PATH . '/log/swoolePid.log',
+            'package_max_length'       => 200000,
+            'reload_async'             => true,
+            'max_wait_time'            => 7,
+            'heartbeat_idle_time'      => 600,
+            'heartbeat_check_interval' => 60,
             'buffer_output_size'         => 8 * 1024 * 1024,
             'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
             'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
@@ -352,7 +352,7 @@ class Server
         if (isset($request_uri[1]) AND !empty($request_uri[1])) {
             $response->header('Access-Control-Allow-Methods', 'POST,DELETE,PUT,GET,OPTIONS');
             $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-            $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign');
+            $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign,Language');
             $response->header('Access-Control-Allow-Credentials', 'true');
             $response->header('Access-Control-Max-Age', '8388608');
             $response->header('Access-Control-Allow-Origin', Yaf\Registry::get('config')->origin->domain);
