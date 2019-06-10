@@ -1009,19 +1009,13 @@ class Login extends Controller_Abstract
      */
     public function coMysqlAction(): void
     {
-        /* $sql = "select * from `users` where id=1 limit 1 ";
-
-         $mysql = Yaf\Registry::get('co_mysql_pool')->get();
-         $get   = $mysql->query($sql);
-         $this->response->end(http_response(200, $get));
-         Yaf\Registry::get('co_mysql_pool')->put($mysql);*/
-
         $sql = "select * from `users` where id=? limit 1 ";
 
-        $mysql = Yaf\Registry::get('co_mysql_pool')->get();
+        $mysql = Registry::get('co_mysql_pool')->get();
         $stmt  = $mysql->prepare($sql);
         $get   = $stmt->execute([1]);
         $this->response->end(http_response(200, '', $get));
+        Registry::get('co_mysql_pool')->put($mysql);
 
     }
 

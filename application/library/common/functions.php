@@ -131,8 +131,14 @@ function co_log($content, string $info, string $channel = 'system', string $leve
 function monolog_by_mongodb($content, string $info, string $channel, string $level): bool
 {
     $log = new \Monolog\Logger($channel);
+
     $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
-        new \MongoDB\Driver\Manager(Yaf\Registry::get('config')->log->mongo),
+        new \MongoDB\Driver\Manager(
+            Yaf\Registry::get('config')->log->mongo, [
+            'username'   => \Yaf\Registry::get('config')->log->username,
+            'password'   => \Yaf\Registry::get('config')->log->pwd,
+            'authSource' => \Yaf\Registry::get('config')->log->database,
+        ]),
         Yaf\Registry::get('config')->log->database,
         Yaf\Registry::get('config')->log->collection,
         $level

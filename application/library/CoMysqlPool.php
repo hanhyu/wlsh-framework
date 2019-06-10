@@ -52,11 +52,11 @@ class CoMysqlPool
             EOF:
             $db  = new Swoole\Coroutine\MySQL();
             $let = $db->connect([
-                'host'     => \Yaf\Registry::get('config')->database->host,
-                'port'     => \Yaf\Registry::get('config')->database->port,
-                'user'     => \Yaf\Registry::get('config')->database->username,
-                'password' => \Yaf\Registry::get('config')->database->password,
-                'database' => \Yaf\Registry::get('config')->database->database,
+                'host'     => \Yaf\Registry::get('config')->mysql->host,
+                'port'     => \Yaf\Registry::get('config')->mysql->port,
+                'user'     => \Yaf\Registry::get('config')->mysql->username,
+                'password' => \Yaf\Registry::get('config')->mysql->password,
+                'database' => \Yaf\Registry::get('config')->mysql->database,
             ]);
 
             if (!$let) throw new \Exception('Coroutine MySQL connect fail', 500);
