@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\Tash\Controllers;
+namespace App\Modules\Task\Controllers;
 
 /**
  * 操作日志类
@@ -9,7 +9,7 @@ namespace App\Modules\Tash\Controllers;
  * Date: 18-10-22
  * Time: 下午5:00
  */
-class LogController extends \Yaf\Controller_Abstract
+class Log extends \Yaf\Controller_Abstract
 {
     /**
      * @param        $content
@@ -18,7 +18,7 @@ class LogController extends \Yaf\Controller_Abstract
      */
     public function IndexAction($content, string $info, string $level): void
     {
-        co_log($content, $info, $level);
+        co_log($content, $info, 'task', $level);
 
         /*
          * 测试投递finish路由

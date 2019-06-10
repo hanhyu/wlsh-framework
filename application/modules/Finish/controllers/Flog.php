@@ -9,7 +9,7 @@ namespace App\Modules\Finish\Controllers;
  * Date: 19-1-14
  * Time: 下午8:33
  */
-class FlogController extends \Yaf\Controller_Abstract
+class Flog extends \Yaf\Controller_Abstract
 {
     /**
      * @param        $content

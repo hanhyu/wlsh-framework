@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 namespace App\Models\Mongo;
+
+use Yaf\Registry;
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -24,7 +26,13 @@ abstract class AbstractMongo
      */
     public function __construct(string $database, string $col)
     {
-        $db        = new \MongoDB\Client(\Yaf\Registry::get('config')->log->mongo);
+        $db        = new \MongoDB\Client(
+            Registry::get('config')->log->mongo,
+            [
+                'username'   => Registry::get('config')->log->username,
+                'password'   => Registry::get('config')->log->pwd,
+                'authSource' => Registry::get('config')->log->database,
+            ]);
         $this->col = $db->selectCollection($database, $col);
     }
 
