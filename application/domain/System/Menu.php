@@ -56,7 +56,11 @@ class Menu
         for ($i = 0; $i < 2; $i++) {
             $res += $chan->pop(7);
             if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getMenuListAction mysql异常');
+                co_log(
+                    ['message' => $res['500']],
+                    '协程mysql异常：' . __FILE__ . ':' . __LINE__,
+                    'mysql'
+                );
                 return null;
             }
         }

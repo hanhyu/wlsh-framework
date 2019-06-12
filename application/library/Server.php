@@ -55,23 +55,23 @@ class Server
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
         $this->server->set([
             //'reactor_num' => 16,
-            'worker_num'               => 8,
-            'task_worker_num'          => 8,
-            'task_enable_coroutine'    => true,
-            'daemonize'                => SWOOLE_DAEMONIZE,
-            'max_request'              => 300000,
-            'max_coroutine'            => 100000,
-            'dispatch_mode'            => 2,
-            'enable_reuse_port'        => false,
-            'log_level'                => SWOOLE_LOG_LEVEL,
-            'trace_flags'              => SWOOLE_TRACE_ALL,
-            'log_file'                 => ROOT_PATH . '/log/swoole.log',
-            'pid_file'                 => ROOT_PATH . '/log/swoolePid.log',
-            'package_max_length'       => 200000,
-            'reload_async'             => true,
-            'max_wait_time'            => 7,
-            'heartbeat_idle_time'      => 600,
-            'heartbeat_check_interval' => 60,
+            'worker_num'                 => 8,
+            'task_worker_num'            => 8,
+            'task_enable_coroutine'      => true,
+            'daemonize'                  => SWOOLE_DAEMONIZE,
+            'max_request'                => 300000,
+            'max_coroutine'              => 100000,
+            'dispatch_mode'              => 2,
+            'enable_reuse_port'          => false,
+            'log_level'                  => SWOOLE_LOG_LEVEL,
+            'trace_flags'                => SWOOLE_TRACE_ALL,
+            'log_file'                   => ROOT_PATH . '/log/swoole.log',
+            'pid_file'                   => ROOT_PATH . '/log/swoolePid.log',
+            'package_max_length'         => 200000,
+            'reload_async'               => true,
+            'max_wait_time'              => 7,
+            'heartbeat_idle_time'        => 600,
+            'heartbeat_check_interval'   => 60,
             'buffer_output_size'         => 8 * 1024 * 1024,
             'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
             'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
@@ -309,23 +309,24 @@ class Server
             $obj_req = new Yaf\Request\Http($res['uri'], '/');
             $obj_req->setParam((array)$frame);
 
+
             try {
                 $this->obj_yaf->getDispatcher()->dispatch($obj_req);
-            } catch (Exception $e) { //业务部分手动触发的异常信息
-                if ($e->getCode() == 0) {
-                    APP_DEBUG ? co_log($e->getMessage(), "onMessage error fail: ") : null;
-                } else {
-                    if ($server->isEstablished($frame->fd))
-                        $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
-                }
+            } catch (ValidateException $e) { //参数验证手动触发的信息
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage(), [], true));
+            } catch (ProgramException $e) { //程序手动抛出的异常
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
             } catch (Throwable $e) {
-                if (APP_DEBUG) {
-                    if ($server->isEstablished($frame->fd))
-                        $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
-                } else {
-                    if ($server->isEstablished($frame->fd))
-                        $server->push($frame->fd, ws_response(500, null, '服务异常'));
-                }
+                $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
+                if ($server->isEstablished($frame->fd))
+                    $server->push($frame->fd, ws_response(500, null, $msg));
+
+                co_log(
+                    ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                    "onRequest Throwable message:"
+                );
             }
         }
     }
@@ -384,19 +385,18 @@ class Server
 
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
-        } catch (Exception $e) { //业务部分手动触发的异常信息
-            if ($e->getCode() == 0) {
-                APP_DEBUG ? co_log($e->getMessage(), "onRequest Exception: ") : null;
-            } else {
-                $response->end(http_response($e->getCode(), $e->getMessage()));
-            }
+        } catch (ValidateException $e) { //参数验证手动触发的信息
+            $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
+        } catch (ProgramException $e) { //程序手动抛出的异常
+            $response->end(http_response($e->getCode(), $e->getMessage()));
         } catch (Throwable $e) {
-            if (APP_DEBUG) {
-                $response->end(http_response(500, $e->getMessage()));
-            } else {
-                $response->status(500);
-                $response->end(http_response(500, '服务异常'));
-            }
+            $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
+            $response->end(http_response(500, $msg));
+
+            co_log(
+                ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                "onRequest Throwable message:"
+            );
         }
     }
 

@@ -167,7 +167,7 @@ trait ControllersTrait
         $data = $this->getParams();
 
         if (empty($data)) {
-            throw new \Exception('参数错误', 400);
+            throw new \ProgramException('参数错误', 400);
         }
 
         //如果是登录接口，则需解密接口数据
@@ -180,14 +180,18 @@ trait ControllersTrait
             $data    = json_decode($decrypt, true);
         }
 
-        $lang_code = $this->request->header['language'] ?? '';
-        if ($lang_code) FormsVali::setLangCode($lang_code);
+        $lang_code = $this->request->header['language'] ?? 'zh-cn';
+        if (empty($lang_code)) {
+            FormsVali::setLangCode('zh-cn');
+        } else {
+            FormsVali::setLangCode($lang_code);
+        }
 
         try {
             $data = FormsVali::validate($data, $validations);
             $data = array_intersect_key($data, $validations);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 400);
+            throw new \ValidateException($e->getMessage(), 400);
         }
         return $data;
     }

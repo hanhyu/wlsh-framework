@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use Yaf\Registry;
+use Swoole\Http\Response;
 
 /**
  * Created by PhpStorm.
@@ -12,7 +13,7 @@ use Yaf\Registry;
 class Error extends \Yaf\Controller_Abstract
 {
     /**
-     * @var Swoole\Http\Response
+     * @var Response
      */
     private $response;
 

@@ -35,16 +35,21 @@ class SystemMenu extends AbstractMysql
             ];
         }
 
-        try {
-            $datas = $this->db->select($this->table, '*', $wheres);
-        } catch (\Throwable $e) {
-            co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
-        }
+        /* try {
+             $datas = $this->db->select($this->table, '*', $wheres);
+         } catch (\Throwable $e) {
+             co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
+         } finally {
+             if ($datas === false) {
+                 co_log($this->db->last(), '查询信息失败的sql：');
+                 $datas = [];
+             }
+         }*/
+
+        $datas = $this->db->select($this->table, '*', $wheres);
+
+        if ($datas == false) throw new \Exception($this->db->last());
+
         return $datas;
     }
 
@@ -65,23 +70,17 @@ class SystemMenu extends AbstractMysql
      */
     protected function getMenuInfo(): array
     {
-        $datas = [];
-        try {
-            $datas = $this->db->select($this->table, [
-                'id',
-                'name',
-                'icon',
-                'url',
-                'up_id',
-                'level',
-            ]);
-        } catch (\Throwable $e) {
-            co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
+        $datas = $this->db->select($this->table, [
+            'id',
+            'name',
+            'icon',
+            'url',
+            'up_id',
+            'level',
+        ]);
+        if ($datas === false) {
+            co_log($this->db->last(), '查询信息失败的sql：', 'mysql');
+            $datas = [];
         }
         return $datas;
     }

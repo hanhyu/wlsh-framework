@@ -53,13 +53,13 @@ trait WebsocketTrait
         }
 
         if (empty($data) or !isset($data['data'])) {
-            throw new \Exception('参数错误', 400);
+            throw new \ProgramException('参数错误', 400);
         }
 
         //todo 优化到路由参数中sign的值控制是否需要进行解密操作,数据加密与数据验证操作
         if (isset($data['sign'])) {
             if (!is_string($data['sign'])) {
-                throw new \Exception('参数错误', 400);
+                throw new \ProgramException('参数错误', 400);
             }
             $decrypt = private_decrypt($data['sign'], Registry::get('config')->sign->prv_key);
             $data    = json_decode($decrypt, true);
@@ -75,7 +75,7 @@ trait WebsocketTrait
             $vali_data = FormsVali::validate($data['data'], $validations);
             $vali_data = array_intersect_key($vali_data, $validations);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 400);
+            throw new \ValidateException($e->getMessage(), 400);
         }
         //url参数在入口判断过
         $this->uri = $data['uri'];

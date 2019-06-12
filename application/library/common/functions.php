@@ -13,16 +13,18 @@ declare(strict_types=1);
  * @param int    $code
  * @param string $msg
  * @param array  $data
+ * @param bool   $vail
  *
  * @return string
  */
-function http_response(int $code = 200, string $msg = '', array $data = []): string
+function http_response(int $code = 200, string $msg = '', array $data = [], bool $vail = false): string
 {
     $result         = [];
     $result['code'] = $code;
 
     $lang_code = \Yaf\Registry::get('request')->header['language'] ?? '';
-    if ($msg and $lang_code) {
+    if ('zh-cn' == $lang_code) $vail = true;
+    if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
     } else {
         $result['msg'] = $msg;
@@ -50,17 +52,19 @@ function http_response(int $code = 200, string $msg = '', array $data = []): str
  * @param string $uri
  * @param string $msg
  * @param array  $data
+ * @param bool   $vail
  *
  * @return string
  */
-function ws_response(int $code = 200, string $uri = '', string $msg = '', array $data = []): string
+function ws_response(int $code = 200, string $uri = '', string $msg = '', array $data = [], bool $vail = false): string
 {
     $result         = [];
     $result['code'] = $code;
     $result['uri']  = $uri;
 
     $lang_code = \Yaf\Registry::get('ws_language') ?? '';
-    if ($msg and $lang_code) {
+    if ('zh-cn' == $lang_code) $vail = true;
+    if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
     } else {
         $result['msg'] = $msg;
