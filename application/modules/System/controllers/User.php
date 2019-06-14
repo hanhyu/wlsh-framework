@@ -127,7 +127,7 @@ class User extends \Yaf\Controller_Abstract
                 //$this->response->cookie('token', $token);
                 $this->response->end(http_response(200, '', ['token' => $token]));
 
-                $params['ip'] = ip2long(get_ip($this->request->server));
+                $params['ip'] = ip2long($this->request->header['x-real-ip'] ?? get_ip($this->request->server));
                 $this->user->setLoginLog($params);
                 //模拟日志发送邮件
                 //task_log($this->server, $data['name'], '用户登录:', 'alert');
