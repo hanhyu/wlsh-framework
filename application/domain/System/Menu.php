@@ -17,13 +17,22 @@ class Menu
     /**
      * @var SystemMenu
      */
-    private $menu;
+    protected $menu;
 
     public function __construct()
     {
         $this->menu = new SystemMenu();
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午9:38
+     *
+     * @param array $data
+     *
+     * @return array|null
+     */
     public function getList(array $data): ?array
     {
         $res = [];
@@ -67,6 +76,13 @@ class Menu
         return $res;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午9:39
+     * @return array
+     * @throws \Exception
+     */
     public function getInfo(): array
     {
         return $this->menu->getMenuInfo();

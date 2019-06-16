@@ -11,19 +11,21 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 
+use Exception;
+
 class UserLogView extends AbstractMysql
 {
-    private $table = 'user_log_view';
+    protected $table = 'user_log_view';
 
     /**
      *
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        $datas = [];
         if (!empty($data['where'])) {
             $wheres = [
                 'AND'   => $data['where'],
@@ -37,34 +39,32 @@ class UserLogView extends AbstractMysql
             ];
         }
 
-        try {
-            $datas = $this->db->select($this->table, [
-                'id',
-                'user_name',
-                'login_dt',
-                'logout_dt',
-                'login_ip',
-            ],
-                $wheres);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->select($this->table, [
+            'id',
+            'user_name',
+            'login_dt',
+            'logout_dt',
+            'login_ip',
+        ],
+            $wheres);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午9:12
+     *
+     * @param array $where
+     *
+     * @return int
+     * @throws Exception
+     */
     protected function getListCount(array $where): int
     {
-        $datas = 1;
-        try {
-            $datas = $this->db->count($this->table, $where);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        }
+        $datas = $this->db->count($this->table, $where);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 

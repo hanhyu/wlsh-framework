@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use Exception;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -11,7 +13,7 @@ namespace App\Models\Mysql;
  */
 class SystemUserLog extends AbstractMysql
 {
-    private $table = 'frame_system_user_log';
+    protected $table = 'frame_system_user_log';
 
     /**
      * 添加用户登录记录
@@ -19,25 +21,17 @@ class SystemUserLog extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setLoginLog(array $data): int
     {
-        $last_id = 0;
-        try {
-            $this->db->insert($this->table, [
-                'user_id'  => $data['id'],
-                'login_dt' => date('Y-m-d H:i:s', $data['time']),
-                'login_ip' => $data['ip'],
-            ]);
-            $last_id = $this->db->id();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id === false) {
-                co_log($this->db->last(), '信息失败的sql：');
-            }
-        }
-        return (int)$last_id;
+        $datas = $this->db->insert($this->table, [
+            'user_id'  => $data['id'],
+            'login_dt' => date('Y-m-d H:i:s', $data['time']),
+            'login_ip' => $data['ip'],
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return (int)$this->db->id();
     }
 
     /**
@@ -46,36 +40,28 @@ class SystemUserLog extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setLogoutLog(array $data): int
     {
-        $last_id = 0;
-        try {
-            $data    = $this->db->update($this->table, [
-                'logout_dt' => date('Y-m-d H:i:s'),
-            ], [
-                'user_id'  => (int)$data['id'],
-                'login_dt' => date('Y-m-d H:i:s', $data['time']),
-            ]);
-            $last_id = $data->rowCount();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "修改信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id == 0) {
-                co_log($this->db->last(), '修改信息失败,失败的sql：');
-            }
-        }
-        return $last_id;
+        $datas = $this->db->update($this->table, [
+            'logout_dt' => date('Y-m-d H:i:s'),
+        ], [
+            'user_id'  => (int)$data['id'],
+            'login_dt' => date('Y-m-d H:i:s', $data['time']),
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return $data->rowCount();
     }
 
     /**
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        $datas = [];
         if (!empty($data['where'])) {
             $wheres = [
                 'AND'   => $data['where'],
@@ -89,35 +75,33 @@ class SystemUserLog extends AbstractMysql
             ];
         }
 
-        try {
-            $datas = $this->db->select($this->table, [
-                'id',
-                'user_id',
-                'login_dt',
-                'logout_dt',
-                'login_ip',
-                //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
-            ],
-                $wheres);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->select($this->table, [
+            'id',
+            'user_id',
+            'login_dt',
+            'logout_dt',
+            'login_ip',
+            //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
+        ],
+            $wheres);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午9:10
+     *
+     * @param array $where
+     *
+     * @return int
+     * @throws Exception
+     */
     protected function getListCount(array $where): int
     {
-        $datas = 1;
-        try {
-            $datas = $this->db->count($this->table, $where);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        }
+        $datas = $this->db->count($this->table, $where);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 

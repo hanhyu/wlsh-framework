@@ -21,15 +21,15 @@ class User
     /**
      * @var SystemUser
      */
-    private $user;
+    protected $user;
     /**
      * @var UserLog
      */
-    private $user_log;
+    protected $user_log;
     /**
      * @var UserV
      */
-    private $user_v;
+    protected $user_v;
 
     public function __construct()
     {
@@ -129,6 +129,7 @@ class User
      * @param array $data
      *
      * @return array|null
+     * @throws \Exception
      */
     public function getLogList(array $data): ?array
     {

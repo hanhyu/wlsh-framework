@@ -76,6 +76,7 @@ class Router
      * @param array $data
      *
      * @return int
+     * @throws \Exception
      */
     public function setRouter(array $data): int
     {
@@ -91,6 +92,7 @@ class Router
      * @param array $data
      *
      * @return int
+     * @throws \Exception
      */
     public function editRouter(array $data): int
     {
@@ -107,6 +109,7 @@ class Router
      * @param int $id
      *
      * @return int
+     * @throws \Exception
      */
     public function delRouter(int $id): int
     {

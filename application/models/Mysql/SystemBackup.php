@@ -10,26 +10,19 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use Exception;
 
 class SystemBackup extends AbstractMysql
 {
     /**
      * 获取数据库中所有表名
      * @return array
+     * @throws Exception
      */
     protected function getTables(): array
     {
-        $datas = [];
-        try {
-            $datas = $this->db->query("show  tables ")->fetchAll();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败,失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->query("show  tables ")->fetchAll();
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -39,49 +32,33 @@ class SystemBackup extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setBackup(array $data): int
     {
-        $last_id = 0;
-        try {
-            $this->db->insert('frame_system_backup', [
-                'file_name' => $data['filename'],
-                'file_size' => $data['size'],
-                'file_md5'  => $data['md5'],
-                'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
-            ]);
-            $last_id = $this->db->id();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id === false) {
-                co_log($this->db->last(), '信息失败的sql：');
-            }
-        }
-        return (int)$last_id;
+        $datas = $this->db->insert('frame_system_backup', [
+            'file_name' => $data['filename'],
+            'file_size' => $data['size'],
+            'file_md5'  => $data['md5'],
+            'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return (int)$this->db->id();
     }
 
     /**
      * @return array
+     * @throws Exception
      */
     protected function getList(): array
     {
-        $datas = [];
-        try {
-            $datas = $this->db->select('frame_system_backup', [
-                'id',
-                'file_name',
-                'file_size',
-                'crt_dt',
-            ]);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->select('frame_system_backup', [
+            'id',
+            'file_name',
+            'file_size',
+            'crt_dt',
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -89,45 +66,38 @@ class SystemBackup extends AbstractMysql
      * @param int $id
      *
      * @return array
+     * @throws Exception
      */
     protected function getFileName(int $id): array
     {
-        $datas = [];
-        try {
-            $datas = $this->db->select('frame_system_backup', [
-                'file_name',
-                'file_size',
-                'file_md5',
-            ], [
-                'id' => $id,
-            ]);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->select('frame_system_backup', [
+            'file_name',
+            'file_size',
+            'file_md5',
+        ], [
+            'id' => $id,
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:46
+     *
+     * @param int $id
+     *
+     * @return int
+     * @throws Exception
+     */
     protected function delBackup(int $id): int
     {
-        $last_id = 0;
-        try {
-            $data    = $this->db->delete('frame_system_backup', [
-                'id' => $id,
-            ]);
-            $last_id = $data->rowCount();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "删除信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id == 0) {
-                co_log($this->db->last(), "删除信息失败的sql：");
-            }
-        }
-        return $last_id;
+        $datas = $this->db->delete('frame_system_backup', [
+            'id' => $id,
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return $datas->rowCount();
     }
 
 

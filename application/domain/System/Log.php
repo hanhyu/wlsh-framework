@@ -16,7 +16,7 @@ class Log
     /**
      * @var Monolog
      */
-    private $monolog;
+    protected $monolog;
 
     public function __construct()
     {
@@ -72,6 +72,16 @@ class Log
         return $res;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午9:38
+     *
+     * @param string $id
+     *
+     * @return array
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
     public function getMongoById(string $id): array
     {
         return $this->monolog->getMongoInfo($id);

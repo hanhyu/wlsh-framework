@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 namespace App\Models\Mysql;
+
+use Exception;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -10,7 +13,7 @@ namespace App\Models\Mysql;
  */
 class SystemMenu extends AbstractMysql
 {
-    private $table = 'frame_system_menu';
+    protected $table = 'frame_system_menu';
 
     /**
      * 获取菜单列表信息
@@ -18,10 +21,10 @@ class SystemMenu extends AbstractMysql
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getMenuList(array $data): array
     {
-        $datas = [];
         if (!empty($data['where'])) {
             $wheres = [
                 'AND'   => $data['where'],
@@ -35,38 +38,34 @@ class SystemMenu extends AbstractMysql
             ];
         }
 
-        /* try {
-             $datas = $this->db->select($this->table, '*', $wheres);
-         } catch (\Throwable $e) {
-             co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
-         } finally {
-             if ($datas === false) {
-                 co_log($this->db->last(), '查询信息失败的sql：');
-                 $datas = [];
-             }
-         }*/
-
         $datas = $this->db->select($this->table, '*', $wheres);
 
-        if ($datas == false) throw new \Exception($this->db->last());
+        if ($datas == false) throw new Exception($this->db->last());
 
         return $datas;
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:10
+     * @return int
+     * @throws Exception
+     */
     protected function getListCount(): int
     {
-        $datas = 1;
-        try {
-            $datas = $this->db->count($this->table);
-        } catch (\Throwable $e) {
-            co_log($this->db->last(), "信息出错：{$e->getMessage()},,出错的sql：");
-        }
+        $datas = $this->db->count($this->table);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
     /**
      * 获取所有菜单指定信息
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:11
      * @return array
+     * @throws Exception
      */
     protected function getMenuInfo(): array
     {
@@ -78,10 +77,7 @@ class SystemMenu extends AbstractMysql
             'up_id',
             'level',
         ]);
-        if ($datas === false) {
-            co_log($this->db->last(), '查询信息失败的sql：', 'mysql');
-            $datas = [];
-        }
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -91,106 +87,86 @@ class SystemMenu extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function setMenu(array $post): int
     {
-        $last_id = 0;
-        try {
-            $this->db->insert($this->table, [
-                'name'  => $post['name'],
-                'icon'  => $post['icon'],
-                'url'   => $post['url'],
-                'up_id' => $post['up_id'],
-                'level' => $post['level'],
-            ]);
-            $last_id = $this->db->id();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "添加信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id === false) {
-                co_log($this->db->last(), '添加信息失败的sql：');
-            }
-        }
-        return (int)$last_id;
+        $datas = $this->db->insert($this->table, [
+            'name'  => $post['name'],
+            'icon'  => $post['icon'],
+            'url'   => $post['url'],
+            'up_id' => $post['up_id'],
+            'level' => $post['level'],
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return (int)$this->db->id();
     }
 
     /**
-     * @param $id
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:19
      *
-     * @return array|bool
+     * @param int $id
+     *
+     * @return array
+     * @throws Exception
      */
     protected function getMenu(int $id): array
     {
-        $datas = [];
-        try {
-            $datas = $this->db->select($this->table, [
-                'id',
-                'name',
-                'icon',
-                'url',
-                'up_id',
-            ], ['id' => $id]);
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "查询信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($datas === false) {
-                co_log($this->db->last(), '查询信息失败,失败的sql：');
-                $datas = [];
-            }
-        }
+        $datas = $this->db->select($this->table, [
+            'id',
+            'name',
+            'icon',
+            'url',
+            'up_id',
+        ], ['id' => $id]);
+        if ($datas == false) throw new Exception($this->db->last());
         return $datas;
     }
 
     /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:23
+     *
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function editMenu(array $post): int
     {
-        $last_id = 0;
-        try {
-            $data    = $this->db->update($this->table, [
-                'name'  => $post['name'],
-                'icon'  => $post['icon'],
-                'url'   => $post['url'],
-                'up_id' => $post['up_id'],
-                'level' => $post['level'],
-            ], [
-                'id' => (int)$post['id'],
-            ]);
-            $last_id = $data->rowCount();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "修改信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id == 0) {
-                co_log($this->db->last(), '修改信息失败,失败的sql：');
-            }
-        }
-        return $last_id;
+        $datas = $this->db->update($this->table, [
+            'name'  => $post['name'],
+            'icon'  => $post['icon'],
+            'url'   => $post['url'],
+            'up_id' => $post['up_id'],
+            'level' => $post['level'],
+        ], [
+            'id' => (int)$post['id'],
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return $datas->rowCount();
     }
 
     /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午8:25
+     *
      * @param int $id
      *
      * @return int
+     * @throws Exception
      */
     protected function delMenu(int $id): int
     {
-        $last_id = 0;
-        try {
-            $data    = $this->db->delete($this->table, [
-                'id' => $id,
-            ]);
-            $last_id = $data->rowCount();
-        } catch (\Exception $e) {
-            co_log($this->db->last(), "删除信息出错：{$e->getMessage()},,出错的sql：");
-        } finally {
-            if ($last_id == 0) {
-                co_log($this->db->last(), "删除{$id}信息失败的sql：");
-            }
-        }
-        return $last_id;
+        $datas = $this->db->delete($this->table, [
+            'id' => $id,
+        ]);
+        if ($datas == false) throw new Exception($this->db->last());
+        return $datas->rowCount();
     }
 
 }
