@@ -26,6 +26,7 @@
             <input type="text" name="uname" placeholder="用户名" autocomplete="on" class="layui-input" v-model="uname">
             <button id="search" class="layui-btn" @click.prevent="getUserList">
                 <i class="layui-icon">&#xe615;</i></button>
+            <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>重置</button>
         </form>
     </div>
     <table class="layui-table">

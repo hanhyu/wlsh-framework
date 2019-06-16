@@ -61,22 +61,34 @@ class UserInit extends \Yaf\Plugin_Abstract
             if (strpos($request->getRequestUri(), '_')) $flg = 1;
             $request_uri = explode('/', $request->getRequestUri());
 
-            if (count($request_uri) > 3) {
-                if ($flg) {
-                    $request->module     = convert_string($request_uri[1], true);
-                    $request->controller = convert_string($request_uri[2], true);
-                    $request->action     = convert_string($request_uri[3], false);
-                } else {
-                    $request->controller = ucfirst($request_uri[2]);
-                }
-            } else {
-                if ($flg) {
-                    $request->controller = convert_string($request_uri[1], true);
-                    $request->action     = convert_string($request_uri[2], false);
-                } else {
-                    $request->controller = ucfirst($request_uri[1]);
-                }
+            switch (count($request_uri)) {
+                case 5:
+                    if ($flg) {
+                        $request->module     = convert_string($request_uri[1], true);
+                        $request->controller = $request_uri[2] . '\\' . convert_string($request_uri[3], true);
+                        $request->action     = convert_string($request_uri[4], false);
+                    } else {
+                        $request->controller = $request_uri[2] . '\\' . ucfirst($request_uri[3]);
+                    }
+                    break;
+                case 4:
+                    if ($flg) {
+                        $request->module     = convert_string($request_uri[1], true);
+                        $request->controller = convert_string($request_uri[2], true);
+                        $request->action     = convert_string($request_uri[3], false);
+                    } else {
+                        $request->controller = ucfirst($request_uri[2]);
+                    }
+                    break;
+                default:
+                    if ($flg) {
+                        $request->controller = convert_string($request_uri[1], true);
+                        $request->action     = convert_string($request_uri[2], false);
+                    } else {
+                        $request->controller = ucfirst($request_uri[1]);
+                    }
             }
+
         }
         /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，
         若存在则停止解析，直接输出页面，缓存数据页。

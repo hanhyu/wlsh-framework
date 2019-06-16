@@ -77,6 +77,11 @@ new Vue({
         getMongo(item) {
             let info = encodeURI(JSON.stringify(item));
             x_admin_show('详细信息', "mongo_info.html?info=" + info, 800, 700);
+        },
+        //清空查询条件
+        cleanSearch() {
+            $("#login_time").val('');
+            this.uname = '';
         }
     },
     watch: {

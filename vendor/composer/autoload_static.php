@@ -89,6 +89,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'A' => 
         array (
             'App\\Plugins\\' => 12,
+            'App\\Modules\\' => 12,
             'App\\Models\\' => 11,
             'App\\Domain\\' => 11,
         ),
@@ -228,6 +229,10 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'App\\Plugins\\' => 
         array (
             0 => __DIR__ . '/../..' . '/application/plugins',
+        ),
+        'App\\Modules\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/application/modules',
         ),
         'App\\Models\\' => 
         array (

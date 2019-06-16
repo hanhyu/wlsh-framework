@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Domain\System\Process as ProcessDomain;
 use App\Models\Forms\SystemProcessForms;
@@ -20,7 +20,7 @@ class Process extends \Yaf\Controller_Abstract
     /**
      * @var ProcessDomain
      */
-    private $msg;
+    protected $msg;
 
     public function init()
     {

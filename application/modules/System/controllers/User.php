@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Domain\System\User as UserDomain;
 use App\Models\Forms\SystemUserForms;
@@ -20,7 +20,7 @@ class User extends \Yaf\Controller_Abstract
     /**
      * @var UserDomain
      */
-    private $user;
+    protected $user;
 
     public function init()
     {

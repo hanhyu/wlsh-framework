@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Domain\System\Router as RouterDomain;
 use App\Models\Forms\SystemRouterForms;
@@ -13,7 +13,7 @@ class Router extends \Yaf\Controller_Abstract
     /**
      * @var RouterDomain
      */
-    private $router;
+    protected $router;
 
     public function init()
     {

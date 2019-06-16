@@ -39,6 +39,7 @@ return array(
     'Composer\\XdebugHandler\\' => array($vendorDir . '/composer/xdebug-handler/src'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
     'App\\Plugins\\' => array($baseDir . '/application/plugins'),
+    'App\\Modules\\' => array($baseDir . '/application/modules'),
     'App\\Models\\' => array($baseDir . '/application/models'),
     'App\\Domain\\' => array($baseDir . '/application/domain'),
 );

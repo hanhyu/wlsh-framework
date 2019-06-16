@@ -33,6 +33,7 @@
       "App\\Models\\": "application/models",
       "App\\Domain\\": "application/domain",
       "App\\Plugins\\": "application/plugins",
+      "App\\Modules\\": "application/modules",
       "Tests\\": "tests/"
     }
   },

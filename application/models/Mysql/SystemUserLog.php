@@ -96,6 +96,7 @@ class SystemUserLog extends AbstractMysql
                 'login_dt',
                 'logout_dt',
                 'login_ip',
+                //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
             ],
                 $wheres);
         } catch (\Exception $e) {

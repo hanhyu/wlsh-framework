@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Domain\System\Menu as MenuDomain;
 use App\Models\Forms\SystemMenuForms;
@@ -25,7 +25,7 @@ class Menu extends Controller_Abstract
     /**
      * @var MenuDomain
      */
-    private $menu;
+    protected $menu;
 
     public function init()
     {

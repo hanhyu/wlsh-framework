@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Models\Forms\SystemLogForms;
 use Exception;

@@ -47,8 +47,11 @@ return [
 
     /***************************************** 系统菜单相关路由 *****************************************/
 
-    '/system/menu/get_menu_info' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
-    '/system/menu/get_menu_list' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/menu/get_menu_info'    => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/menu/get_menu_list'    => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/v1/menu/get_menu_list' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/v1/menu/get_menu_info' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+
     '/system/menu/set_menu'      => ['auth' => true, 'method' => 'POST', 'action' => '*'],
     '/system/menu/get_menu'      => ['auth' => true, 'method' => 'GET', 'action' => '*'],
     '/system/menu/edit_menu'     => ['auth' => true, 'method' => 'PUT', 'action' => '*'],

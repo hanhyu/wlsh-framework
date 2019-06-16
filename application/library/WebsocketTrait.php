@@ -16,10 +16,10 @@ trait WebsocketTrait
     /**
      * @var Server
      */
-    private $server;
-    private $fd;
-    private $uri;
-    private $data;
+    protected $server;
+    protected $fd;
+    protected $uri;
+    protected $data;
 
     /**
      * 实现aop编程前置方法，供yaf控制器初始化中使用。

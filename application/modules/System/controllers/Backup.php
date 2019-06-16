@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 /**
  * Created by PhpStorm.
@@ -22,7 +22,7 @@ class Backup extends \Yaf\Controller_Abstract
     /**
      * @var SystemBackup
      */
-    private $backup_m;
+    protected $backup_m;
 
     public $backup_path = ''; //备份文件夹相对路径
     public $backup_name = ''; //当前备份文件夹名

@@ -20,23 +20,23 @@ trait ControllersTrait
     /**
      * @var Server
      */
-    private $server;
+    protected $server;
     /**
      * @var Request
      */
-    private $request;
+    protected $request;
     /**
      * @var Response
      */
-    private $response;
+    protected $response;
     /**
      * @var Atomic
      */
-    private $atomic;
+    protected $atomic;
     /**
      * @var \Redis
      */
-    private $redis;
+    protected $redis;
 
     /**
      * 实现aop编程前置方法，供yaf控制器初始化中使用。
@@ -195,5 +195,6 @@ trait ControllersTrait
         }
         return $data;
     }
+
 
 }

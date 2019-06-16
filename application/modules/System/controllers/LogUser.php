@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\System\Controllers;
+namespace App\Modules\System\controllers;
 
 use App\Domain\System\User;
 use App\Models\Forms\SystemLogForms;
@@ -20,7 +20,7 @@ class LogUser extends \Yaf\Controller_Abstract
     /**
      * @var User
      */
-    private $log;
+    protected $log;
 
     public function init()
     {
