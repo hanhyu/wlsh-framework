@@ -264,6 +264,7 @@ class Server
 
         $response->status(101);
         $response->end();
+
         $this->server->defer(function () use ($request) {
             $this->onOpen($this->server, $request);
         });
@@ -325,7 +326,8 @@ class Server
 
                 co_log(
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                    "onRequest Throwable message:"
+                    "onRequest Throwable message:",
+                    'websocket'
                 );
             }
         }
@@ -395,7 +397,8 @@ class Server
 
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                "onRequest Throwable message:"
+                "onRequest Throwable message:",
+                'http'
             );
         }
     }
@@ -420,8 +423,11 @@ class Server
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
         } catch (Throwable $e) {
-            $error = var_export($e->getMessage(), true);
-            co_log($error, "onReceive error fail");
+            co_log(
+                ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                "onReceive Throwable message:",
+                'receive'
+            );
         }
     }
 
@@ -446,8 +452,11 @@ class Server
         try {
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
         } catch (Throwable $e) {
-            $error = var_export($e->getMessage(), true);
-            co_log($error, "onTask error fail");
+            co_log(
+                ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                "onTask Throwable message:",
+                'task'
+            );
         } finally {
             $result = ob_get_contents();
         }
@@ -476,8 +485,11 @@ class Server
                     $this->obj_yaf->getDispatcher()->dispatch($obj_req);
                 } catch (Throwable $e) {
                     if (APP_DEBUG) {
-                        $error = var_export($e->getMessage(), true);
-                        co_log($error, "onFinish error fail");
+                        co_log(
+                            ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                            "onFinish Throwable message:",
+                            'finish'
+                        );
                     }
                 }
             }
@@ -505,8 +517,11 @@ class Server
             $this->obj_yaf->getDispatcher()->dispatch($obj_req);
         } catch (Throwable $e) {
             if (APP_DEBUG) {
-                $error = var_export($e->getMessage(), true);
-                co_log($error, "onClose error fail");
+                co_log(
+                    ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                    "onClose Throwable message:",
+                    'close'
+                );
             }
         }
     }

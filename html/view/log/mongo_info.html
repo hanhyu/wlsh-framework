@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="import" href="../head_js.html">
+    <link href="../../static/css/jquery.jsonview.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -26,7 +27,9 @@
         </tr>
         <tr>
             <td>日志内容</td>
-            <td>{{info.context}}</td>
+            <td>
+                <div id="json">{{info.context}}</div>
+            </td>
         </tr>
         <tr>
             <td>日志等级</td>
@@ -48,5 +51,12 @@
     </table>
 </div>
 </body>
+<script src="../../static/js/jquery.jsonview.js"></script>
 <script src="../../controller/log/mongo_info.js"></script>
+<script>
+    $(function () {
+        let json = $("#json");
+        json.JSONView(json.text());
+    });
+</script>
 </html>
