@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Domain\System;
 
 use App\Models\Mysql\SystemMenu;
+use App\Models\Redis\Login;
 
 class Menu
 {
@@ -106,6 +107,12 @@ class Menu
     public function delMenu(int $id): int
     {
         return $this->menu->delMenu($id);
+    }
+
+    public function getRedis(string $key): ?string
+    {
+        $redis = new Login();
+        return $redis->getKey($key);
     }
 
 }

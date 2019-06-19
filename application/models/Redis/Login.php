@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace App\Models\Redis;
 
-use Exception;
-
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -13,6 +11,12 @@ use Exception;
  */
 class Login extends AbstractRedis
 {
+    /**
+     * 此处使用静态延迟绑定，实现选择不同的数据库
+     * @var int
+     */
+    protected static $dbindex = 1;
+
     protected function getKey(string $key): ?string
     {
         //$this->db->select(1);

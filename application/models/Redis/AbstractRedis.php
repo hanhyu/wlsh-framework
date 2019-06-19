@@ -19,6 +19,11 @@ class AbstractRedis
      * @var \Redis
      */
     protected $db;
+    /**
+     * 此处使用静态延迟绑定，实现选择不同的数据库
+     * @var int
+     */
+    protected static $dbindex = 0;
 
     /**
      * @param $method
@@ -31,6 +36,7 @@ class AbstractRedis
     {
         try {
             $this->db = Registry::get('redis_pool')->get();
+            $this->db->select(static::$dbindex);
         } catch (Exception $e) {
             co_log($e->getMessage(), "redis数据连接异常", 'alert');
             throw new Exception('redis数据连接异常', 500);

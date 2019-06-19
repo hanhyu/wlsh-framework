@@ -55,7 +55,7 @@
             </td>
             <td>{{item._id.$oid}}</td>
             <td>{{item.message}}</td>
-            <td>{{item.context}}</td>
+            <td @click.prevent="getMongo(item)" style="cursor: pointer">{{item.context}}</td>
             <td>{{item.level_name}}</td>
             <td>{{item.channel}}</td>
             <td>{{item.datetime.$date.$numberLong | timestampFilter}}</td>

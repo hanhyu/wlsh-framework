@@ -51,6 +51,7 @@ return [
     '/system/menu/get_menu_list'    => ['auth' => true, 'method' => 'GET', 'action' => '*'],
     '/system/v1/menu/get_menu_list' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
     '/system/v1/menu/get_menu_info' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
+    '/system/v1/menu/get_redis'     => ['auth' => false, 'method' => 'GET', 'action' => '*'],
 
     '/system/menu/set_menu'      => ['auth' => true, 'method' => 'POST', 'action' => '*'],
     '/system/menu/get_menu'      => ['auth' => true, 'method' => 'GET', 'action' => '*'],

@@ -41,4 +41,10 @@ class Menu extends BaseMenu
         $this->response->end(http_response(200, '', $data));
     }
 
+    public function getRedisAction(): void
+    {
+        $data = $this->menu->getRedis('key');
+        $this->response->end(http_response(200, '', ['content' => $data]));
+    }
+
 }
