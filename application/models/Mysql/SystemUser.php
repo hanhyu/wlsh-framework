@@ -21,7 +21,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function setUser(array $post): int
+    public function setUser(array $post): int
     {
         $datas = $this->db->insert($this->table, [
             'name'   => $post['name'],
@@ -40,7 +40,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getUserList(array $data): array
+    public function getUserList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -67,7 +67,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function getListCount(): int
+    public function getListCount(): int
     {
         $datas = $this->db->count($this->table);
         if ($datas == false) throw new Exception($this->db->last());
@@ -80,7 +80,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function delUser(int $id): int
+    public function delUser(int $id): int
     {
         $datas = $data = $this->db->delete($this->table, [
             'id' => $id,
@@ -95,7 +95,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getUser(int $id): array
+    public function getUser(int $id): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -112,7 +112,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function editUser(array $post): int
+    public function editUser(array $post): int
     {
         $datas = $this->db->update($this->table, [
             'status' => $post['status'],
@@ -125,12 +125,14 @@ class SystemUser extends AbstractMysql
     }
 
     /**
-     * @param string $name
+     * 获取用户基本信息
      *
-     * @return array
+     * @param string $name 用户名
+     *
+     * @return array ['id','name','status','pwd']
      * @throws Exception
      */
-    protected function getInfo(string $name): array
+    public function getInfo(string $name): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -154,7 +156,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getNameById(array $uid): array
+    public function getNameById(array $uid): array
     {
         $datas = $this->db->select($this->table, [
             'id',

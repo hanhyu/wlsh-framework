@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
+use App\Models\Factory;
 use App\Models\Mysql\{
-    SystemUser,
     SystemUserLog as UserLog,
     UserLogView as UserV,
 };
@@ -19,10 +19,6 @@ use App\Models\Mysql\{
 class User
 {
     /**
-     * @var SystemUser
-     */
-    protected $user;
-    /**
      * @var UserLog
      */
     protected $user_log;
@@ -33,19 +29,19 @@ class User
 
     public function __construct()
     {
-        $this->user     = new SystemUser();
         $this->user_log = new UserLog();
         $this->user_v   = new UserV();
     }
 
-    public function getInfoByName(string $name): ?array
+    public function getInfoByName(string $name): array
     {
-        return $this->user->getInfo($name);
+        //return $this->user->getInfo($name);
+        return Factory::systemUser()->getInfo($name);
     }
 
     public function setUser(array $data): int
     {
-        return $this->user->setUser($data);
+        return Factory::systemUser()->setUser($data);
     }
 
     /**
@@ -68,7 +64,7 @@ class User
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan) { //获取总数
             try {
-                $count = $this->user->getListCount();
+                $count = Factory::systemUser()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -76,7 +72,7 @@ class User
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = $this->user->getUserList($data);
+                $list = Factory::systemUser()->getUserList($data);
                 $chan->push(['list' => $list]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -96,17 +92,17 @@ class User
 
     public function delUser(int $id): int
     {
-        return $this->user->delUser($id);
+        return Factory::systemUser()->delUser($id);
     }
 
     public function getUserById(int $id): array
     {
-        return $this->user->getUser($id);
+        return Factory::systemUser()->getUser($id);
     }
 
     public function editUser(array $data): int
     {
-        return $this->user->editUser($data);
+        return Factory::systemUser()->editUser($data);
     }
 
     public function setLoginLog(array $data): void

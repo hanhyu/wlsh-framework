@@ -577,6 +577,17 @@ class Login extends Controller_Abstract
         }
     }
 
+    public function getUserInfoAction(): void
+    {
+        $user              = new \App\Domain\System\User();
+        $res               = $user->getInfoByName('ceshi123');
+        if ($res) {
+            $this->response->end(http_response(200, '', $res));
+        } else {
+            $this->response->end(http_response(500, '查询失败'));
+        }
+    }
+
     /**
      * 测试mongodb查询
      * ab -c 7000 -n 300000 -k http://127.0.0.1:9770/login/get_mongo_log_list

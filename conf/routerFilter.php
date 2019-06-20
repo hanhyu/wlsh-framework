@@ -19,6 +19,7 @@ return [
     '/login/get_mongo_log_list' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_log_user_list'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_log_user_view'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
+    '/login/get_user_info'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
 
     '/login/publisher_redis' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/consumer_redis'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
