@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Mongo\Monolog;
+use App\Models\Factory;
 
 class Log
 {
@@ -20,7 +20,7 @@ class Log
 
     public function __construct()
     {
-        $this->monolog = new Monolog('baseFrame', 'monolog');
+        $this->monolog = Factory::monolog('baseFrame', 'monolog');
     }
 
     public function getMongoList(array $data): ?array

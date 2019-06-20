@@ -3,20 +3,10 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Mysql\SystemRouter;
+use App\Models\Factory;
 
 class Router
 {
-    /**
-     * @var SystemRouter
-     */
-    private $router;
-
-    public function __construct()
-    {
-        $this->router = new SystemRouter();
-    }
-
     /**
      * 获取路由列表数据
      * User: hanhyu
@@ -41,7 +31,7 @@ class Router
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan) { //获取总数
             try {
-                $count = $this->router->getListCount();
+                $count = Factory::systemRouter()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -49,7 +39,7 @@ class Router
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = $this->router->getList($data);
+                $list = Factory::systemRouter()->getList($data);
                 $chan->push(['list' => $list]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -80,7 +70,7 @@ class Router
      */
     public function setRouter(array $data): int
     {
-        return $this->router->setRouter($data);
+        return Factory::systemRouter()->setRouter($data);
     }
 
     /**
@@ -96,7 +86,7 @@ class Router
      */
     public function editRouter(array $data): int
     {
-        return $this->router->editRouter($data);
+        return Factory::systemRouter()->editRouter($data);
     }
 
 
@@ -113,12 +103,12 @@ class Router
      */
     public function delRouter(int $id): int
     {
-        return $this->router->delRouter($id);
+        return Factory::systemRouter()->delRouter($id);
     }
 
     public function getInfo(): array
     {
-        $res  = $this->router->getInfo();
+        $res  = Factory::systemRouter()->getInfo();
         $list = [];
         foreach ($res as $k => $v) {
             $list[$v['menu_name']][] = $v;

@@ -24,7 +24,7 @@ class SystemMsg extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function setMsg(array $data): int
+    public function setMsg(array $data): int
     {
         $datas = $this->db->insert($this->table, [
             'content' => $data['content'],
@@ -43,7 +43,7 @@ class SystemMsg extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function setLogoutLog(array $data): int
+    public function setLogoutLog(array $data): int
     {
         $datas = $this->db->update($this->table, [
             'logout_dt' => date('Y-m-d H:i:s'),
@@ -61,7 +61,7 @@ class SystemMsg extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -98,7 +98,7 @@ class SystemMsg extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function getListCount(array $where): int
+    public function getListCount(array $where): int
     {
         $datas = $this->db->count($this->table, $where);
         if ($datas == false) throw new Exception($this->db->last());

@@ -17,7 +17,7 @@ class SystemRouter extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -56,7 +56,7 @@ class SystemRouter extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function getListCount(): int
+    public function getListCount(): int
     {
         $datas = $this->db->count($this->table);
         if ($datas == false) throw new Exception($this->db->last());
@@ -75,7 +75,7 @@ class SystemRouter extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function setRouter(array $post): int
+    public function setRouter(array $post): int
     {
         $datas = $this->db->insert($this->table, [
             'name'    => $post['name'],
@@ -99,7 +99,7 @@ class SystemRouter extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function editRouter(array $post): int
+    public function editRouter(array $post): int
     {
         $datas = $this->db->update($this->table, [
             'name'    => $post['name'],
@@ -125,7 +125,7 @@ class SystemRouter extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function delRouter(int $id): int
+    public function delRouter(int $id): int
     {
         $datas = $this->db->delete($this->table, [
             'id' => $id,
@@ -141,7 +141,7 @@ class SystemRouter extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getInfo(): array
+    public function getInfo(): array
     {
         $datas = $this->db->select($this->table, ["[>]frame_system_menu" => ["menu_id" => "id"]],
             [

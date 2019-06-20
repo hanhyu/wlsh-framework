@@ -24,7 +24,7 @@ class UserLogView extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -61,7 +61,7 @@ class UserLogView extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function getListCount(array $where): int
+    public function getListCount(array $where): int
     {
         $datas = $this->db->count($this->table, $where);
         if ($datas == false) throw new Exception($this->db->last());

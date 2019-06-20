@@ -4,10 +4,6 @@ declare(strict_types=1);
 namespace App\Domain\System;
 
 use App\Models\Factory;
-use App\Models\Mysql\{
-    SystemUserLog as UserLog,
-    UserLogView as UserV,
-};
 
 
 /**
@@ -18,21 +14,6 @@ use App\Models\Mysql\{
  */
 class User
 {
-    /**
-     * @var UserLog
-     */
-    protected $user_log;
-    /**
-     * @var UserV
-     */
-    protected $user_v;
-
-    public function __construct()
-    {
-        $this->user_log = new UserLog();
-        $this->user_v   = new UserV();
-    }
-
     public function getInfoByName(string $name): array
     {
         //return $this->user->getInfo($name);
@@ -108,14 +89,14 @@ class User
     public function setLoginLog(array $data): void
     {
         go(function () use ($data) {
-            $this->user_log->setLoginLog($data);
+           Factory::systemUserLog()->setLoginLog($data);
         });
     }
 
     public function setLogoutLog(array $data): void
     {
         go(function () use ($data) {
-            $this->user_log->setLogoutLog($data);
+            Factory::systemUserLog()->setLogoutLog($data);
         });
     }
 
@@ -146,14 +127,14 @@ class User
         }
 
         if (!empty($data['uname'])) {
-            $arr_uid                  = $this->user->getInfo($data['uname']);
+            $arr_uid                  = Factory::systemUser()->getInfo($data['uname']);
             $data['where']['user_id'] = $arr_uid[0]['id'] ?? 0;
         }
 
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan, $data) { //获取总数
             try {
-                $count = $this->user_log->getListCount($data['where']);
+                $count = Factory::systemUserLog()->getListCount($data['where']);
                 $chan->push(['count' => $count]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage() . __LINE__]);
@@ -161,10 +142,10 @@ class User
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list    = $this->user_log->getList($data);
+                $list    = Factory::systemUserLog()->getList($data);
                 $arr_uid = array_column($list, 'user_id');
 
-                $arr_name = $this->user->getNameById(array_unique($arr_uid));
+                $arr_name = Factory::systemUser()->getNameById(array_unique($arr_uid));
                 $arr_let  = array_column($arr_name, 'name', 'id');
 
                 foreach ($list as $k => &$v) {
@@ -213,7 +194,7 @@ class User
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan, $data) { //获取总数
             try {
-                $count = $this->user_v->getListCount($data['where']);
+                $count = Factory::userLogView()->getListCount($data['where']);
                 $chan->push(['count' => $count]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage() . __LINE__]);
@@ -221,7 +202,7 @@ class User
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = $this->user_v->getList($data);
+                $list = Factory::userLogView()->getList($data);
                 $chan->push(['list' => $list]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage() . __LINE__]);

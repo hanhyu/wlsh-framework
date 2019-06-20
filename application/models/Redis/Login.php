@@ -17,7 +17,7 @@ class Login extends AbstractRedis
      */
     protected static $dbindex = 1;
 
-    protected function getKey(string $key): ?string
+    public function getKey(string $key): ?string
     {
         //$this->db->select(1);
         $datas = $this->db->get($key);

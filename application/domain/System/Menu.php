@@ -10,21 +10,11 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Mysql\SystemMenu;
+use App\Models\Factory;
 use App\Models\Redis\Login;
 
 class Menu
 {
-    /**
-     * @var SystemMenu
-     */
-    protected $menu;
-
-    public function __construct()
-    {
-        $this->menu = new SystemMenu();
-    }
-
     /**
      * User: hanhyu
      * Date: 19-6-16
@@ -48,7 +38,7 @@ class Menu
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan) { //获取总数
             try {
-                $count = $this->menu->getListCount();
+                $count = Factory::systemMenu()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -56,7 +46,7 @@ class Menu
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = $this->menu->getMenuList($data);
+                $list = Factory::systemMenu()->getMenuList($data);
                 $chan->push(['list' => $list]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -86,27 +76,27 @@ class Menu
      */
     public function getInfo(): array
     {
-        return $this->menu->getMenuInfo();
+        return Factory::systemMenu()->getMenuInfo();
     }
 
     public function setMenu(array $data): int
     {
-        return $this->menu->setMenu($data);
+        return Factory::systemMenu()->setMenu($data);
     }
 
     public function getMenuById(int $id): array
     {
-        return $this->menu->getMenu($id);
+        return Factory::systemMenu()->getMenu($id);
     }
 
     public function editMenu(array $data): int
     {
-        return $this->menu->editMenu($data);
+        return Factory::systemMenu()->editMenu($data);
     }
 
     public function delMenu(int $id): int
     {
-        return $this->menu->delMenu($id);
+        return Factory::systemMenu()->delMenu($id);
     }
 
     public function getRedis(string $key): ?string
