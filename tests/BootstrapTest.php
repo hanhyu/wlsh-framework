@@ -45,9 +45,15 @@ class BootstrapTest extends TestCase
         \Yaf\Loader::import(ROOT_PATH . '/vendor/autoload.php');
         \Yaf\Loader::import(LIBRARY_PATH . '/common/functions.php');
 
+        $common  = require CONF_PATH . DS . 'common.php';
+        $develop = require CONF_PATH . DS . 'develop.php';
+        $test    = require CONF_PATH . DS . 'test.php';
+        $devtest = require CONF_PATH . DS . 'devtest.php';
+        $product = require CONF_PATH . DS . 'product.php';
 
+        $yaf_conf = ini_get('yaf.environ');
         try {
-            $obj_yaf = new \Yaf\Application(CONF_PATH . DS . 'application.ini', ini_get('yaf.environ'));
+            $obj_yaf = new \Yaf\Application(array_merge($common, $$yaf_conf));
             ob_start();
             $obj_yaf->bootstrap()->run();
             ob_end_clean();

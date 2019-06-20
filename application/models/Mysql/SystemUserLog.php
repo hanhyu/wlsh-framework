@@ -51,7 +51,7 @@ class SystemUserLog extends AbstractMysql
             'login_dt' => date('Y-m-d H:i:s', $data['time']),
         ]);
         if ($datas == false) throw new Exception($this->db->last());
-        return $data->rowCount();
+        return $datas->rowCount();
     }
 
     /**

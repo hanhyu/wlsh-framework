@@ -37,9 +37,9 @@ class Server
 
     public function setConfigIni($config_ini): void
     {
-        if (!is_file($config_ini)) {
+        /*if (!is_file($config_ini)) {
             trigger_error('Server Config File Not Exist!', E_USER_ERROR);
-        }
+        }*/
         $this->config_file = $config_ini;
     }
 
@@ -170,12 +170,13 @@ class Server
 
         //实例化yaf
         try {
-            $this->obj_yaf = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
+            //$this->obj_yaf = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
+            $this->obj_yaf = new Yaf\Application($this->config_file);
             ob_start();
             $this->obj_yaf->bootstrap()->run();
             ob_end_clean();
         } catch (\Yaf\Exception $e) {
-            var_dump($e);
+            var_dump($e->getMessage());
         }
 
         /*

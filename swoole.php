@@ -93,9 +93,17 @@ function run(string $param = 'produce'): void
     define('LIBRARY_PATH', APPLICATION_PATH . DS . 'library');
 
     require LIBRARY_PATH . DS . 'Server.php';
+    $common  = require CONF_PATH . DS . 'common.php';
+    $develop = require CONF_PATH . DS . 'develop.php';
+    $test    = require CONF_PATH . DS . 'test.php';
+    $devtest = require CONF_PATH . DS . 'devtest.php';
+    $product = require CONF_PATH . DS . 'product.php';
+
+    $yaf_conf = ini_get('yaf.environ');
 
     $serverObj = Server::getInstance();
-    $serverObj->setConfigIni(CONF_PATH . DS . 'application.ini');
+    //$serverObj->setConfigIni(CONF_PATH . DS . 'application234243234.ini');
+    $serverObj->setConfigIni(array_merge($common, $$yaf_conf));
     $serverObj->start();
 }
 
