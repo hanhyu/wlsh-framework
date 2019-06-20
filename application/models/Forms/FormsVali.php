@@ -20,96 +20,96 @@ class FormsVali extends Validation
         ],
         "en-us" => [
             'Int'            => '“{{param}}” must be an integer',
-            'IntEq'          => '“{{param}}”必须等于 {{value}}',
+            'IntEq'          => '“{{param}}” must be equal to {{value}}',
             'IntGt'          => '“{{param}}” must be greater than {{min}}',
-            'IntGe'          => '“{{param}}”必须大于等于 {{min}}',
-            'IntLt'          => '“{{param}}”必须小于 {{max}}',
-            'IntLe'          => '“{{param}}”必须小于等于 {{max}}',
-            'IntGtLt'        => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
-            'IntGeLe'        => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
-            'IntGtLe'        => '“{{param}}”必须大于 {{min}} 小于等于 {{max}}',
-            'IntGeLt'        => '“{{param}}”必须大于等于 {{min}} 小于 {{max}}',
-            'IntIn'          => '“{{param}}”只能取这些值: {{valueList}}',
-            'IntNotIn'       => '“{{param}}”不能取这些值: {{valueList}}',
+            'IntGe'          => '“{{param}}” must be greater than or equal to {{min}}',
+            'IntLt'          => '“{{param}}” must be smaller than {{max}}',
+            'IntLe'          => '“{{param}}” must be less than or equal to {{max}}',
+            'IntGtLt'        => '“{{param}}” must be greater than {{min}} and smaller than {{max}}',
+            'IntGeLe'        => '“{{param}}” must be greater than or equal to {{min}} and less than or equal to {{max}}',
+            'IntGtLe'        => '“{{param}}” must be greater than {{min}} and less than or equal to {{max}}',
+            'IntGeLt'        => '“{{param}}” must be greater than or equal to {{min}} and smaller than {{max}}',
+            'IntIn'          => '“{{param}}” can only be values: {{valueList}}',
+            'IntNotIn'       => '“{{param}}” can`t take values: {{valueList}}',
 
             // 浮点型（内部一律使用double来处理）
-            'Float'          => '“{{param}}”必须是浮点数',
-            'FloatGt'        => '“{{param}}”必须大于 {{min}}',
-            'FloatGe'        => '“{{param}}”必须大于等于 {{min}}',
-            'FloatLt'        => '“{{param}}”必须小于 {{max}}',
-            'FloatLe'        => '“{{param}}”必须小于等于 {{max}}',
-            'FloatGtLt'      => '“{{param}}”必须大于 {{min}} 小于 {{max}}',
-            'FloatGeLe'      => '“{{param}}”必须大于等于 {{min}} 小于等于 {{max}}',
-            'FloatGtLe'      => '“{{param}}”必须大于 {{min}} 小于等于 {{max}}',
-            'FloatGeLt'      => '“{{param}}”必须大于等于 {{min}} 小于 {{max}}',
+            'Float'          => '“{{param}}” must be floating point',
+            'FloatGt'        => '“{{param}}” must be greater than {{min}}',
+            'FloatGe'        => '“{{param}}” must be greater than or equal to {{min}}',
+            'FloatLt'        => '“{{param}}” must be smaller than {{max}}',
+            'FloatLe'        => '“{{param}}” must be less than or equal to {{max}}',
+            'FloatGtLt'      => '“{{param}}” must be greater than {{min}} and smaller than {{max}}',
+            'FloatGeLe'      => '“{{param}}” must be greater than or equal to {{min}} and less than or equal to {{max}}',
+            'FloatGtLe'      => '“{{param}}” must be greater than {{min}} and less than or equal to {{max}}',
+            'FloatGeLt'      => '“{{param}}” must be greater than or equal to {{min}} and smaller than {{max}}',
 
             // bool型
-            'Bool'           => '“{{param}}”必须是bool型(true or false)', // 忽略大小写
-            'BoolSmart'      => '“{{param}}”只能取这些值: true, false, 1, 0, yes, no, y, n（忽略大小写）',
+            'Bool'           => '“{{param}}” must be bool(true or false)', // 忽略大小写
+            'BoolSmart'      => '“{{param}}” can only be values: true, false, 1, 0, yes, no, y, n（忽略大小写）',
 
             // 字符串
             'Str'            => '“{{param}}” must be a string',
-            'StrEq'          => '“{{param}}”必须等于"{{value}}"',
-            'StrEqI'         => '“{{param}}”必须等于"{{value}}"（忽略大小写）',
-            'StrNe'          => '“{{param}}”不能等于"{{value}}"',
-            'StrNeI'         => '“{{param}}”不能等于"{{value}}"（忽略大小写）',
-            'StrIn'          => '“{{param}}”只能取这些值: {{valueList}}',
-            'StrInI'         => '“{{param}}”只能取这些值: {{valueList}}（忽略大小写）',
-            'StrNotIn'       => '“{{param}}”不能取这些值: {{valueList}}',
-            'StrNotInI'      => '“{{param}}”不能取这些值: {{valueList}}（忽略大小写）',
+            'StrEq'          => '“{{param}}” must be equal to "{{value}}"',
+            'StrEqI'         => '“{{param}}” must be equal to "{{value}}"（忽略大小写）',
+            'StrNe'          => '“{{param}}” not equal to "{{value}}"',
+            'StrNeI'         => '“{{param}}” not equal to "{{value}}"（忽略大小写）',
+            'StrIn'          => '“{{param}}” can only be values: {{valueList}}',
+            'StrInI'         => '“{{param}}” can only be values: {{valueList}}（忽略大小写）',
+            'StrNotIn'       => '“{{param}}” can`t take values: {{valueList}}',
+            'StrNotInI'      => '“{{param}}” can`t take values: {{valueList}}（忽略大小写）',
             // todo StrSame:var 检测某个参数是否等于另一个参数, 比如password2要等于password
-            'StrLen'         => '“{{param}}”长度必须等于 {{length}}', // 字符串长度
-            'StrLenGe'       => '“{{param}}”长度必须大于等于 {{min}}',
-            'StrLenLe'       => '“{{param}}”长度必须小于等于 {{max}}',
+            'StrLen'         => '“{{param}}” length has to be equal to {{length}}', // 字符串长度
+            'StrLenGe'       => '“{{param}}” length has to be greater than or equal to {{min}}',
+            'StrLenLe'       => '“{{param}}” length has to be less than or equal to {{max}}',
             'StrLenGeLe'     => '“{{param}}” Length must be between {{min}} - {{max}}', // 字符串长度
-            'ByteLen'        => '“{{param}}”长度（字节）必须等于 {{length}}', // 字符串长度
-            'ByteLenGe'      => '“{{param}}”长度（字节）必须大于等于 {{min}}',
-            'ByteLenLe'      => '“{{param}}”长度（字节）必须小于等于 {{max}}',
-            'ByteLenGeLe'    => '“{{param}}”长度（字节）必须在 {{min}} - {{max}} 之间', // 字符串长度
-            'Letters'        => '“{{param}}”只能包含字母',
-            'Alphabet'       => '“{{param}}”只能包含字母', // 同Letters
-            'Numbers'        => '“{{param}}”只能是纯数字',
-            'Digits'         => '“{{param}}”只能是纯数字', // 同Numbers
-            'LettersNumbers' => '“{{param}}”只能包含字母和数字',
-            'Numeric'        => '“{{param}}”必须是数值', // 一般用于大数处理（超过double表示范围的数,一般会用字符串来表示）, 如果是正常范围内的数, 可以使用'Int'或'Float'来检测
-            'VarName'        => '“{{param}}”只能包含字母、数字和下划线，并且以字母或下划线开头',
-            'Email'          => '“{{param}}”不是合法的email',
-            'Url'            => '“{{param}}”不是合法的Url地址',
-            'Ip'             => '“{{param}}”不是合法的IP地址',
-            'Mac'            => '“{{param}}”不是合法的MAC地址',
-            'Regexp'         => '“{{param}}”不匹配正则表达式“{{regexp}}”', // Perl正则表达式匹配. 目前不支持modifiers. http://www.rexegg.com/regex-modifiers.html
+            'ByteLen'        => '“{{param}}” length (bytes) must be equal to {{length}}', // 字符串长度
+            'ByteLenGe'      => '“{{param}}” length (bytes) must be greater than or equal to {{min}}',
+            'ByteLenLe'      => '“{{param}}” length (bytes) must be less than or equal {{max}}',
+            'ByteLenGeLe'    => '“{{param}}” length (bytes) must be in {{min}} - {{max}} between', // 字符串长度
+            'Letters'        => '“{{param}}” can only contain letters',
+            'Alphabet'       => '“{{param}}” can only contain letters', // 同Letters
+            'Numbers'        => '“{{param}}” can only be pure Numbers',
+            'Digits'         => '“{{param}}” can only be pure Numbers', // 同Numbers
+            'LettersNumbers' => '“{{param}}” only letters and Numbers can be included',
+            'Numeric'        => '“{{param}}” has to be number', // 一般用于大数处理（超过double表示范围的数,一般会用字符串来表示）, 如果是正常范围内的数, 可以使用'Int'或'Float'来检测
+            'VarName'        => '“{{param}}” Only letters, Numbers, and underscores can be included and begin with a letter or underscore',
+            'Email'          => '“{{param}}” not a legitimate email',
+            'Url'            => '“{{param}}” not a valid Url',
+            'Ip'             => '“{{param}}” not a legitimate IP address',
+            'Mac'            => '“{{param}}” not a valid MAC address',
+            'Regexp'         => '“{{param}}” does not match the regular expression “{{regexp}}”', // Perl正则表达式匹配. 目前不支持modifiers. http://www.rexegg.com/regex-modifiers.html
 
-            // 数组. 如何检测数组长度为0
-            'Arr'            => '“{{param}}”必须是数组',
-            'ArrLen'         => '“{{param}}”长度必须等于 {{length}}',
-            'ArrLenGe'       => '“{{param}}”长度必须大于等于 {{min}}',
-            'ArrLenLe'       => '“{{param}}”长度必须小于等于 {{max}}',
-            'ArrLenGeLe'     => '“{{param}}”长度必须在 {{min}} ~ {{max}} 之间',
+            // 数组. 如何检测数组长度为0, Arr认证的是数值型索引数组
+            'Arr'            => '“{{param}}” has to be an array',
+            'ArrLen'         => '“{{param}}” length has to be equal to {{length}}',
+            'ArrLenGe'       => '“{{param}}” length has to be greater than or equal to {{min}}',
+            'ArrLenLe'       => '“{{param}}” length has to be less than or equal to {{max}}',
+            'ArrLenGeLe'     => '“{{param}}” length has to be in {{min}} ~ {{max}} between',
 
-            // 对象
-            'Obj'            => '“{{param}}”必须是对象',
+            // 对象，Obj认证的是键（字符串）值对型数组
+            'Obj'            => '“{{param}}” has to be an object',
 
             // 文件
-            'File'           => '“{{param}}”必须是文件',
-            'FileMaxSize'    => '“{{param}}”必须是文件, 且文件大小不超过{{size}}',
-            'FileMinSize'    => '“{{param}}”必须是文件, 且文件大小不小于{{size}}',
-            'FileImage'      => '“{{param}}”必须是图片',
-            'FileVideo'      => '“{{param}}”必须是视频文件',
-            'FileAudio'      => '“{{param}}”必须是音频文件',
-            'FileMimes'      => '“{{param}}”必须是这些MIME类型的文件:{{mimes}}',
+            'File'           => '“{{param}}”has to be a file',
+            'FileMaxSize'    => '“{{param}}” must be a file, and the file size must not exceed{{size}}',
+            'FileMinSize'    => '“{{param}}” must be a file, and the file size is not less than{{size}}',
+            'FileImage'      => '“{{param}}” has to be a picture',
+            'FileVideo'      => '“{{param}}” must be a video file',
+            'FileAudio'      => '“{{param}}” must be an audio file',
+            'FileMimes'      => '“{{param}}” must be files of these MIME types:{{mimes}}',
 
             // Date & Time
-            'Date'           => '“{{param}}”必须符合日期格式YYYY-MM-DD',
-            'DateFrom'       => '“{{param}}”不得早于 {{from}}',
-            'DateTo'         => '“{{param}}”不得晚于 {{to}}',
-            'DateFromTo'     => '“{{param}}”必须在 {{from}} ~ {{to}} 之间',
-            'DateTime'       => '“{{param}}”必须符合日期时间格式YYYY-MM-DD HH:mm:ss',
-            'DateTimeFrom'   => '“{{param}}”不得早于 {{from}}',
-            'DateTimeTo'     => '“{{param}}”必须早于 {{to}}',
-            'DateTimeFromTo' => '“{{param}}”必须在 {{from}} ~ {{to}} 之间',
+            'Date'           => '“{{param}}” must conform to date formatYYYY-MM-DD',
+            'DateFrom'       => '“{{param}}” shall not be earlier than {{from}}',
+            'DateTo'         => '“{{param}}” shall not be later than {{to}}',
+            'DateFromTo'     => '“{{param}}” must be in {{from}} ~ {{to}} between',
+            'DateTime'       => '“{{param}}” must conform to date and time format YYYY-MM-DD HH:mm:ss',
+            'DateTimeFrom'   => '“{{param}}” shall not be earlier than {{from}}',
+            'DateTimeTo'     => '“{{param}}” must be earlier than {{to}}',
+            'DateTimeFromTo' => '“{{param}}” must be in {{from}} ~ {{to}} between',
 
             // 其它
-            'Required'       => '必须提供“{{param}}”',
+            'Required'       => 'must provide “{{param}}”',
         ],
     ];
 

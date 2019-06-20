@@ -12,7 +12,7 @@ namespace App\Models\Redis;
 class Login extends AbstractRedis
 {
     /**
-     * 此处使用静态延迟绑定，实现选择不同的数据库
+     * 此处使用静态延迟绑定，实现选择不同的数据库,如不设置默认为0
      * @var int
      */
     protected static $dbindex = 1;
