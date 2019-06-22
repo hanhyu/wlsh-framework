@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Factory;
+use App\Models\MysqlFactory;
 
 class Router
 {
@@ -31,7 +31,7 @@ class Router
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan) { //获取总数
             try {
-                $count = Factory::systemRouter()->getListCount();
+                $count = MysqlFactory::systemRouter()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -39,7 +39,7 @@ class Router
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = Factory::systemRouter()->getList($data);
+                $list = MysqlFactory::systemRouter()->getList($data);
                 $chan->push(['list' => $list]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -70,7 +70,7 @@ class Router
      */
     public function setRouter(array $data): int
     {
-        return Factory::systemRouter()->setRouter($data);
+        return MysqlFactory::systemRouter()->setRouter($data);
     }
 
     /**
@@ -86,7 +86,7 @@ class Router
      */
     public function editRouter(array $data): int
     {
-        return Factory::systemRouter()->editRouter($data);
+        return MysqlFactory::systemRouter()->editRouter($data);
     }
 
 
@@ -103,12 +103,12 @@ class Router
      */
     public function delRouter(int $id): int
     {
-        return Factory::systemRouter()->delRouter($id);
+        return MysqlFactory::systemRouter()->delRouter($id);
     }
 
     public function getInfo(): array
     {
-        $res  = Factory::systemRouter()->getInfo();
+        $res  = MysqlFactory::systemRouter()->getInfo();
         $list = [];
         foreach ($res as $k => $v) {
             $list[$v['menu_name']][] = $v;

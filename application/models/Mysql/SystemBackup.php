@@ -14,12 +14,14 @@ use Exception;
 
 class SystemBackup extends AbstractMysql
 {
+    protected $table = 'frame_system_backup';
+
     /**
      * 获取数据库中所有表名
      * @return array
      * @throws Exception
      */
-    protected function getTables(): array
+    public function getTables(): array
     {
         $datas = $this->db->query("show  tables ")->fetchAll();
         if ($datas == false) throw new Exception($this->db->last());
@@ -34,9 +36,9 @@ class SystemBackup extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function setBackup(array $data): int
+    public function setBackup(array $data): int
     {
-        $datas = $this->db->insert('frame_system_backup', [
+        $datas = $this->db->insert($this->table, [
             'file_name' => $data['filename'],
             'file_size' => $data['size'],
             'file_md5'  => $data['md5'],
@@ -50,9 +52,9 @@ class SystemBackup extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getList(): array
+    public function getList(): array
     {
-        $datas = $this->db->select('frame_system_backup', [
+        $datas = $this->db->select($this->table, [
             'id',
             'file_name',
             'file_size',
@@ -68,9 +70,9 @@ class SystemBackup extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    protected function getFileName(int $id): array
+    public function getFileName(int $id): array
     {
-        $datas = $this->db->select('frame_system_backup', [
+        $datas = $this->db->select($this->table, [
             'file_name',
             'file_size',
             'file_md5',
@@ -91,9 +93,9 @@ class SystemBackup extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    protected function delBackup(int $id): int
+    public function delBackup(int $id): int
     {
-        $datas = $this->db->delete('frame_system_backup', [
+        $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
         if ($datas == false) throw new Exception($this->db->last());

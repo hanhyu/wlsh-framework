@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Factory;
+use App\Models\MysqlFactory;
 use App\Models\Redis\Login;
 
 class Menu
@@ -38,7 +38,7 @@ class Menu
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan) { //获取总数
             try {
-                $count = Factory::systemMenu()->getListCount();
+                $count = MysqlFactory::systemMenu()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -46,7 +46,7 @@ class Menu
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list = Factory::systemMenu()->getMenuList($data);
+                $list = MysqlFactory::systemMenu()->getMenuList($data);
                 $chan->push(['list' => $list]);
             } catch (\Exception $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -76,27 +76,27 @@ class Menu
      */
     public function getInfo(): array
     {
-        return Factory::systemMenu()->getMenuInfo();
+        return MysqlFactory::systemMenu()->getMenuInfo();
     }
 
     public function setMenu(array $data): int
     {
-        return Factory::systemMenu()->setMenu($data);
+        return MysqlFactory::systemMenu()->setMenu($data);
     }
 
     public function getMenuById(int $id): array
     {
-        return Factory::systemMenu()->getMenu($id);
+        return MysqlFactory::systemMenu()->getMenu($id);
     }
 
     public function editMenu(array $data): int
     {
-        return Factory::systemMenu()->editMenu($data);
+        return MysqlFactory::systemMenu()->editMenu($data);
     }
 
     public function delMenu(int $id): int
     {
-        return Factory::systemMenu()->delMenu($id);
+        return MysqlFactory::systemMenu()->delMenu($id);
     }
 
     public function getRedis(string $key): ?string

@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 //todo 还需完善ping与流程安全测试
+use Swoole\Coroutine\{Channel, MySQL};
+use Yaf\Registry;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -11,34 +14,24 @@ declare(strict_types=1);
 class CoMysqlPool
 {
     /**
-     * @var \Swoole\Coroutine\Channel
+     * @var Channel
      */
     protected $ch;
 
     public function __construct()
     {
-        $this->ch = new \Swoole\Coroutine\Channel(1000);
-    }
-
-    /**
-     * 向连接池中存入连接对象，让后面的客户端可以复用则连接。
-     *
-     * @param \Swoole\Coroutine\MySQL $mysql
-     */
-    public function put(\Swoole\Coroutine\MySQL $mysql): void
-    {
-        $this->ch->push($mysql);
+        $this->ch = new Channel(100);
     }
 
     /**
      * 获取mysql连接，如池子内有连接就取一个，连接不够则新建一个。
-     * @return \Swoole\Coroutine\MySQL
-     * @throws \Exception
+     * @return MySQL
+     * @throws Exception
      */
-    public function get(): \Swoole\Coroutine\MySQL
+    public function get(): MySQL
     {
         //有空闲连接
-        if ($this->ch->stats()['queue_num'] > 0) {
+        if ($this->ch->length() > 0) {
             $db = $this->ch->pop(3);
             /**
              * 判断此空闲连接是否已被断开，已断开就重新请求连接，
@@ -50,17 +43,22 @@ class CoMysqlPool
             //if ($db === false OR $this->ping($db->pdo)) goto EOF;
         } else {
             EOF:
-            $db  = new Swoole\Coroutine\MySQL();
+            $db  = new MySQL();
             $let = $db->connect([
-                'host'     => \Yaf\Registry::get('config')->mysql->host,
-                'port'     => \Yaf\Registry::get('config')->mysql->port,
-                'user'     => \Yaf\Registry::get('config')->mysql->username,
-                'password' => \Yaf\Registry::get('config')->mysql->password,
-                'database' => \Yaf\Registry::get('config')->mysql->database,
+                'host'     => Registry::get('config')->mysql->host,
+                'port'     => Registry::get('config')->mysql->port,
+                'user'     => Registry::get('config')->mysql->username,
+                'password' => Registry::get('config')->mysql->password,
+                'database' => Registry::get('config')->mysql->database,
             ]);
 
-            if (!$let) throw new \Exception('Coroutine MySQL connect fail', 500);
+            if (!$let) throw new Exception('Coroutine MySQL connect fail', 500);
         }
+
+        defer(function () use ($db) {
+            $this->ch->push($db);
+        });
+
         return $db;
     }
 

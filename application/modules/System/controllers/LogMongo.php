@@ -44,8 +44,10 @@ class LogMongo extends \Yaf\Controller_Abstract
     }
 
     /**
-     *
-     * @throws Exception
+     * User: hanhyu
+     * Date: 19-6-22
+     * Time: 下午10:11
+     * @throws \MongoDB\Driver\Exception\Exception
      */
     public function getMongoInfoAction()
     {

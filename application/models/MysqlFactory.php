@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Mongo\Monolog;
-use App\Models\Mysql\{SystemMenu, SystemMsg, SystemRouter, SystemUser, SystemUserLog, UserLogView};
+use App\Models\Mysql\{SystemBackup, SystemMenu, SystemMsg, SystemRouter, SystemUser, SystemUserLog, UserLogView};
 
-class Factory
+class MysqlFactory
 {
     /**
      * @var SystemUser
@@ -29,15 +28,15 @@ class Factory
      */
     private static $systemMsg;
     /**
-     * @var Monolog
-     */
-    private static $monolog;
-    /**
      * @var SystemMenu
      */
     private static $systemMenu;
+    /**
+     * @var SystemBackup
+     */
+    private static $systemBackup;
 
-    public static function systemUser()
+    public static function systemUser(): SystemUser
     {
         if (!self::$system_user) {
             self::$system_user = new SystemUser();
@@ -45,7 +44,7 @@ class Factory
         return self::$system_user;
     }
 
-    public static function systemUserLog()
+    public static function systemUserLog(): SystemUserLog
     {
         if (!self::$system_user_log) {
             self::$system_user_log = new SystemUserLog();
@@ -53,7 +52,7 @@ class Factory
         return self::$system_user_log;
     }
 
-    public static function userLogView()
+    public static function userLogView(): UserLogView
     {
         if (!self::$userLogView) {
             self::$userLogView = new UserLogView();
@@ -61,7 +60,7 @@ class Factory
         return self::$userLogView;
     }
 
-    public static function systemRouter()
+    public static function systemRouter(): SystemRouter
     {
         if (!self::$systemRouter) {
             self::$systemRouter = new SystemRouter();
@@ -69,7 +68,7 @@ class Factory
         return self::$systemRouter;
     }
 
-    public static function systemMsg()
+    public static function systemMsg(): SystemMsg
     {
         if (!self::$systemMsg) {
             self::$systemMsg = new SystemMsg();
@@ -77,20 +76,20 @@ class Factory
         return self::$systemMsg;
     }
 
-    public static function monolog(string $database, string $col)
-    {
-        if (!self::$monolog) {
-            self::$monolog = new Monolog($database, $col);
-        }
-        return self::$monolog;
-    }
-
-    public static function systemMenu()
+    public static function systemMenu(): SystemMenu
     {
         if (!self::$systemMenu) {
             self::$systemMenu = new SystemMenu();
         }
         return self::$systemMenu;
+    }
+
+    public static function systemBackup(): SystemBackup
+    {
+        if (!self::$systemBackup) {
+            self::$systemBackup = new SystemBackup();
+        }
+        return self::$systemBackup;
     }
 
 }

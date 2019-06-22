@@ -1026,8 +1026,6 @@ class Login extends Controller_Abstract
         $stmt  = $mysql->prepare($sql);
         $get   = $stmt->execute([1]);
         $this->response->end(http_response(200, '', $get));
-        Registry::get('co_mysql_pool')->put($mysql);
-
     }
 
 }

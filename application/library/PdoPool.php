@@ -19,6 +19,12 @@ class PdoPool
     protected $ch;
     private $config;
 
+    /**
+     * 池子的大小必须大于初始分配的worker进程数量（含taskWorker进程）
+     * PdoPool constructor.
+     *
+     * @param string $db_type
+     */
     public function __construct(string $db_type)
     {
         $this->ch     = new Channel(300);
