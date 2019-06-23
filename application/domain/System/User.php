@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Domain\System;
 
 use App\Models\MysqlFactory;
+use Exception;
 
 
 /**
@@ -81,6 +82,13 @@ class User
         return MysqlFactory::systemUser()->getUser($id);
     }
 
+    /**
+     *
+     * @param array $data
+     *
+     * @return int
+     * @throws Exception
+     */
     public function editUser(array $data): int
     {
         return MysqlFactory::systemUser()->editUser($data);

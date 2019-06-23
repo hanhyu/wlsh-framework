@@ -17,9 +17,17 @@ class Login extends AbstractRedis
      */
     protected static $dbindex = 1;
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-23
+     * Time: 上午9:14
+     *
+     * @param string $key
+     *
+     * @return string|null
+     */
     public function getKey(string $key): ?string
     {
-        //$this->db->select(1);
         $datas = $this->db->get($key);
         if ($datas == false) $datas = null;
         return $datas;
