@@ -78,6 +78,7 @@ class Server
             //'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,
+            'send_yield'                 => true,
         ]);
 
         $this->table = new Swoole\Table(1024);
@@ -315,14 +316,14 @@ class Server
                 $this->obj_yaf->getDispatcher()->dispatch($obj_req);
             } catch (ValidateException $e) { //参数验证手动触发的信息
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage(), [], true));
+                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage(), [], true));
             } catch (ProgramException $e) { //程序手动抛出的异常
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage()));
             } catch (Throwable $e) {
                 $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response(500, null, $msg));
+                    $server->push($frame->fd, ws_response(500, '', $msg));
 
                 co_log(
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],

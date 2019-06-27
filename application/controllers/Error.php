@@ -43,7 +43,7 @@ class Error extends \Yaf\Controller_Abstract
         $server = Registry::get('server');
 
         if ($server->isEstablished($fd)) {
-            $server->push($fd, ws_response(400, null, '请求的接口不存在'));
+            $server->push($fd, ws_response(400, '', '请求的接口不存在'));
         } else {
             $this->response->end(http_response(400, '请求的接口不存在'));
         }
@@ -61,7 +61,7 @@ class Error extends \Yaf\Controller_Abstract
         $server = Registry::get('server');
 
         if ($server->isEstablished($fd)) {
-            $server->push($fd, ws_response(400, null, '请求的方法不正确'));
+            $server->push($fd, ws_response(400, '', '请求的方法不正确'));
         } else {
             $this->response->end(http_response(400, '请求的方法不正确'));
         }
