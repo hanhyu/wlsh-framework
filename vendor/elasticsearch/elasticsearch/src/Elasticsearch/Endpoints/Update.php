@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions;
@@ -85,7 +87,10 @@ class Update extends AbstractEndpoint
             'ttl',
             'version',
             'version_type',
-            '_source'
+            '_source',
+            'include_type_name',
+            'if_primary_term',
+            'if_seq_no'
         );
     }
 

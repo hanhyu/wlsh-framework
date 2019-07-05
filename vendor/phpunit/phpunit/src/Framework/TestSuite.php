@@ -23,7 +23,7 @@ use Throwable;
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
  */
-class TestSuite implements Test, SelfDescribing, IteratorAggregate
+class TestSuite implements IteratorAggregate, SelfDescribing, Test
 {
     /**
      * Enable or disable the backup and restoration of the $GLOBALS array.
@@ -750,7 +750,7 @@ class TestSuite implements Test, SelfDescribing, IteratorAggregate
             foreach ($hookMethods['afterClass'] as $afterClassMethod) {
                 if ($this->testCase === true && \class_exists($this->name, false) && \method_exists(
                     $this->name,
-                        $afterClassMethod
+                    $afterClassMethod
                 )) {
                     \call_user_func([$this->name, $afterClassMethod]);
                 }
@@ -758,11 +758,13 @@ class TestSuite implements Test, SelfDescribing, IteratorAggregate
         } catch (Throwable $t) {
             $message = "Exception in {$this->name}::$afterClassMethod" . \PHP_EOL . $t->getMessage();
             $error   = new SyntheticError($message, 0, $t->getFile(), $t->getLine(), $t->getTrace());
-            $test    = new \Failure($afterClassMethod);
 
-            $result->startTest($test);
-            $result->addFailure($test, $error, 0);
-            $result->endTest($test, 0);
+            $placeholderTest = clone $test;
+            $placeholderTest->setName($afterClassMethod);
+
+            $result->startTest($placeholderTest);
+            $result->addFailure($placeholderTest, $error, 0);
+            $result->endTest($placeholderTest, 0);
         }
 
         $this->tearDown();

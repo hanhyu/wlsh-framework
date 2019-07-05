@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\RedisFactory;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yaf\{
@@ -378,10 +379,13 @@ class Login extends Controller_Abstract
      */
     public function getRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
+        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
         //$this->redis->select(1);
-        $this->response->end($this->redis->get('key'));
+        //$this->response->end($this->redis->get('key'));
         //\Yaf\Registry::get('redis_pool')->put($this->redis);
+
+        $value = RedisFactory::login()->getKey('key');
+        $this->response->end($value);
     }
 
     public function publisherRedisAction(): void
@@ -579,8 +583,8 @@ class Login extends Controller_Abstract
 
     public function getUserInfoAction(): void
     {
-        $user              = new \App\Domain\System\User();
-        $res               = $user->getInfoByName('ceshi123');
+        $user = new \App\Domain\System\User();
+        $res  = $user->getInfoByName('ceshi123');
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {

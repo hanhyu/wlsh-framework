@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions;
@@ -92,7 +94,10 @@ class Index extends AbstractEndpoint
             'ttl',
             'version',
             'version_type',
-            'pipeline'
+            'pipeline',
+            'if_primary_term',
+            'if_seq_no',
+            'include_type_name'
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch;
 
 use Elasticsearch\Common\Exceptions;
@@ -43,7 +45,7 @@ class Transport
      * Transport class is responsible for dispatching requests to the
      * underlying cluster connections
      *
-     * @param $retries
+     * @param int $retries
      * @param bool $sniffOnStart
      * @param ConnectionPool\AbstractConnectionPool $connectionPool
      * @param \Psr\Log\LoggerInterface $log    Monolog logger object
@@ -151,7 +153,7 @@ class Transport
     }
 
     /**
-     * @param $request
+     * @param array $request
      *
      * @return bool
      */

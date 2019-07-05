@@ -41,6 +41,21 @@ class ApplicationTest extends TestCase
 {
     protected static $fixturesPath;
 
+    private $colSize;
+
+    protected function setUp()
+    {
+        $this->colSize = getenv('COLUMNS');
+    }
+
+    protected function tearDown()
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+        putenv('SHELL_VERBOSITY');
+        unset($_ENV['SHELL_VERBOSITY']);
+        unset($_SERVER['SHELL_VERBOSITY']);
+    }
+
     public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
@@ -58,8 +73,8 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
         require_once self::$fixturesPath.'/FooWithoutAliasCommand.php';
-        require_once self::$fixturesPath.'/TestTiti.php';
-        require_once self::$fixturesPath.'/TestToto.php';
+        require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering.php';
+        require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering2.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -148,6 +163,28 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $command = $application->register('foo');
         $this->assertEquals('foo', $command->getName(), '->register() registers a new command');
+    }
+
+    public function testRegisterAmbiguous()
+    {
+        $code = function (InputInterface $input, OutputInterface $output) {
+            $output->writeln('It works!');
+        };
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application
+            ->register('test-foo')
+            ->setAliases(['test'])
+            ->setCode($code);
+
+        $application
+            ->register('test-bar')
+            ->setCode($code);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['test']);
+        $this->assertContains('It works!', $tester->getDisplay(true));
     }
 
     public function testAdd()
@@ -289,9 +326,9 @@ class ApplicationTest extends TestCase
     public function testFindNonAmbiguous()
     {
         $application = new Application();
-        $application->add(new \TestTiti());
-        $application->add(new \TestToto());
-        $this->assertEquals('test-toto', $application->find('test')->getName());
+        $application->add(new \TestAmbiguousCommandRegistering());
+        $application->add(new \TestAmbiguousCommandRegistering2());
+        $this->assertEquals('test-ambiguous', $application->find('test')->getName());
     }
 
     /**
@@ -384,6 +421,7 @@ class ApplicationTest extends TestCase
      */
     public function testFindWithAmbiguousAbbreviations($abbreviation, $expectedExceptionMessage)
     {
+        putenv('COLUMNS=120');
         if (method_exists($this, 'expectException')) {
             $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
             $this->expectExceptionMessage($expectedExceptionMessage);
@@ -515,6 +553,7 @@ class ApplicationTest extends TestCase
 
     public function testFindAlternativeExceptionMessageMultiple()
     {
+        putenv('COLUMNS=120');
         $application = new Application();
         $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
@@ -670,7 +709,7 @@ class ApplicationTest extends TestCase
         $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(['getNamespaces'])->getMock();
         $application->expects($this->once())
             ->method('getNamespaces')
-            ->will($this->returnValue(['foo:sublong', 'bar:sub']));
+            ->willReturn(['foo:sublong', 'bar:sub']);
 
         $this->assertEquals('foo:sublong', $application->findNamespace('f:sub'));
     }
@@ -814,7 +853,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->expects($this->any())
             ->method('getTerminalWidth')
-            ->will($this->returnValue(120));
+            ->willReturn(120);
         $application->register('foo')->setCode(function () {
             throw new \InvalidArgumentException("\n\nline 1 with extra spaces        \nline 2\n\nline 4\n");
         });
@@ -966,6 +1005,19 @@ class ApplicationTest extends TestCase
 
         $tester->run(['command' => 'foo:bar', '-n' => true], ['decorated' => false]);
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+    }
+
+    public function testRunWithGlobalOptionAndNoCommand()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->getDefinition()->addOption(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL));
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+        $input = new ArgvInput(['cli.php', '--foo', 'bar']);
+
+        $this->assertSame(0, $application->run($input, $output));
     }
 
     /**
@@ -1726,13 +1778,6 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
-    }
-
-    protected function tearDown()
-    {
-        putenv('SHELL_VERBOSITY');
-        unset($_ENV['SHELL_VERBOSITY']);
-        unset($_SERVER['SHELL_VERBOSITY']);
     }
 }
 

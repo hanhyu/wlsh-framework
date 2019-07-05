@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions;
@@ -42,7 +44,7 @@ class Scroll extends AbstractEndpoint
     }
 
     /**
-     * @param $scroll
+     * @param string $scroll
      *
      * @return $this
      */
@@ -58,7 +60,7 @@ class Scroll extends AbstractEndpoint
     }
 
     /**
-     * @param $scroll_id
+     * @param string $scroll_id
      *
      * @return $this
      */
@@ -89,6 +91,7 @@ class Scroll extends AbstractEndpoint
     {
         return array(
             'scroll',
+            'rest_total_hits_as_int'
         );
     }
 

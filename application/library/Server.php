@@ -49,7 +49,8 @@ class Server
             "0.0.0.0",
             9770,
             SWOOLE_PROCESS,
-            SWOOLE_SOCK_TCP | SWOOLE_SSL
+            SWOOLE_SOCK_TCP
+        //SWOOLE_SOCK_TCP | SWOOLE_SSL
         );
 
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
@@ -73,8 +74,8 @@ class Server
             'heartbeat_idle_time'        => 600,
             'heartbeat_check_interval'   => 60,
             'buffer_output_size'         => 8 * 1024 * 1024,
-            'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
-            'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            //'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
+            //'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
             //'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,

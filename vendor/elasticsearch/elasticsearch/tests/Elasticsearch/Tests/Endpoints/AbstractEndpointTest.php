@@ -10,7 +10,7 @@ class AbstractEndpointTest extends \PHPUnit\Framework\TestCase
 {
     private $endpoint;
 
-    public static function invalidParameters()
+    public static function invalidParameters(): array
     {
         return [
             [['invalid' => 10]],
@@ -20,13 +20,14 @@ class AbstractEndpointTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidParameters
-     * @expectedException \Elasticsearch\Common\Exceptions\UnexpectedValueException
      */
     public function testInvalidParamsCauseErrorsWhenProvidedToSetParams(array $params)
     {
         $this->endpoint->expects($this->once())
             ->method('getParamWhitelist')
             ->willReturn(['one', 'two']);
+
+        $this->expectException(\Elasticsearch\Common\Exceptions\UnexpectedValueException::class);
 
         $this->endpoint->setParams($params);
     }

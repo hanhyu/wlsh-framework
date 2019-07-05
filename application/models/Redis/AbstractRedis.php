@@ -26,29 +26,6 @@ class AbstractRedis
     protected static $dbindex = 0;
 
     /**
-     * @param $method
-     * @param $args
-     *
-     * @return mixed
-     * @throws Exception
-
-    public function __call($method, $args)
-    {
-        try {
-            $this->db = Registry::get('redis_pool')->get();
-            $this->db->select(static::$dbindex);
-        } catch (Exception $e) {
-            co_log($e->getMessage(), "redis数据连接异常", 'alert');
-            throw new Exception('redis数据连接异常', 500);
-        }
-
-        $data = call_user_func_array([$this, $method], $args);
-
-        return $data;
-    }
-    */
-
-    /**
      * AbstractRedis constructor.
      * @throws Exception
      */
@@ -57,10 +34,34 @@ class AbstractRedis
         try {
             $this->db = Registry::get('redis_pool')->get();
             $this->db->select(static::$dbindex);
-        } catch (\PDOException $e) {
+        } catch (Exception $e) {
             co_log($e->getMessage(), "redis数据连接异常", 'alert');
             throw new Exception('redis数据连接异常', 500);
         }
     }
+
+
+    /**
+     * @param $method
+     * @param $args
+     *
+     * @return mixed
+     * @throws Exception
+     *
+     * public function __call($method, $args)
+     * {
+     * try {
+     * $this->db = Registry::get('redis_pool')->get();
+     * $this->db->select(static::$dbindex);
+     * } catch (Exception $e) {
+     * co_log($e->getMessage(), "redis数据连接异常", 'alert');
+     * throw new Exception('redis数据连接异常', 500);
+     * }
+     *
+     * $data = call_user_func_array([$this, $method], $args);
+     *
+     * return $data;
+     * }
+     */
 
 }

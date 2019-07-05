@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Namespaces;
 
 use Elasticsearch\Endpoints\Tasks\Cancel;
@@ -19,7 +21,7 @@ class TasksNamespace extends AbstractNamespace
     /**
      * $params['wait_for_completion'] = (bool) Wait for the matching tasks to complete (default: false)
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -27,7 +29,7 @@ class TasksNamespace extends AbstractNamespace
     {
         $id = $this->extractArgument($params, 'task_id');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var Get $endpoint */
@@ -47,14 +49,14 @@ class TasksNamespace extends AbstractNamespace
      *        ['wait_for_completion'] = (bool) Wait for the matching tasks to complete (default: false)
      *        ['group_by'] = (enum) Group tasks by nodes or parent/child relationships
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function tasksList($params = array())
     {
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var Get $endpoint */
@@ -70,7 +72,7 @@ class TasksNamespace extends AbstractNamespace
      *        ['parent_node'] = (string) Cancel tasks with specified parent node
      *        ['parent_task'] = (string) Cancel tasks with specified parent task id (node_id:task_number). Set to -1 to cancel all.
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -78,7 +80,7 @@ class TasksNamespace extends AbstractNamespace
     {
         $id = $this->extractArgument($params, 'id');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var Cancel $endpoint */

@@ -188,12 +188,23 @@ class TestRunner extends BaseTestRunner
         }
 
         if ($arguments['cacheResult']) {
-            if (isset($arguments['cacheResultFile'])) {
-                $cache = new TestResultCache($arguments['cacheResultFile']);
-            } else {
-                $cache = new TestResultCache;
+            if (!isset($arguments['cacheResultFile'])) {
+                if ($arguments['configuration'] instanceof Configuration) {
+                    $cacheLocation = $arguments['configuration']->getFilename();
+                } else {
+                    $cacheLocation = $_SERVER['PHP_SELF'];
+                }
+
+                $arguments['cacheResultFile'] = null;
+
+                $cacheResultFile = \realpath($cacheLocation);
+
+                if ($cacheResultFile !== false) {
+                    $arguments['cacheResultFile'] = \dirname($cacheResultFile);
+                }
             }
 
+            $cache              = new TestResultCache($arguments['cacheResultFile']);
             $this->extensions[] = new ResultCacheExtension($cache);
         }
 
@@ -338,13 +349,6 @@ class TestRunner extends BaseTestRunner
 
             $this->writeMessage('Runtime', $runtime);
 
-            if ($arguments['executionOrder'] === TestSuiteSorter::ORDER_RANDOMIZED) {
-                $this->writeMessage(
-                    'Random seed',
-                    $arguments['randomOrderSeed']
-                );
-            }
-
             if (isset($arguments['configuration'])) {
                 $this->writeMessage(
                     'Configuration',
@@ -365,6 +369,13 @@ class TestRunner extends BaseTestRunner
                     $extension
                 );
             }
+        }
+
+        if ($arguments['executionOrder'] === TestSuiteSorter::ORDER_RANDOMIZED) {
+            $this->writeMessage(
+                'Random seed',
+                $arguments['randomOrderSeed']
+            );
         }
 
         if (isset($tooFewColumnsRequested)) {
@@ -774,7 +785,7 @@ class TestRunner extends BaseTestRunner
         }
 
         if ($exit) {
-            if ($result->wasSuccessful()) {
+            if ($result->wasSuccessfulIgnoringWarnings()) {
                 if ($arguments['failOnRisky'] && !$result->allHarmless()) {
                     exit(self::FAILURE_EXIT);
                 }
