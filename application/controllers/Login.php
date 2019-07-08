@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Domain\System\User;
 use App\Models\RedisFactory;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -12,6 +13,7 @@ use Yaf\{
 };
 use Swoole\WebSocket\Server;
 use Swoole\Http\Response;
+use Exception;
 
 /**
  * 测试用例
@@ -385,6 +387,7 @@ class Login extends Controller_Abstract
         //\Yaf\Registry::get('redis_pool')->put($this->redis);
 
         $value = RedisFactory::login()->getKey('key');
+        //$value = (new \App\Models\Redis\Login())->getKey('key');
         $this->response->end($value);
     }
 
@@ -572,8 +575,8 @@ class Login extends Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Domain\System\User();
-        $res               = $user->getInfoList($data);
+        //$user              = new \App\Domain\System\User();
+        $res = (new User())->getInfoList($data);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -1031,5 +1034,34 @@ class Login extends Controller_Abstract
         $get   = $stmt->execute([1]);
         $this->response->end(http_response(200, '', $get));
     }
+
+    public function getCoRedisAction(): void
+    {
+        go(function () {
+            for ($i = 0; $i < 20; $i++) {
+                go(function () use ($i) {
+                    $value = RedisFactory::login()->getKey('key');
+                    echo $value . '-' . $i . PHP_EOL;
+                });
+                \Co::sleep(0.1);
+            }
+        });
+        $this->response->end('success');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function setRedisAction(): void
+    {
+        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
+        //$this->redis->select(1);
+        //$this->response->end($this->redis->get('key'));
+        //\Yaf\Registry::get('redis_pool')->put($this->redis);
+
+        $value = RedisFactory::login()->setKey('setKey', '123');
+        $this->response->end($value);
+    }
+
 
 }

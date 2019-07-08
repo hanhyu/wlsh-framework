@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
+use App\Models\Mysql\SystemUser;
 use App\Models\MysqlFactory;
 use Exception;
 

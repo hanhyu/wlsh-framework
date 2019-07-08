@@ -23,7 +23,7 @@ class SystemMenu extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getMenuList(array $data): array
+    protected function getMenuList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -52,7 +52,7 @@ class SystemMenu extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function getListCount(): int
+    protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
         if ($datas == false) throw new Exception($this->db->last());
@@ -67,7 +67,7 @@ class SystemMenu extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getMenuInfo(): array
+    protected function getMenuInfo(): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -89,7 +89,7 @@ class SystemMenu extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function setMenu(array $post): int
+    protected function setMenu(array $post): int
     {
         $datas = $this->db->insert($this->table, [
             'name'  => $post['name'],
@@ -112,7 +112,7 @@ class SystemMenu extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getMenu(int $id): array
+    protected function getMenu(int $id): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -135,7 +135,7 @@ class SystemMenu extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function editMenu(array $post): int
+    protected function editMenu(array $post): int
     {
         $datas = $this->db->update($this->table, [
             'name'  => $post['name'],
@@ -160,7 +160,7 @@ class SystemMenu extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function delMenu(int $id): int
+    protected function delMenu(int $id): int
     {
         $datas = $this->db->delete($this->table, [
             'id' => $id,

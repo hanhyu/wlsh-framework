@@ -44,7 +44,6 @@ class RedisPool
          * 1、在使用单例工厂模式下不影响性能
          * 2、普通模式下性能降低20%
          */
-
         if ($this->ping($db)) $db = $this->connect();
 
         /*

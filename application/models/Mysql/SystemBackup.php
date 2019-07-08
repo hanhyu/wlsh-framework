@@ -21,7 +21,7 @@ class SystemBackup extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getTables(): array
+    protected function getTables(): array
     {
         $datas = $this->db->query("show  tables ")->fetchAll();
         if ($datas == false) throw new Exception($this->db->last());
@@ -36,7 +36,7 @@ class SystemBackup extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function setBackup(array $data): int
+    protected function setBackup(array $data): int
     {
         $datas = $this->db->insert($this->table, [
             'file_name' => $data['filename'],
@@ -52,7 +52,7 @@ class SystemBackup extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getList(): array
+    protected function getList(): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -70,7 +70,7 @@ class SystemBackup extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getFileName(int $id): array
+    protected function getFileName(int $id): array
     {
         $datas = $this->db->select($this->table, [
             'file_name',
@@ -93,7 +93,7 @@ class SystemBackup extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function delBackup(int $id): int
+    protected function delBackup(int $id): int
     {
         $datas = $this->db->delete($this->table, [
             'id' => $id,
