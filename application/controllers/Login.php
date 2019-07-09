@@ -1037,16 +1037,28 @@ class Login extends Controller_Abstract
 
     public function getCoRedisAction(): void
     {
-        go(function () {
-            for ($i = 0; $i < 20; $i++) {
-                go(function () use ($i) {
-                    $value = RedisFactory::login()->getKey('key');
-                    echo $value . '-' . $i . PHP_EOL;
-                });
+        /*for ($i = 0; $i < 20; $i++) {
+            go(function () use ($i) {
                 \Co::sleep(0.1);
-            }
+                $value = RedisFactory::login()->getKey('key');
+                echo $value . '-' . $i . PHP_EOL;
+            });
+        }*/
+
+        /*$scheduler = new \Swoole\Coroutine\Scheduler;
+        $scheduler->add(function () {
+            \Co::sleep(1);
+            echo "Done.\n";
         });
+        $scheduler->start();*/
+
+        /*     \Co\run(function () {
+                 \Co::sleep(1);
+                 echo "Done.\n";
+             });*/
+
         $this->response->end('success');
+
     }
 
     /**

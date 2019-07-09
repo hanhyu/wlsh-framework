@@ -44,7 +44,7 @@ class RedisPool
          * 1、在使用单例工厂模式下不影响性能
          * 2、普通模式下性能降低20%
          */
-        if ($this->ping($db)) $db = $this->connect();
+        //if ($this->ping($db)) $db = $this->connect();
 
         /*
          * 这种合并写法，池子性能降低10%
@@ -54,12 +54,18 @@ class RedisPool
         */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
-        defer(function () use ($db) {
-            $this->ch->push($db);
-        });
+        /* defer(function () use ($db) {
+             $this->ch->push($db);
+         });*/
 
         return $db;
     }
+
+    public function put(Redis $db): void
+    {
+        $this->ch->push($db);
+    }
+
 
     /**
      * User: hanhyu
@@ -68,7 +74,7 @@ class RedisPool
      * @return Redis
      * @throws Exception
      */
-    private function connect(): Redis
+    public function connect(): Redis
     {
         $db  = new Redis();
         $res = $db->connect(Registry::get('config')->redis->host, (int)Registry::get('config')->redis->port);
@@ -85,7 +91,7 @@ class RedisPool
      *
      * @return bool ping通了返回false,ping不通返回true
      */
-    private function ping(Redis $dbconn): bool
+    public function ping(Redis $dbconn): bool
     {
         try {
             $dbconn->ping();

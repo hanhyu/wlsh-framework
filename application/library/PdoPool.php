@@ -54,11 +54,16 @@ class PdoPool
         */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
-        defer(function () use ($db) {
-            $this->ch->push($db);
-        });
+        /* defer(function () use ($db) {
+             $this->ch->push($db);
+         });*/
 
         return $db;
+    }
+
+    public function put(Medoo $db): void
+    {
+        $this->ch->push($db);
     }
 
     /**
@@ -67,7 +72,7 @@ class PdoPool
      * Time: 上午10:52
      * @return Medoo
      */
-    private function connect(): Medoo
+    public function connect(): Medoo
     {
         try {
             $db = new Medoo([
@@ -109,7 +114,7 @@ class PdoPool
      *
      * @return bool ping通了返回false,ping不通返回true
      */
-    private function ping(PDO $dbconn): bool
+    /*private function ping(PDO $dbconn): bool
     {
         try {
             $dbconn->getAttribute(PDO::ATTR_SERVER_INFO);
@@ -120,7 +125,7 @@ class PdoPool
             }
         }
         return false;
-    }
+    }*/
 
     /**
      * 连接池销毁, 置不可用状态, 防止新的客户端进入常驻连接池, 导致服务器无法平滑退出
