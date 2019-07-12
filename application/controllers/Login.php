@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Domain\System\User;
 use App\Models\RedisFactory;
+use Co\Channel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yaf\{
@@ -40,6 +41,11 @@ class Login extends Controller_Abstract
     {
         $this->server   = Registry::get('server');
         $this->response = Registry::get('response');
+    }
+
+    public function indexAction(): void
+    {
+
     }
 
     /**
@@ -1037,28 +1043,14 @@ class Login extends Controller_Abstract
 
     public function getCoRedisAction(): void
     {
-        /*for ($i = 0; $i < 20; $i++) {
-            go(function () use ($i) {
-                \Co::sleep(0.1);
-                $value = RedisFactory::login()->getKey('key');
-                echo $value . '-' . $i . PHP_EOL;
-            });
-        }*/
-
-        /*$scheduler = new \Swoole\Coroutine\Scheduler;
-        $scheduler->add(function () {
-            \Co::sleep(1);
-            echo "Done.\n";
+        $ch = new Channel(1);
+        go(function () use ($ch) {
+            $value = RedisFactory::login()->getKey('key');
+            $ch->push($value);
         });
-        $scheduler->start();*/
+        $res = $ch->pop(3);
 
-        /*     \Co\run(function () {
-                 \Co::sleep(1);
-                 echo "Done.\n";
-             });*/
-
-        $this->response->end('success');
-
+        $this->response->end($res);
     }
 
     /**

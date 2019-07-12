@@ -27,8 +27,8 @@ class Error extends \Yaf\Controller_Abstract
      */
     public function errorAction($exception): void
     {
-        echo $exception->getMessage() ?? '';
-        //$this->response->end(http_response(400, $msg));
+        $msg = $exception->getMessage() ?? '';
+        $this->response->end(http_response(400, $msg));
     }
 
     /**

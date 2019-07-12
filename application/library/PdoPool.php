@@ -43,8 +43,6 @@ class PdoPool
         //todo 可以自定义一个定时器来检测空闲连接或连接时间超时操作
 
         if ($db === false) $db = $this->connect();
-        //每次提前检测一下该池子中的连接是否可用，压测不影响性能。
-        if ($this->ping($db->pdo)) $db = $this->connect();
 
         /*
          * 这种合并写法，池子性能降低10%
