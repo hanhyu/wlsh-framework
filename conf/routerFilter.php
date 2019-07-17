@@ -12,14 +12,15 @@
  */
 return [
     /***************************************** 测试服务相关路由 *****************************************/
-    '/login/test' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
-
+    '/login/test'               => ['auth' => false, 'method' => 'GET', 'action' => '*'],
+    '/login/set_redis'          => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_redis'          => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_user_list'      => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_mongo_log_list' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_log_user_list'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_log_user_view'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
-    '/login/get_user_info'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
+    '/login/get_user_info'      => ['auth' => false, 'method' => 'GET', 'action' => '*'],
+    '/login/get_co_redis'       => ['auth' => false, 'method' => 'GET', 'action' => '*'],
 
     '/login/publisher_redis' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/consumer_redis'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
@@ -96,6 +97,6 @@ return [
     /******************************** 业务流程管理相关路由 ****************************/
 
     '/system/process/get_msg_list' => ['auth' => true, 'method' => 'GET', 'action' => '*'],
-    '/system/process/set_msg' => ['auth' => true, 'method' => 'POST', 'action' => '*'],
+    '/system/process/set_msg'      => ['auth' => true, 'method' => 'POST', 'action' => '*'],
 
 ];

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Factory;
+use App\Models\MysqlFactory;
 
 class Process
 {
@@ -30,7 +30,7 @@ class Process
         $chan = new \Swoole\Coroutine\Channel(2);
         go(function () use ($chan, $data) { //获取总数
             try {
-                $count = Factory::systemMsg()->getListCount($data['where']);
+                $count = MysqlFactory::systemMsg()->getListCount($data['where']);
                 $chan->push(['count' => $count]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage() . __LINE__]);
@@ -38,7 +38,7 @@ class Process
         });
         go(function () use ($chan, $data) { //获取列表数据
             try {
-                $list    = Factory::systemMsg()->getList($data);
+                $list = MysqlFactory::systemMsg()->getList($data);
                 $chan->push(['list' => $list]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage() . __LINE__]);
@@ -58,12 +58,12 @@ class Process
 
     public function getMongoById(string $id): array
     {
-        return Factory::monolog()->getMongoInfo($id);
+        return MysqlFactory::monolog()->getMongoInfo($id);
     }
 
     public function setMsg(array $data): int
     {
-        return Factory::systemMsg()->setMsg($data);
+        return MysqlFactory::systemMsg()->setMsg($data);
     }
 
 }

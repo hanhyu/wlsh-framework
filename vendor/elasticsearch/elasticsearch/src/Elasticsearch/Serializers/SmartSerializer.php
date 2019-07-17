@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Serializers;
 
 use Elasticsearch\Common\Exceptions;
@@ -68,7 +70,7 @@ class SmartSerializer implements SerializerInterface
     /**
      * @todo For 2.0, remove the E_NOTICE check before raising the exception.
      *
-     * @param $data
+     * @param string|null $data
      *
      * @return array
      * @throws JsonErrorException

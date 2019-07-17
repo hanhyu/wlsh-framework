@@ -10,37 +10,41 @@ namespace App\Modules\System\controllers;
  * Time: 下午11:30
  */
 
-use App\Models\Mysql\SystemBackup;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Forms\SystemBackupForms;
 use Exception;
+use Yaf\Controller_Abstract;
+use Yaf\Registry;
+use App\Domain\System\Backup as BackupDomain;
 
 //todo 数据备份类未整理完
-class Backup extends \Yaf\Controller_Abstract
+class Backup extends Controller_Abstract
 {
     use \ControllersTrait;
-    /**
-     * @var SystemBackup
-     */
-    protected $backup_m;
 
     public $backup_path = ''; //备份文件夹相对路径
     public $backup_name = ''; //当前备份文件夹名
     public $offset = '500'; //每次取数据条数
     public $dump_sql = '';
 
+    /**
+     * @var BackupDomain
+     */
+    private $backup_domain;
+
     public function init()
     {
         $this->beforeInit();
-        $this->backup_m = new SystemBackup();
+        $this->backup_domain = new BackupDomain();
     }
 
     /**
      * 获取所有数据表名
+     * @throws Exception
      */
     public function indexAction(): void
     {
-        $res = $this->backup_m->getTables();
+        $res = $this->backup_domain->getTables();
         echo http_response(200, '', $res);
     }
 
@@ -52,7 +56,7 @@ class Backup extends \Yaf\Controller_Abstract
     {
         $data = $this->validator(SystemUserForms::$pull);
         if ($data['pwd'] == 'wlsh_frame_mysql_backup_20180107') {
-            $config = \Yaf\Registry::get('config');
+            $config      = Registry::get('config');
             $host        = $config->mysql->host;
             $port        = $config->mysql->port;
             $username    = $config->mysql->username;
@@ -63,17 +67,17 @@ class Backup extends \Yaf\Controller_Abstract
             $rand        = time();
             $yaf_environ = ini_get('yaf.environ');
             $filename    = "{$path}/{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
-            $res = \Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
+            $res         = \Swoole\Coroutine::exec("mysqldump -h{$host} -P{$port} -u{$username} -p{$pwd} {$database} > {$filename}");
             if ($res['code'] == 0) {
                 $arr['filename'] = "{$database}-{$yaf_environ}-{$date}-{$rand}.sql";
                 $arr['size']     = filesize($filename);
                 $arr['md5']      = hash_file('md5', $filename);
                 $arr['rand']     = $rand;
-                $let             = $this->backup_m->setBackup($arr);
+                $let             = $this->backup_domain->setBackup($arr);
                 if (empty($let)) {
                     $this->response->end(http_response(400, '存入数据失败'));
                 } else {
-                    $this->response->end( http_response());
+                    $this->response->end(http_response());
                 }
             } else {
                 $this->response->end(http_response(400, '生成备份数据文件失败'));
@@ -85,10 +89,11 @@ class Backup extends \Yaf\Controller_Abstract
 
     /**
      * 获取列表
+     * @throws Exception
      */
     public function getListAction(): void
     {
-        $list = $this->backup_m->getList();
+        $list = $this->backup_domain->getList();
         $this->response->end(http_response(200, '', $list));
     }
 
@@ -100,9 +105,9 @@ class Backup extends \Yaf\Controller_Abstract
     public function downAction(): void
     {
         $data = $this->validator(SystemUserForms::$getUser);
-        $res  = $this->backup_m->getFileName($data['id']);
+        $res  = $this->backup_domain->getFileName($data['id']);
         if (!empty($res)) {
-            $res[0]['file_name'] = \Yaf\Registry::get('config')->backup->downUrl . $res[0]['file_name'];
+            $res[0]['file_name'] = Registry::get('config')->backup->downUrl . $res[0]['file_name'];
             $this->response->end(http_response(200, '', $res[0]));
         }
     }
@@ -118,9 +123,9 @@ class Backup extends \Yaf\Controller_Abstract
         //$id = intval($data['id'] ?? 0);
         //$fileName = strval($data['fileName'] ?? 0);
         //删除数据库备份表中的信息
-        $res = $this->backup_m->delBackup($data['id']);
+        $res = $this->backup_domain->delBackup($data['id']);
         if ($res) {
-            $linkname = \Yaf\Registry::get('config')->backup->path . '/' . $data['filename'];
+            $linkname = Registry::get('config')->backup->path . '/' . $data['filename'];
             if (is_file($linkname)) {
                 //删除备份文件
                 $unFile = unlink($linkname);

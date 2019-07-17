@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Endpoints;
 
 use Elasticsearch\Common\Exceptions\UnexpectedValueException;
@@ -34,7 +36,7 @@ abstract class AbstractEndpoint
     /** @var  string */
     protected $method = null;
 
-    /** @var  array */
+    /** @var string|array */
     protected $body = null;
 
     /** @var array  */
@@ -164,6 +166,10 @@ abstract class AbstractEndpoint
             return $this;
         }
 
+        if (is_int($docID)) {
+            $docID = (string) $docID;
+        }
+
         $this->id = urlencode($docID);
 
         return $this;
@@ -243,7 +249,7 @@ abstract class AbstractEndpoint
     }
 
     /**
-     * @param $params       Note: this is passed by-reference!
+     * @param array $params       Note: this is passed by-reference!
      */
     private function extractOptions(&$params)
     {

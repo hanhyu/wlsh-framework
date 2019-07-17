@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Endpoints\Indices;
 
 use Elasticsearch\Endpoints\AbstractEndpoint;
@@ -63,7 +65,8 @@ class Create extends AbstractEndpoint
             'timeout',
             'master_timeout',
             'update_all_types',
-            'wait_for_active_shards'
+            'wait_for_active_shards',
+            'include_type_name'
         );
     }
 

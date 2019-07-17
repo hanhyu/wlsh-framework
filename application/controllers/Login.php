@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Domain\System\User;
+use App\Models\RedisFactory;
+use Co\Channel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yaf\{
@@ -11,6 +14,7 @@ use Yaf\{
 };
 use Swoole\WebSocket\Server;
 use Swoole\Http\Response;
+use Exception;
 
 /**
  * 测试用例
@@ -37,6 +41,17 @@ class Login extends Controller_Abstract
     {
         $this->server   = Registry::get('server');
         $this->response = Registry::get('response');
+    }
+
+    /**
+     * 此方法不能删除
+     * User: hanhyu
+     * Date: 19-7-12
+     * Time: 上午10:09
+     */
+    public function indexAction(): void
+    {
+
     }
 
     /**
@@ -378,10 +393,14 @@ class Login extends Controller_Abstract
      */
     public function getRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
+        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
         //$this->redis->select(1);
-        $this->response->end($this->redis->get('key'));
+        //$this->response->end($this->redis->get('key'));
         //\Yaf\Registry::get('redis_pool')->put($this->redis);
+
+        $value = RedisFactory::login()->getKey('key');
+        //$value = (new \App\Models\Redis\Login())->getKey('key');
+        $this->response->end($value);
     }
 
     public function publisherRedisAction(): void
@@ -568,8 +587,8 @@ class Login extends Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Domain\System\User();
-        $res               = $user->getInfoList($data);
+        //$user              = new \App\Domain\System\User();
+        $res = (new User())->getInfoList($data);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -579,8 +598,8 @@ class Login extends Controller_Abstract
 
     public function getUserInfoAction(): void
     {
-        $user              = new \App\Domain\System\User();
-        $res               = $user->getInfoByName('ceshi123');
+        $user = new \App\Domain\System\User();
+        $res  = $user->getInfoByName('ceshi123');
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -1026,8 +1045,33 @@ class Login extends Controller_Abstract
         $stmt  = $mysql->prepare($sql);
         $get   = $stmt->execute([1]);
         $this->response->end(http_response(200, '', $get));
-        Registry::get('co_mysql_pool')->put($mysql);
-
     }
+
+    public function getCoRedisAction(): void
+    {
+        $ch = new Channel(1);
+        go(function () use ($ch) {
+            $value = RedisFactory::login()->getKey('key');
+            $ch->push($value);
+        });
+        $res = $ch->pop(3);
+
+        $this->response->end($res);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function setRedisAction(): void
+    {
+        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
+        //$this->redis->select(1);
+        //$this->response->end($this->redis->get('key'));
+        //\Yaf\Registry::get('redis_pool')->put($this->redis);
+
+        $value = RedisFactory::login()->setKey('setKey', '123');
+        $this->response->end($value);
+    }
+
 
 }

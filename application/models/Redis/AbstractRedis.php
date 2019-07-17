@@ -13,7 +13,7 @@ namespace App\Models\Redis;
 use Yaf\Registry;
 use Exception;
 
-class AbstractRedis
+abstract class AbstractRedis
 {
     /**
      * @var \Redis
@@ -25,14 +25,9 @@ class AbstractRedis
      */
     protected static $dbindex = 0;
 
-    /**
-     * @param $method
-     * @param $args
-     *
-     * @return mixed
-     * @throws Exception
-
-    public function __call($method, $args)
+    /*
+     * 协程模式中不建议使用单例对象
+     * public function __construct()
     {
         try {
             $this->db = Registry::get('redis_pool')->get();
@@ -41,26 +36,47 @@ class AbstractRedis
             co_log($e->getMessage(), "redis数据连接异常", 'alert');
             throw new Exception('redis数据连接异常', 500);
         }
+    }*/
 
-        $data = call_user_func_array([$this, $method], $args);
-
-        return $data;
-    }
-    */
 
     /**
-     * AbstractRedis constructor.
+     * 在协程中单例模式下使用
+     *
+     * @param $method
+     * @param $args
+     *
+     * @return mixed
      * @throws Exception
+     *
      */
-    public function __construct()
+    public function __call($method, $args)
     {
+        $redis_pool_obj = Registry::get('redis_pool');
+
         try {
-            $this->db = Registry::get('redis_pool')->get();
+
+            $this->db = $redis_pool_obj->get();
+
             $this->db->select(static::$dbindex);
-        } catch (\PDOException $e) {
+
+            $data = call_user_func_array([$this, $method], $args);
+
+        } catch (Exception $e) {
             co_log($e->getMessage(), "redis数据连接异常", 'alert');
-            throw new Exception('redis数据连接异常', 500);
+
+            if ($redis_pool_obj->ping($this->db)) {
+                $this->db = $redis_pool_obj->connect();
+                $this->db->select(static::$dbindex);
+
+                $data = call_user_func_array([$this, $method], $args);
+            } else {
+                throw new Exception('redis数据连接异常', 500);
+            }
         }
+
+        $redis_pool_obj->put($this->db);
+
+        return $data;
     }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Connections;
 
 use Elasticsearch\Serializers\SerializerInterface;
@@ -18,9 +20,7 @@ use Psr\Log\LoggerInterface;
 interface ConnectionInterface
 {
     /**
-     * Constructor
-     *
-     * @param $handler
+     * @param callable $handler
      * @param array $hostDetails
      * @param array $connectionParams connection-specific parameters
      * @param \Elasticsearch\Serializers\SerializerInterface $serializer
@@ -93,9 +93,9 @@ interface ConnectionInterface
     public function getLastRequestInfo();
 
     /**
-     * @param $method
-     * @param $uri
-     * @param null $params
+     * @param string $method
+     * @param string $uri
+     * @param array $params
      * @param null $body
      * @param array $options
      * @param \Elasticsearch\Transport $transport

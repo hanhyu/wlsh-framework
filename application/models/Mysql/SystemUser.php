@@ -21,7 +21,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function setUser(array $post): int
+    protected function setUser(array $post): int
     {
         $datas = $this->db->insert($this->table, [
             'name'   => $post['name'],
@@ -40,7 +40,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getUserList(array $data): array
+    protected function getUserList(array $data): array
     {
         if (!empty($data['where'])) {
             $wheres = [
@@ -67,7 +67,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function getListCount(): int
+    protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
         if ($datas == false) throw new Exception($this->db->last());
@@ -80,7 +80,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function delUser(int $id): int
+    protected function delUser(int $id): int
     {
         $datas = $data = $this->db->delete($this->table, [
             'id' => $id,
@@ -95,7 +95,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getUser(int $id): array
+    protected function getUser(int $id): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -112,7 +112,7 @@ class SystemUser extends AbstractMysql
      * @return int
      * @throws Exception
      */
-    public function editUser(array $post): int
+    protected function editUser(array $post): int
     {
         $datas = $this->db->update($this->table, [
             'status' => $post['status'],
@@ -132,7 +132,7 @@ class SystemUser extends AbstractMysql
      * @return array ['id','name','status','pwd']
      * @throws Exception
      */
-    public function getInfo(string $name): array
+    protected function getInfo(string $name): array
     {
         $datas = $this->db->select($this->table, [
             'id',
@@ -156,7 +156,7 @@ class SystemUser extends AbstractMysql
      * @return array
      * @throws Exception
      */
-    public function getNameById(array $uid): array
+    protected function getNameById(array $uid): array
     {
         $datas = $this->db->select($this->table, [
             'id',

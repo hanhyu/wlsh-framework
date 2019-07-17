@@ -39,6 +39,9 @@ class StaticConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->getMock()
                           ->shouldReceive('markDead')->once()->getMock();
 
+        /**
+ * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+*/
         $connections = [$mockConnection];
 
         $selector = m::mock(RoundRobinSelector::class)
@@ -122,9 +125,6 @@ class StaticConnectionPoolTest extends \PHPUnit\Framework\TestCase
             'randomizeHosts' => false,
         ];
         $connectionPool = new StaticConnectionPool($connections, $selector, $connectionFactory, $connectionPoolParams);
-
-        $this->expectException(\Elasticsearch\Common\Exceptions\NoNodesAvailableException::class);
-        $this->expectExceptionMessage('No alive nodes found in your cluster');
 
         $this->expectException(\Elasticsearch\Common\Exceptions\NoNodesAvailableException::class);
         $this->expectExceptionMessage('No alive nodes found in your cluster');

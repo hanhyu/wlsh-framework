@@ -14,6 +14,8 @@ use Exception;
 
 class SystemBackup extends AbstractMysql
 {
+    protected $table = 'frame_system_backup';
+
     /**
      * 获取数据库中所有表名
      * @return array
@@ -36,7 +38,7 @@ class SystemBackup extends AbstractMysql
      */
     protected function setBackup(array $data): int
     {
-        $datas = $this->db->insert('frame_system_backup', [
+        $datas = $this->db->insert($this->table, [
             'file_name' => $data['filename'],
             'file_size' => $data['size'],
             'file_md5'  => $data['md5'],
@@ -52,7 +54,7 @@ class SystemBackup extends AbstractMysql
      */
     protected function getList(): array
     {
-        $datas = $this->db->select('frame_system_backup', [
+        $datas = $this->db->select($this->table, [
             'id',
             'file_name',
             'file_size',
@@ -70,7 +72,7 @@ class SystemBackup extends AbstractMysql
      */
     protected function getFileName(int $id): array
     {
-        $datas = $this->db->select('frame_system_backup', [
+        $datas = $this->db->select($this->table, [
             'file_name',
             'file_size',
             'file_md5',
@@ -93,7 +95,7 @@ class SystemBackup extends AbstractMysql
      */
     protected function delBackup(int $id): int
     {
-        $datas = $this->db->delete('frame_system_backup', [
+        $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
         if ($datas == false) throw new Exception($this->db->last());

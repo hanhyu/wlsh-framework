@@ -31,19 +31,48 @@ class PdoPool
      */
     public function get(): Medoo
     {
+        $db = false;
         //有空闲连接
-        if ($this->ch->length() > 0) {
-            $db = $this->ch->pop(3);
-            /**
-             * 判断此空闲连接是否已被断开，已断开就重新请求连接，
-             * 这里使用channel的pop功能就实现了一个判断池子中的连接是否超过空闲时间，如超时mysql则会自动断开此连接，
-             * 当ping检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
-             * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
-             */
-            //todo 可以自定义一个定时器来检测空闲连接或连接时间超时操作
-            if ($db === false or $this->ping($db->pdo)) goto EOF;
-        } else {
-            EOF:
+        if ($this->ch->length() > 0) $db = $this->ch->pop(3);
+        /**
+         * 判断此空闲连接是否已被断开，已断开就重新请求连接，
+         * 这里使用channel的pop功能就实现了一个判断池子中的连接是否超过空闲时间，如超时mysql则会自动断开此连接，
+         * 当ping检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
+         * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
+         */
+        //todo 可以自定义一个定时器来检测空闲连接或连接时间超时操作
+
+        if ($db === false) $db = $this->connect();
+
+        /*
+         * 这种合并写法，池子性能降低10%
+         if ($db != false and $this->ping($db->pdo)) {
+            $db = $this->connect();
+        }
+        */
+
+        //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
+        /* defer(function () use ($db) {
+             $this->ch->push($db);
+         });*/
+
+        return $db;
+    }
+
+    public function put(Medoo $db): void
+    {
+        $this->ch->push($db);
+    }
+
+    /**
+     * User: hanhyu
+     * Date: 19-7-5
+     * Time: 上午10:52
+     * @return Medoo
+     */
+    public function connect(): Medoo
+    {
+        try {
             $db = new Medoo([
                 'database_type' => $this->config['driver'],
                 'database_name' => $this->config['database'],
@@ -62,21 +91,30 @@ class PdoPool
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                     PDO::ATTR_ORACLE_NULLS             => PDO::NULL_TO_STRING,
                     PDO::ATTR_TIMEOUT                  => 3,
-                    //PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
                     //PDO::ATTR_PERSISTENT => true
                 ],
                 'command'       => [
                     'SET SQL_MODE=ANSI_QUOTES',
                 ],
             ]);
-
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage());
         }
 
-        defer(function () use ($db) {
-            $this->ch->push($db);
-        });
-
         return $db;
+    }
+
+    /**
+     * 获取连接池使用状态
+     * User: hanhyu
+     * Date: 19-7-17
+     * Time: 上午11:09
+     * @return array
+     */
+    public function getStatus(): array
+    {
+        return $this->ch->stats();
     }
 
     /**
@@ -84,9 +122,9 @@ class PdoPool
      *
      * @param PDO $dbconn 数据库连接
      *
-     * @return Boolean ping通了返回false,ping不通返回true
+     * @return bool ping通了返回false,ping不通返回true
      */
-    private function ping(PDO $dbconn): bool
+    public function ping(PDO $dbconn): bool
     {
         try {
             $dbconn->getAttribute(PDO::ATTR_SERVER_INFO);

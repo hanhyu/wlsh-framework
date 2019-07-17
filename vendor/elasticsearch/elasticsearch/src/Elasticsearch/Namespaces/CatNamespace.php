@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Namespaces;
 
 /**
@@ -20,7 +22,7 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -28,7 +30,7 @@ class CatNamespace extends AbstractNamespace
     {
         $name = $this->extractArgument($params, 'name');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Aliases $endpoint */
@@ -47,7 +49,7 @@ class CatNamespace extends AbstractNamespace
      *        ['v']              = (bool) Verbose mode. Display column headers
      *        ['bytes']          = (enum) The unit in which to display byte values
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -55,12 +57,12 @@ class CatNamespace extends AbstractNamespace
     {
         $nodeID = $this->extractArgument($params, 'node_id');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Allocation $endpoint */
         $endpoint = $endpointBuilder('Cat\Allocation');
-        $endpoint->setNodeID($nodeID);
+        $endpoint->setNodeId($nodeID);
         $endpoint->setParams($params);
 
         return $this->performRequest($endpoint);
@@ -73,7 +75,7 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -81,7 +83,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Count $endpoint */
@@ -100,13 +102,13 @@ class CatNamespace extends AbstractNamespace
      *        ['v']              = (bool) Verbose mode. Display column headers
      *        ['ts']             = (bool) Set to false to disable timestamping
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function health($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Health $endpoint */
@@ -119,13 +121,13 @@ class CatNamespace extends AbstractNamespace
     /**
      * $params['help'] = (bool) Return help information
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function help($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Help $endpoint */
@@ -144,7 +146,7 @@ class CatNamespace extends AbstractNamespace
      *        ['bytes']          = (enum) The unit in which to display byte values
      *        ['pri']            = (bool) Set to true to return stats only for primary shards
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -152,7 +154,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Indices $endpoint */
@@ -170,13 +172,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function master($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Master $endpoint */
@@ -193,13 +195,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function nodes($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Nodes $endpoint */
@@ -216,13 +218,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function nodeAttrs($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\NodeAttrs $endpoint */
@@ -239,13 +241,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function pendingTasks($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\PendingTasks $endpoint */
@@ -263,7 +265,7 @@ class CatNamespace extends AbstractNamespace
      *        ['v']              = (bool) Verbose mode. Display column headers
      *        ['bytes']          = (enum) The unit in which to display byte values
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -271,7 +273,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Recovery $endpoint */
@@ -289,13 +291,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function repositories($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Repositories $endpoint */
@@ -313,7 +315,7 @@ class CatNamespace extends AbstractNamespace
      *        ['v']              = (bool) Verbose mode. Display column headers
      *        ['bytes']          = (enum) The unit in which to display byte values
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -321,7 +323,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Shards $endpoint */
@@ -341,7 +343,7 @@ class CatNamespace extends AbstractNamespace
      *        ['bytes']          = (enum) The unit in which to display byte values
      *        ['repository']     = (string) Name of repository from which to fetch the snapshot information
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -349,7 +351,7 @@ class CatNamespace extends AbstractNamespace
     {
         $repository = $this->extractArgument($params, 'repository');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Snapshots $endpoint */
@@ -369,7 +371,7 @@ class CatNamespace extends AbstractNamespace
      *        ['full_id']        = (bool) Enables displaying the complete node ids
      *        ['size']           = (enum) The multiplier in which to display values ([ "", "k", "m", "g", "t", "p" ])
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -377,7 +379,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\ThreadPool $endpoint */
@@ -397,7 +399,7 @@ class CatNamespace extends AbstractNamespace
      *        ['bytes']          = (enum) The unit in which to display byte values
      *        ['fields']         = (list) A comma-separated list of fields to return the fielddata size
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -405,7 +407,7 @@ class CatNamespace extends AbstractNamespace
     {
         $fields = $this->extractArgument($params, 'fields');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Fielddata $endpoint */
@@ -423,13 +425,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function plugins($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Plugins $endpoint */
@@ -444,7 +446,7 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -452,7 +454,7 @@ class CatNamespace extends AbstractNamespace
     {
         $index = $this->extractArgument($params, 'index');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Segments $endpoint */
@@ -475,13 +477,13 @@ class CatNamespace extends AbstractNamespace
      *        ['help']           = (bool) Return help information
      *        ['v']              = (bool) Verbose mode. Display column headers
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
     public function tasks($params = array())
     {
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Tasks $endpoint */
@@ -499,7 +501,7 @@ class CatNamespace extends AbstractNamespace
      *        ['v']              = (bool) Verbose mode. Display column headers
      *        ['bytes']          = (enum) The unit in which to display byte values
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -507,7 +509,7 @@ class CatNamespace extends AbstractNamespace
     {
         $name = $this->extractArgument($params, 'name');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cat\Templates $endpoint */

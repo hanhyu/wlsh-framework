@@ -7,7 +7,10 @@ return [
         'modules'        => "Index,Task,Finish,Ws,Tcp,Close,System",
         'showErrors'     => 1,
         'throwException' => 1,
-        'dispatcher'     => ['catchException' => 1],
+        'dispatcher'     => [
+            'defaultController' => 'login',
+            'catchException'    => 1,
+        ],
     ],
 
     'token' => [

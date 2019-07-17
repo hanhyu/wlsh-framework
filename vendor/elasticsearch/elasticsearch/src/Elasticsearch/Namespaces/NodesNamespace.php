@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch\Namespaces;
 
 /**
@@ -30,7 +32,7 @@ class NodesNamespace extends AbstractNamespace
      *        ['thread_pool']   = (boolean) Return information about the thread pool
      *        ['transport']     = (boolean) Return information about transport
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -42,7 +44,7 @@ class NodesNamespace extends AbstractNamespace
 
         $index_metric = $this->extractArgument($params, 'index_metric');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cluster\Nodes\Stats $endpoint */
@@ -62,7 +64,7 @@ class NodesNamespace extends AbstractNamespace
      *        ['human']         = (boolean) Whether to return time and byte values in human-readable format.
 
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -71,7 +73,7 @@ class NodesNamespace extends AbstractNamespace
         $nodeID = $this->extractArgument($params, 'node_id');
         $metric = $this->extractArgument($params, 'metric');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cluster\Nodes\Info $endpoint */
@@ -89,7 +91,7 @@ class NodesNamespace extends AbstractNamespace
      *        ['threads']   = (number) Specify the number of threads to provide information for (default: 3)
      *        ['type']      = (enum) The type to sample (default: cpu)
      *
-     * @param $params array Associative array of parameters
+     * @param array $params Associative array of parameters
      *
      * @return array
      */
@@ -97,7 +99,7 @@ class NodesNamespace extends AbstractNamespace
     {
         $nodeID = $this->extractArgument($params, 'node_id');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cluster\Nodes\HotThreads $endpoint */
@@ -119,7 +121,7 @@ class NodesNamespace extends AbstractNamespace
     {
         $nodeID = $this->extractArgument($params, 'node_id');
 
-        /** @var callback $endpointBuilder */
+        /** @var callable $endpointBuilder */
         $endpointBuilder = $this->endpoints;
 
         /** @var \Elasticsearch\Endpoints\Cluster\Nodes\ReloadSecureSettings $endpoint */

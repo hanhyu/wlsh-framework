@@ -2,6 +2,7 @@ new Vue({
     el: ".all",
     data: {
         'swoole': [],
+        'pool': [],
         'content': [],
         'title': ''
     },
@@ -30,6 +31,7 @@ new Vue({
                     }
                     if (response.data.code === 200) {
                         self.swoole = response.data.data.swoole;
+                        self.pool = response.data.data.pool;
                         self.content = response.data.data.content;
                         self.swoole.start_time = formatDate(response.data.data.swoole.start_time);
                     }

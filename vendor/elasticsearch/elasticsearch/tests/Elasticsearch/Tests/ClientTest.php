@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Elasticsearch\Tests;
 
 use Elasticsearch;
+use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\MaxRetriesException;
 use Mockery as m;
@@ -26,11 +27,11 @@ class ClientTest extends \PHPUnit\Framework\TestCase
         m::close();
     }
 
-    /**
-     * @expectedException \Elasticsearch\Common\Exceptions\InvalidArgumentException
-     */
     public function testConstructorIllegalPort()
     {
+        $this->expectException(\Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not parse URI');
+
         $client = Elasticsearch\ClientBuilder::create()->setHosts(['localhost:abc'])->build();
     }
 
@@ -44,11 +45,10 @@ class ClientTest extends \PHPUnit\Framework\TestCase
             'handler' => ClientBuilder::multiHandler()
         ];
         $client = ClientBuilder::fromConfig($params);
+
+        $this->assertInstanceOf(Client::class, $client);
     }
 
-    /**
-     * @expectedException \Elasticsearch\Common\Exceptions\RuntimeException
-     */
     public function testFromConfigBadParam()
     {
         $params = [
@@ -58,6 +58,10 @@ class ClientTest extends \PHPUnit\Framework\TestCase
             'retries' => 2,
             'imNotReal' => 5
         ];
+
+        $this->expectException(\Elasticsearch\Common\Exceptions\RuntimeException::class);
+        $this->expectExceptionMessage('Unknown parameters provided: imNotReal');
+
         $client = ClientBuilder::fromConfig($params);
     }
 
@@ -71,136 +75,168 @@ class ClientTest extends \PHPUnit\Framework\TestCase
             'imNotReal' => 5
         ];
         $client = ClientBuilder::fromConfig($params, true);
+
+        $this->assertInstanceOf(Client::class, $client);
     }
 
-    public function testNullDelete()
+    public function testIndexCannotBeNullForDelete()
     {
         $client = ClientBuilder::create()->build();
 
-        try {
-            $client->delete([
-                'index' => null,
-                'type' => 'test',
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('index cannot be null.');
 
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => null,
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
-
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => 'test',
-                'id' => null
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $client->delete(
+            [
+            'index' => null,
+            'type' => 'test',
+            'id' => 'test'
+            ]
+        );
     }
 
-    public function testEmptyStringDelete()
+    public function testTypeCannotBeNullForDelete()
     {
         $client = ClientBuilder::create()->build();
 
-        try {
-            $client->delete([
-                'index' => '',
-                'type' => 'test',
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('type cannot be null.');
 
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => '',
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
-
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => 'test',
-                'id' => ''
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => null,
+            'id' => 'test'
+            ]
+        );
     }
 
-    public function testArrayOfEmptyStringDelete()
+    public function testIdCannotBeNullForDelete()
     {
         $client = ClientBuilder::create()->build();
 
-        try {
-            $client->delete([
-                'index' => ['', '', ''],
-                'type' => 'test',
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('id cannot be null.');
 
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => ['', '', ''],
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => 'test',
+            'id' => null
+            ]
+        );
     }
 
-    public function testArrayOfNullDelete()
+    public function testIndexCannotBeEmptyStringForDelete()
     {
         $client = ClientBuilder::create()->build();
 
-        try {
-            $client->delete([
-                'index' => [null, null, null],
-                'type' => 'test',
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('index cannot be an empty string');
 
-        try {
-            $client->delete([
-                'index' => 'test',
-                'type' => [null, null, null],
-                'id' => 'test'
-            ]);
-            $this->fail("InvalidArgumentException was not thrown");
-        } catch (Elasticsearch\Common\Exceptions\InvalidArgumentException $e) {
-            // all good
-        }
+        $client->delete(
+            [
+            'index' => '',
+            'type' => 'test',
+            'id' => 'test'
+            ]
+        );
+    }
+
+    public function testTypeCannotBeEmptyStringForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('type cannot be an empty string');
+
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => '',
+            'id' => 'test'
+            ]
+        );
+    }
+
+    public function testIdCannotBeEmptyStringForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('id cannot be an empty string');
+
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => 'test',
+            'id' => ''
+            ]
+        );
+    }
+
+    public function testIndexCannotBeArrayOfEmptyStringsForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('index cannot be an array of empty strings');
+
+        $client->delete(
+            [
+            'index' => ['', '', ''],
+            'type' => 'test',
+            'id' => 'test'
+            ]
+        );
+    }
+
+    public function testTypeCannotBeArrayOfEmptyStringsForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('type cannot be an array of empty strings');
+
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => ['', '', ''],
+            'id' => 'test'
+            ]
+        );
+    }
+
+    public function testIndexCannotBeArrayOfNullsForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('index cannot be an array of empty strings');
+
+        $client->delete(
+            [
+            'index' => [null, null, null],
+            'type' => 'test',
+            'id' => 'test'
+            ]
+        );
+    }
+
+    public function testTypeCannotBeArrayOfNullsForDelete()
+    {
+        $client = ClientBuilder::create()->build();
+
+        $this->expectException(Elasticsearch\Common\Exceptions\InvalidArgumentException::class);
+        $this->expectExceptionMessage('type cannot be an array of empty strings');
+
+        $client->delete(
+            [
+            'index' => 'test',
+            'type' => [null, null, null],
+            'id' => 'test'
+            ]
+        );
     }
 
     public function testMaxRetriesException()
@@ -256,39 +292,49 @@ class ClientTest extends \PHPUnit\Framework\TestCase
 
     public function testInlineHosts()
     {
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             'localhost:9200'
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("localhost:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             'http://localhost:9200'
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("localhost:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             'http://foo.com:9200'
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             'https://foo.com:9200'
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("https", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             'https://user:pass@foo.com:9200'
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("https", $host->getTransportSchema());
@@ -297,106 +343,124 @@ class ClientTest extends \PHPUnit\Framework\TestCase
 
     public function testExtendedHosts()
     {
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'localhost',
                 'port' => 9200,
                 'scheme' => 'http'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("localhost:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com',
                 'port' => 9200,
                 'scheme' => 'http'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com',
                 'port' => 9200,
                 'scheme' => 'https'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("https", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com',
                 'scheme' => 'http'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com',
                 'port' => 9500,
                 'scheme' => 'https'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9500", $host->getHost());
         $this->assertSame("https", $host->getTransportSchema());
 
 
         try {
-            $client = Elasticsearch\ClientBuilder::create()->setHosts([
+            $client = Elasticsearch\ClientBuilder::create()->setHosts(
+                [
                 [
                     'port' => 9200,
                     'scheme' => 'http'
                 ]
-            ])->build();
+                ]
+            )->build();
             $this->fail("Expected RuntimeException from missing host, none thrown");
         } catch (Elasticsearch\Common\Exceptions\RuntimeException $e) {
             // good
         }
 
         // Underscore host, questionably legal, but inline method would break
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'the_foo.com'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("the_foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());
 
 
         // Special characters in user/pass, would break inline
-        $client = Elasticsearch\ClientBuilder::create()->setHosts([
+        $client = Elasticsearch\ClientBuilder::create()->setHosts(
+            [
             [
                 'host' => 'foo.com',
                 'user' => 'user',
                 'pass' => 'abc#$@?%!abc'
             ]
-        ])->build();
+            ]
+        )->build();
         $host = $client->transport->getConnection();
         $this->assertSame("foo.com:9200", $host->getHost());
         $this->assertSame("http", $host->getTransportSchema());

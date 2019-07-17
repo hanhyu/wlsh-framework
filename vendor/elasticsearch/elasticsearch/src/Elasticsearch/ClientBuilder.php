@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Elasticsearch;
 
 use Elasticsearch\Common\Exceptions\InvalidArgumentException;
@@ -37,7 +39,7 @@ class ClientBuilder
     /** @var Transport */
     private $transport;
 
-    /** @var callback */
+    /** @var callable */
     private $endpoint;
 
     /** @var NamespaceBuilderInterface[] */
@@ -99,7 +101,7 @@ class ClientBuilder
 
     /**
      * Can supply first parm to Client::__construct() when invoking manually or with dependency injection
-     * @return this->ransport
+     * @return Transport
      *
      */
     public function getTransport()
@@ -109,7 +111,7 @@ class ClientBuilder
 
     /**
      * Can supply second parm to Client::__construct() when invoking manually or with dependency injection
-     * @return this->endpoint
+     * @return callable
      *
      */
     public function getEndpoint()
@@ -119,7 +121,7 @@ class ClientBuilder
 
     /**
      * Can supply third parm to Client::__construct() when invoking manually or with dependency injection
-     * @return this->registeredNamespacesBuilders
+     * @return NamespaceBuilderInterface[]
      *
      */
     public function getRegisteredNamespacesBuilders()
@@ -210,20 +212,6 @@ class ClientBuilder
         } else {
             throw new \RuntimeException('CurlSingle handler requires cURL.');
         }
-    }
-
-    /**
-     * @param $path string
-     * @param int $level
-     * @return \Monolog\Logger\Logger
-     */
-    public static function defaultLogger($path, $level = Logger::WARNING)
-    {
-        $log       = new Logger('log');
-        $handler   = new StreamHandler($path, $level);
-        $log->pushHandler($handler);
-
-        return $log;
     }
 
     /**
@@ -400,7 +388,7 @@ class ClientBuilder
     }
 
     /**
-     * @param $cert
+     * @param string $cert The name of a file containing a PEM formatted certificate.
      * @param null|string $password
      * @return $this
      */
@@ -412,7 +400,7 @@ class ClientBuilder
     }
 
     /**
-     * @param $key
+     * @param string $key The name of a file containing a private SSL key.
      * @param null|string $password
      * @return $this
      */
@@ -528,7 +516,7 @@ class ClientBuilder
 
         $registeredNamespaces = [];
         foreach ($this->registeredNamespacesBuilders as $builder) {
-            /** @var $builder NamespaceBuilderInterface */
+            /** @var NamespaceBuilderInterface $builder */
             $registeredNamespaces[$builder->getName()] = $builder->getObject($this->transport, $this->serializer);
         }
 
@@ -636,10 +624,10 @@ class ClientBuilder
     }
 
     /**
-     * @param $host
+     * @param array $host
      * @return array
      */
-    private function normalizeExtendedHost($host)
+    private function normalizeExtendedHost(array $host)
     {
         if (isset($host['host']) === false) {
             $this->logger->error("Required 'host' was not defined in extended format: ".print_r($host, true));

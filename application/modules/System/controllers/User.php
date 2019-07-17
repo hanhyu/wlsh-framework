@@ -5,6 +5,7 @@ namespace App\Modules\System\controllers;
 
 use App\Domain\System\User as UserDomain;
 use App\Models\Forms\SystemUserForms;
+use Yaf\Controller_Abstract;
 use Exception;
 
 /**
@@ -13,7 +14,7 @@ use Exception;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class User extends \Yaf\Controller_Abstract
+class User extends Controller_Abstract
 {
     use \ControllersTrait;
 

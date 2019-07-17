@@ -44,6 +44,9 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->andReturn(true)
                           ->getMock();
 
+        /**
+ * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+*/
         $connections = [$mockConnection];
 
         $selector = m::mock(RoundRobinSelector::class)
@@ -71,6 +74,9 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->shouldReceive('getTransportSchema')->once()->andReturn('http')->getMock()
                           ->shouldReceive('sniff')->once()->andReturn($clusterState)->getMock();
 
+        /**
+ * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+*/
         $connections = [$mockConnection];
         $mockNewConnection = m::mock(Connection::class)
                              ->shouldReceive('isAlive')->andReturn(true)->getMock();
@@ -104,6 +110,9 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->shouldReceive('getTransportSchema')->once()->andReturn('http')->getMock()
                           ->shouldReceive('sniff')->once()->andReturn($clusterState)->getMock();
 
+        /**
+ * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+*/
         $connections = [$mockConnection];
         $mockNewConnection = m::mock(Connection::class)
                              ->shouldReceive('isAlive')->andReturn(true)->getMock();
@@ -239,6 +248,9 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->shouldReceive('getTransportSchema')->twice()->andReturn('http')->getMock()
                           ->shouldReceive('sniff')->twice()->andReturn($clusterState)->getMock();
 
+        /**
+ * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+*/
         $connections = [$mockConnection];
 
         $newConnections = [];
@@ -250,11 +262,13 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
 
         $selector = m::mock(RoundRobinSelector::class)
                     ->shouldReceive('select')
-                    ->andReturnValues([        //selects provided node first, then the new cluster list
+                    ->andReturnValues(
+                        [        //selects provided node first, then the new cluster list
                             $mockConnection,
                             $newConnections[0],
                             $newConnections[1]
-                    ])
+                        ]
+                    )
                     ->getMock();
 
         $connectionFactory = m::mock(ConnectionFactory::class)
@@ -284,6 +298,9 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
                           ->shouldReceive('getTransportSchema')->once()->andReturn('http')->getMock()
                           ->shouldReceive('sniff')->once()->andReturn($clusterState)->getMock();
 
+        /**
+         * @var \Elasticsearch\Connections\Connection[]&\Mockery\MockInterface[] $connections
+         */
         $connections = [$mockConnection];
 
         $newConnections = [];
@@ -297,11 +314,13 @@ class SniffingConnectionPoolTest extends \PHPUnit\Framework\TestCase
 
         $selector = m::mock(RoundRobinSelector::class)
                     ->shouldReceive('select')
-                    ->andReturnValues([        //selects provided node first, then the new cluster list
-                    $mockConnection,
-                    $newConnections[0],
-                    $newConnections[1]
-                    ])
+                    ->andReturnValues(
+                        [        //selects provided node first, then the new cluster list
+                        $mockConnection,
+                        $newConnections[0],
+                        $newConnections[1]
+                        ]
+                    )
                     ->getMock();
 
         $connectionFactory = m::mock(ConnectionFactory::class)

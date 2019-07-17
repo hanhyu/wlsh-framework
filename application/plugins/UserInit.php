@@ -8,52 +8,62 @@
 
 namespace App\Plugins;
 
-use Yaf\Registry;
+use Yaf\{
+    Registry,
+    Plugin_Abstract,
+    Request_Abstract,
+    Response_Abstract,
+};
+use Exception;
 
-class UserInit extends \Yaf\Plugin_Abstract
+class UserInit extends Plugin_Abstract
 {
     /**
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function routerStartup(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function routerStartup(Request_Abstract $request, Response_Abstract $response)
     {
         $uri    = $request->getRequestUri() ?? '0';
         $method = $request->getMethod() ?? '0';
 
+        $request_uri = explode('/', $request->getRequestUri());
         /**
          * $arr[1] module
          * $arr[2] controller
          * $arr[3] action
          */
         if ($uri) {
+            if ($request_uri[1] == 'task') return;
+
             $router = Registry::get('router_filter_config')->toArray();
+
+            $this->authToken($router[$uri]['auth'] ?? true);
+
             if (!isset($router[$uri])) { //请求的路由错误
-                $request->setRequestUri('/error/router');
+                $uri = '/error/router';
             } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
-                $request->setRequestUri('/error/method');
-            } else if ('*' === $router[$uri]['action']) { //默认转发请求的路由
-                $this->authToken($router, $uri);
-                $request->setRequestUri($uri);
-            } else { //转发指定的路由
-                $this->authToken($router, $uri);
-                $request->setRequestUri($router[$uri]['action']);
+                $uri = '/error/method';
+            } else if ('*' != $router[$uri]['action']) { //转发指定的路由
+                $uri = $router[$uri]['action'];
             }
+            //默认转发请求的路由
+            $request->setRequestUri($uri);
         }
     }
 
     /**
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
      */
-    public function routerShutdown(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function routerShutdown(Request_Abstract $request, Response_Abstract $response)
     {
         if (!empty($request->getRequestUri())) {
             //标记uri中是否存在下划线
@@ -99,71 +109,69 @@ class UserInit extends \Yaf\Plugin_Abstract
     /**
      *分发循环开始之前被触发
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
      */
-    public function dispatchLoopStartup(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function dispatchLoopStartup(Request_Abstract $request, Response_Abstract $response)
     {
     }
 
     /**
      * 分发之前触发
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
      */
-    public function preDispatch(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function preDispatch(Request_Abstract $request, Response_Abstract $response)
     {
     }
 
     /**
      * 分发结束之后触发
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
      */
-    public function postDispatch(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function postDispatch(Request_Abstract $request, Response_Abstract $response)
     {
     }
 
     /**
      * 分发循环结束之后触发
      *
-     * @param \Yaf\Request_Abstract  $request
-     * @param \Yaf\Response_Abstract $response
+     * @param Request_Abstract  $request
+     * @param Response_Abstract $response
      *
      * @return bool|void
      */
-    public function dispatchLoopShutdown(\Yaf\Request_Abstract $request, \Yaf\Response_Abstract $response)
+    public function dispatchLoopShutdown(Request_Abstract $request, Response_Abstract $response)
     {
     }
 
     /**
-     *
      * 请求授权的token,过滤掉配置中不需要授权认证的路由与合法性
      *
-     * @param $router
-     * @param $uri
+     * @param bool $auth_flag
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    private function authToken($router, $uri): void
+    private function authToken(bool $auth_flag): void
     {
         //该接口是否需要token认证
-        if ($router[$uri]['auth']) {
+        if ($auth_flag) {
             //验证授权token的合法性与过期时间
             $headers = Registry::get('request')->header;
             $token   = $headers['authorization'] ?? '0';
 
             $res = validate_token($token);
             if ($res != '0') {
-                throw new \Exception($res, 300);
+                throw new Exception($res, 300);
             }
         }
     }

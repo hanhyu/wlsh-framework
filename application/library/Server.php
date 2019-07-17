@@ -6,7 +6,15 @@
  * Date: 16-7-25
  * Time: 上午10:19
  */
+
 require 'AutoReload.php';
+
+use Yaf\{
+    Registry,
+    Loader,
+    Application,
+    Exception
+};
 
 class Server
 {
@@ -20,7 +28,7 @@ class Server
     /**
      * @var Yaf\Application
      */
-    private $obj_yaf;
+    private $yaf_obj;
     protected static $instance = null;
 
     public static function getInstance()
@@ -78,6 +86,7 @@ class Server
             //'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,
+            'send_yield'                 => true,
         ]);
 
         $this->table = new Swoole\Table(1024);
@@ -112,26 +121,26 @@ class Server
     }
 
     /**
-     * @param \Swoole\WebSocket\Server $server
+     * @param Swoole\WebSocket\Server $server
      */
-    public function onStart(\Swoole\WebSocket\Server $server): void
+    public function onStart(Swoole\WebSocket\Server $server): void
     {
         echo "Swoole tcp server is started at tcp://127.0.0.1:9771" . PHP_EOL;
         echo "Swoole http|ws server is started at http://127.0.0.1:9770" . PHP_EOL;
     }
 
-    public function onManagerStart(\Swoole\WebSocket\Server $server): void
+    public function onManagerStart(Swoole\WebSocket\Server $server): void
     {
 
     }
 
     /**
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $worker_id
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $worker_id
      *
      * @throws NotFound
      */
-    public function onWorkerStart(\Swoole\WebSocket\Server $server, int $worker_id): void
+    public function onWorkerStart(Swoole\WebSocket\Server $server, int $worker_id): void
     {
         /* array(3) {
                  [0]=>
@@ -150,7 +159,6 @@ class Server
             $kit->watch(CONF_PATH);
             $kit->watch(APPLICATION_PATH);
             $kit->addFileType('.php');
-            $kit->addFileType('.ini');
             $kit->run();
         }
 
@@ -161,23 +169,22 @@ class Server
             swoole_set_process_name('swooleWorkerProcess');
         }
 
-        Yaf\Registry::set('server', $server);
-        Yaf\Registry::set('table', $this->table);
-        Yaf\Registry::set('atomic', $this->atomic);
+        Registry::set('server', $server);
+        Registry::set('table', $this->table);
+        Registry::set('atomic', $this->atomic);
 
-        Yaf\Loader::import(ROOT_PATH . '/vendor/autoload.php');
-        Yaf\Loader::import(LIBRARY_PATH . '/common/functions.php');
+        Loader::import(ROOT_PATH . '/vendor/autoload.php');
+        Loader::import(LIBRARY_PATH . '/common/functions.php');
 
         //实例化yaf
         try {
-            //$this->obj_yaf = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
-            $this->obj_yaf = new Yaf\Application($this->config_file);
-            ob_start();
-            $this->obj_yaf->bootstrap()->run();
-            ob_end_clean();
-        } catch (\Yaf\Exception $e) {
+            //$this->yaf_obj = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
+            $this->yaf_obj = new Application($this->config_file);
+            $this->yaf_obj->bootstrap()->run();
+        } catch (Exception $e) {
             var_dump($e->getMessage());
         }
+
 
         /*
          * 默认第一个工作进程发送websocket控制流0x9 ping帧，
@@ -202,8 +209,8 @@ class Server
 
     /**
      *
-     * @param \Swoole\Http\Request  $request
-     * @param \Swoole\Http\Response $response
+     * @param Swoole\Http\Request  $request
+     * @param Swoole\Http\Response $response
      *
      * @return bool
      */
@@ -275,8 +282,8 @@ class Server
     /**
      * 用户创建socket连接，记录fd值
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param \Swoole\Http\Request     $request
+     * @param Swoole\WebSocket\Server $server
+     * @param Swoole\Http\Request     $request
      */
     public function onOpen(Swoole\WebSocket\Server $server, Swoole\Http\Request $request): void
     {
@@ -291,9 +298,8 @@ class Server
     /**
      * websocket协议路由转接
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param \Swoole\WebSocket\Frame  $frame
-     *
+     * @param Swoole\WebSocket\Server $server
+     * @param Swoole\WebSocket\Frame  $frame
      */
     public function onMessage(Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame): void
     {
@@ -308,22 +314,22 @@ class Server
                 return;
             }
 
-            $obj_req = new Yaf\Request\Http($res['uri'], '/');
-            $obj_req->setParam((array)$frame);
+            $req_obj = new Yaf\Request\Http($res['uri'], '/');
+            $req_obj->setParam((array)$frame);
 
 
             try {
-                $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+                $this->yaf_obj->getDispatcher()->dispatch($req_obj);
             } catch (ValidateException $e) { //参数验证手动触发的信息
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage(), [], true));
+                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage(), [], true));
             } catch (ProgramException $e) { //程序手动抛出的异常
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response($e->getCode(), null, $e->getMessage()));
+                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage()));
             } catch (Throwable $e) {
                 $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
                 if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response(500, null, $msg));
+                    $server->push($frame->fd, ws_response(500, '', $msg));
 
                 co_log(
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
@@ -337,8 +343,8 @@ class Server
     /**
      * http协议路由转接
      *
-     * @param \Swoole\Http\Request  $request
-     * @param \Swoole\Http\Response $response
+     * @param Swoole\Http\Request  $request
+     * @param Swoole\Http\Response $response
      *
      */
     public function onRequest(Swoole\Http\Request $request, Swoole\Http\Response $response): void
@@ -353,16 +359,17 @@ class Server
         $response->header('Content-Type', 'application/json;charset=utf-8');
 
         $request_uri = explode('/', $request->server['request_uri']);
+        $yaf_config  = Yaf\Registry::get('config');
         if (isset($request_uri[1]) AND !empty($request_uri[1])) {
             $response->header('Access-Control-Allow-Methods', 'POST,DELETE,PUT,GET,OPTIONS');
             $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
             $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign,Language');
             $response->header('Access-Control-Allow-Credentials', 'true');
             $response->header('Access-Control-Max-Age', '8388608');
-            $response->header('Access-Control-Allow-Origin', Yaf\Registry::get('config')->origin->domain);
+            $response->header('Access-Control-Allow-Origin', $yaf_config['origin']['domain']);
 
             //过滤掉固定的几个模块不能在外部http直接访问，ws、task、tcp、close、finish模块
-            $router = explode(',', \Yaf\Registry::get('config')->router->notHttp);
+            $router = explode(',', $yaf_config['router']['notHttp']);
             if (in_array($request_uri[1], $router)) {
                 $response->status(404);
                 $response->end();
@@ -376,8 +383,8 @@ class Server
             }
         }
 
-        $obj_req         = new Yaf\Request\Http($request->server['request_uri'], '/');
-        $obj_req->method = $request->server['request_method'];
+        $req_obj         = new Yaf\Request\Http($request->server['request_uri'], '/');
+        $req_obj->method = $request->server['request_method'];
 
         //注册全局信息
         /*多个协程是并发执行的，因此不能使用类静态变量/全局变量保存协程上下文内容。
@@ -387,7 +394,7 @@ class Server
         Yaf\Registry::set('response', $response);
 
         try {
-            $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+            $this->yaf_obj->getDispatcher()->dispatch($req_obj);
         } catch (ValidateException $e) { //参数验证手动触发的信息
             $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
         } catch (ProgramException $e) { //程序手动抛出的异常
@@ -407,22 +414,22 @@ class Server
     /**
      * tcp协议路由转接
      *
-     * @param \Swoole\WebSocket\Server $server
+     * @param Swoole\WebSocket\Server  $server
      * @param int                      $fd
      * @param int                      $reactor_id
      * @param                          $data
      */
     //todo 暂未实现路由Tcp模块
-    public function onReceive(\Swoole\WebSocket\Server $server, int $fd, int $reactor_id, $data): void
+    public function onReceive(Swoole\WebSocket\Server $server, int $fd, int $reactor_id, $data): void
     {
         $data      = substr($data, 4);
         $res       = json_decode($data, true);
         $res['fd'] = $fd;
-        $obj_req   = new Yaf\Request\Http($res['uri'], '/');
-        $obj_req->setParam($res);
+        $req_obj   = new Yaf\Request\Http($res['uri'], '/');
+        $req_obj->setParam($res);
 
         try {
-            $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+            $this->yaf_obj->getDispatcher()->dispatch($req_obj);
         } catch (Throwable $e) {
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
@@ -438,20 +445,20 @@ class Server
      * 到task方法中同步+协程执行模式,worker中可更多地处理请求以提高websocket服务器性能.
      * task路由转接
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param \Swoole\Server\Task      $task
+     * @param Swoole\WebSocket\Server $server
+     * @param Swoole\Server\Task      $task
      *
      */
-    public function onTask(\Swoole\WebSocket\Server $server, \Swoole\Server\Task $task): void
+    public function onTask(Swoole\WebSocket\Server $server, Swoole\Server\Task $task): void
     {
         $res     = unserialize($task->data);
-        $obj_req = new Yaf\Request\Http($res['uri'], '/');
+        $req_obj = new Yaf\Request\Http($res['uri'], '/');
         unset($res['uri']);
-        $obj_req->setParam($res);
+        $req_obj->setParam($res);
 
         ob_start();
         try {
-            $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+            $this->yaf_obj->getDispatcher()->dispatch($req_obj);
         } catch (Throwable $e) {
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
@@ -469,21 +476,21 @@ class Server
     /**
      * task任务完成返回数据到worker时路由转接
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $task_id
-     * @param string                   $data
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $task_id
+     * @param string                  $data
      */
-    public function onFinish(\Swoole\WebSocket\Server $server, int $task_id, string $data): void
+    public function onFinish(Swoole\WebSocket\Server $server, int $task_id, string $data): void
     {
         if (!empty($data)) {
             $res = unserialize($data);
             if (isset($res['uri'])) {
-                $obj_req = new Yaf\Request\Http($res['uri'], '/');
+                $req_obj = new Yaf\Request\Http($res['uri'], '/');
                 unset($res['uri']);
-                $obj_req->setParam((array)$res);
+                $req_obj->setParam((array)$res);
 
                 try {
-                    $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+                    $this->yaf_obj->getDispatcher()->dispatch($req_obj);
                 } catch (Throwable $e) {
                     if (APP_DEBUG) {
                         co_log(
@@ -500,22 +507,22 @@ class Server
     /**
      * 连接关闭路由转接
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $fd
-     * @param int                      $reactorId
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $fd
+     * @param int                     $reactorId
      */
-    public function onClose(\Swoole\WebSocket\Server $server, int $fd, int $reactorId): void
+    public function onClose(Swoole\WebSocket\Server $server, int $fd, int $reactorId): void
     {
         //echo "client-{$fd} is closed" . PHP_EOL;
         //echo '==============='. date("Y-m-d H:i:s", time()). '欢送' . $fd . '离开==============' . PHP_EOL;
         $res['uri'] = '/close/index/index';
         $res['fd']  = $fd;
 
-        $obj_req = new Yaf\Request\Http($res['uri'], '/');
-        $obj_req->setParam((array)$res);
+        $req_obj = new Yaf\Request\Http($res['uri'], '/');
+        $req_obj->setParam((array)$res);
 
         try {
-            $this->obj_yaf->getDispatcher()->dispatch($obj_req);
+            $this->yaf_obj->getDispatcher()->dispatch($req_obj);
         } catch (Throwable $e) {
             if (APP_DEBUG) {
                 co_log(
@@ -530,10 +537,10 @@ class Server
     /**
      * 此事件在worker进程终止时发生。在此函数中可以回收worker进程申请的各类资源
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $worker_id
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $worker_id
      */
-    public function onWorkerStop(\Swoole\WebSocket\Server $server, int $worker_id): void
+    public function onWorkerStop(Swoole\WebSocket\Server $server, int $worker_id): void
     {
         //请勿开启opcache，如开启了需要在这里使用opcache_reset();
     }
@@ -541,10 +548,10 @@ class Server
     /**
      * 在onWorkerExit中尽可能地移除/关闭异步的Socket连接，最终底层检测到Reactor中事件监听的句柄数量为0时退出进程。
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $worker_id
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $worker_id
      */
-    public function onWorkerExit(\Swoole\WebSocket\Server $server, int $worker_id): void
+    public function onWorkerExit(Swoole\WebSocket\Server $server, int $worker_id): void
     {
 
     }
@@ -553,13 +560,13 @@ class Server
      * 此函数主要用于报警和监控，一旦发现Worker进程异常退出，那么很有可能是遇到了致命错误或者进程CoreDump。
      * 通过记录日志或者发送报警的信息来提示开发者进行相应的处理
      *
-     * @param \Swoole\WebSocket\Server $server
-     * @param int                      $worker_id
-     * @param int                      $worker_pid
-     * @param int                      $exit_code
-     * @param int                      $signal
+     * @param Swoole\WebSocket\Server $server
+     * @param int                     $worker_id
+     * @param int                     $worker_pid
+     * @param int                     $exit_code
+     * @param int                     $signal
      */
-    public function onWorkerError(\Swoole\WebSocket\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
+    public function onWorkerError(Swoole\WebSocket\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
     {
         $content = "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}";
         $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
