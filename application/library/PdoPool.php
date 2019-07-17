@@ -106,13 +106,25 @@ class PdoPool
     }
 
     /**
+     * 获取连接池使用状态
+     * User: hanhyu
+     * Date: 19-7-17
+     * Time: 上午11:09
+     * @return array
+     */
+    public function getStatus(): array
+    {
+        return $this->ch->stats();
+    }
+
+    /**
      * 检查连接是否可用
      *
      * @param PDO $dbconn 数据库连接
      *
      * @return bool ping通了返回false,ping不通返回true
      */
-    /*private function ping(PDO $dbconn): bool
+    public function ping(PDO $dbconn): bool
     {
         try {
             $dbconn->getAttribute(PDO::ATTR_SERVER_INFO);
@@ -123,7 +135,7 @@ class PdoPool
             }
         }
         return false;
-    }*/
+    }
 
     /**
      * 连接池销毁, 置不可用状态, 防止新的客户端进入常驻连接池, 导致服务器无法平滑退出

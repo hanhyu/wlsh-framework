@@ -43,6 +43,12 @@ class Login extends Controller_Abstract
         $this->response = Registry::get('response');
     }
 
+    /**
+     * 此方法不能删除
+     * User: hanhyu
+     * Date: 19-7-12
+     * Time: 上午10:09
+     */
     public function indexAction(): void
     {
 

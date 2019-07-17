@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\Mysql\SystemUser;
 use App\Models\MysqlFactory;
 use Exception;
-
 
 /**
  * Created by PhpStorm.
@@ -18,7 +16,6 @@ class User
 {
     public function getInfoByName(string $name): array
     {
-        //return $this->user->getInfo($name);
         return MysqlFactory::systemUser()->getInfo($name);
     }
 
