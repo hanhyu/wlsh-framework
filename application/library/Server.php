@@ -159,7 +159,7 @@ class Server
             $kit->watch(CONF_PATH);
             $kit->watch(APPLICATION_PATH);
             $kit->addFileType('.php');
-            $kit->run();
+            //$kit->run();
         }
 
         //重命名进程名字

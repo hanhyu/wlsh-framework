@@ -48,7 +48,7 @@ class AutoReload
         }
         $this->inotify = inotify_init();
         $this->events = IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE;
-        swoole_event_add($this->inotify, function ($ifd) {
+        Swoole\Event::add($this->inotify, function ($ifd) {
             $events = inotify_read($this->inotify);
             if (!$events) {
                 return;
@@ -165,6 +165,6 @@ class AutoReload
 
     function run()
     {
-        swoole_event_wait();
+        //swoole_event_wait();
     }
 }
