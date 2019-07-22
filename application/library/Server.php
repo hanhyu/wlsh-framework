@@ -221,7 +221,7 @@ class Server
         $res   = validate_token($token);
         if (!empty($res)) {
             $response->status(400);
-            $response->end($res);
+            $response->end($res['msg']);
             return false;
         }
 
@@ -465,6 +465,7 @@ class Server
                 "onTask Throwable message:",
                 'task'
             );
+            //todo task中抛的异常后怎么处理
         } finally {
             $result = ob_get_contents();
         }

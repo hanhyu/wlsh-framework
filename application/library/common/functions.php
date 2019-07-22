@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
  * Date: 18-8-1
  * Time: 下午9:03
  */
+
+use Yaf\Registry;
 
 /**
  * http协议以固定json格式返回信息
@@ -288,26 +291,33 @@ function msectime(): float
  *
  * @param string $token
  *
- * @return string
+ * @return array
  */
-function validate_token(string $token): string
+function validate_token(string $token): array
 {
+    $res['code'] = 666;
+
     if (empty($token)) {
-        return '请先登录';
+        $res['msg'] = '请先登录';
+        return $res;
     }
 
     $data = get_token_params((string)$token);
 
     if (empty($data)) {
         co_log($token, 'validate_token data fail:');
-        return '非法操作';
+        $res['msg'] = '非法操作';
+    } else {
+        //设置登录时长过期时间
+        $time_flag = (time() - (int)$data['time']) > (int)Registry::get('config')->token->expTime;
+        if ($time_flag) {
+            $res['msg'] = '登录超时';
+        } else {
+            $res = [];
+        }
     }
 
-    //设置登录时长过期时间
-    if ((time() - (int)$data['time']) > (int)\Yaf\Registry::get('config')->token->expTime) {
-        return '登录超时';
-    }
-    return '0';
+    return $res;
 }
 
 /**
