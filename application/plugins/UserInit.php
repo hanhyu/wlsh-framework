@@ -8,6 +8,7 @@
 
 namespace App\Plugins;
 
+use ProgramException;
 use Yaf\{
     Registry,
     Plugin_Abstract,
@@ -170,8 +171,8 @@ class UserInit extends Plugin_Abstract
             $token   = $headers['authorization'] ?? '0';
 
             $res = validate_token($token);
-            if ($res != '0') {
-                throw new Exception($res, 300);
+            if (!empty($res)) {
+                throw new ProgramException($res['msg'], $res['code']);
             }
         }
     }
