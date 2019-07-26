@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Controllers;
+
 use Yaf\Registry;
-use Swoole\Http\Response;
 
 /**
  * Created by PhpStorm.
@@ -12,14 +12,11 @@ use Swoole\Http\Response;
  */
 class Error extends \Yaf\Controller_Abstract
 {
-    /**
-     * @var Response
-     */
-    private $response;
+    use \ControllersTrait;
 
     public function init()
     {
-        $this->response = Registry::get('response');
+        $this->beforeInit();
     }
 
     /**

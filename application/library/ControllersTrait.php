@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Models\Forms\FormsVali;
 
 use Swoole\Atomic;
+use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Server;
@@ -37,6 +38,7 @@ trait ControllersTrait
      * @var \Redis
      */
     protected $redis;
+    protected $cid;
 
     /**
      * 实现aop编程前置方法，供yaf控制器初始化中使用。
@@ -45,9 +47,10 @@ trait ControllersTrait
      */
     public function beforeInit($log = true): void
     {
+        $this->cid      = Coroutine::getCid();
         $this->server   = Registry::get('server');
-        $this->request  = Registry::get('request');
-        $this->response = Registry::get('response');
+        $this->request  = Registry::get('request_' . $this->cid);
+        $this->response = Registry::get('response_' . $this->cid);
         $this->atomic   = Registry::get('atomic');
 
         if ($log) {

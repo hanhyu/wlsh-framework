@@ -25,7 +25,7 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
     $result         = [];
     $result['code'] = $code;
 
-    $lang_code = \Yaf\Registry::get('request')->header['language'] ?? '';
+    $lang_code = Registry::get('request')->header['language'] ?? '';
     if ('zh-cn' == $lang_code) $vail = true;
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
@@ -43,7 +43,7 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
         $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
         return $res;
     }
-    sign(stripslashes($res));
+    //sign(stripslashes($res));
     //debug_print_backtrace();
     return $res;
 }
@@ -65,7 +65,7 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
     $result['code'] = $code;
     $result['uri']  = $uri;
 
-    $lang_code = \Yaf\Registry::get('ws_language') ?? '';
+    $lang_code = Registry::get('ws_language') ?? '';
     if ('zh-cn' == $lang_code) $vail = true;
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
@@ -141,13 +141,13 @@ function monolog_by_mongodb($content, string $info, string $channel, string $lev
 
     $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
         new \MongoDB\Driver\Manager(
-            Yaf\Registry::get('config')->log->mongo, [
-            'username'   => \Yaf\Registry::get('config')->log->username,
-            'password'   => \Yaf\Registry::get('config')->log->pwd,
-            'authSource' => \Yaf\Registry::get('config')->log->database,
+            Registry::get('config')->log->mongo, [
+            'username'   => Registry::get('config')->log->username,
+            'password'   => Registry::get('config')->log->pwd,
+            'authSource' => Registry::get('config')->log->database,
         ]),
-        Yaf\Registry::get('config')->log->database,
-        Yaf\Registry::get('config')->log->collection,
+        Registry::get('config')->log->database,
+        Registry::get('config')->log->collection,
         $level
     ));
 
@@ -202,7 +202,7 @@ function monolog_by_file($content, string $info, string $level): void
  */
 function send_email($content, string $info): void
 {
-    $email     = \Yaf\Registry::get('email_config')->toArray()[ini_get('yaf.environ')];
+    $email     = Registry::get('email_config')->toArray()[ini_get('yaf.environ')];
     $transport = (new Swift_SmtpTransport($email['host'], $email['port']))
         ->setUsername($email['uname'])
         ->setPassword($email['pwd']);
@@ -332,9 +332,9 @@ function get_token(array $params): string
     $encrypted = openssl_encrypt(
         json_encode($params, JSON_UNESCAPED_UNICODE),
         'aes-256-cbc',
-        base64_decode(\Yaf\Registry::get('config')->token->encryptKey),
+        base64_decode(Registry::get('config')->token->encryptKey),
         OPENSSL_RAW_DATA,
-        base64_decode(\Yaf\Registry::get('config')->token->encryptIv)
+        base64_decode(Registry::get('config')->token->encryptIv)
     );
     $encode    = base64_encode($encrypted);
 
@@ -355,8 +355,8 @@ function get_token_params(string $auth): array
     $decrypted = openssl_decrypt(
         $token,
         'aes-256-cbc',
-        base64_decode(\Yaf\Registry::get('config')->token->encryptKey),
-        OPENSSL_RAW_DATA, base64_decode(\Yaf\Registry::get('config')->token->encryptIv)
+        base64_decode(Registry::get('config')->token->encryptKey),
+        OPENSSL_RAW_DATA, base64_decode(Registry::get('config')->token->encryptIv)
     );
     if ($decrypted) {
         $res = json_decode($decrypted, true);
@@ -371,22 +371,26 @@ function get_token_params(string $auth): array
  * 数据签名规则
  * 如需要对返回的数据进行加密，请自行用https私钥加密，客户端可以用https公钥解密。
  *
+ * @param int    $cid
  * @param string $data
  */
-function sign(string $data): void
+function sign(int $cid, string $data): void
 {
+    $data = stripslashes($data);
     //简单的sign签名，如需用app_id、app_key颁发认证签名时请放进redis中和noncestr随机数
-    if (Yaf\Registry::get('config')->sign->flag) {
+    if (Registry::get('config')->sign->flag) {
         $time = time();
         /*
         $sign = private_encrypt(
                     md5($data . $time),
-                    Yaf\Registry::get('config')->sign->prv_key
+                    Registry::get('config')->sign->prv_key
                 );
         */
         $sign = md5($data . $time);
-        Yaf\Registry::get('response')->header('timestamp', (string)$time);
-        Yaf\Registry::get('response')->header('sign', $sign);
+
+        $resp = Registry::get('response_' . $cid);
+        $resp->header('timestamp', (string)$time);
+        $resp->header('sign', $sign);
     }
 }
 

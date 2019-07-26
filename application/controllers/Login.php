@@ -5,16 +5,17 @@ namespace App\Controllers;
 
 use App\Domain\System\User;
 use App\Models\RedisFactory;
-use Co\Channel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yaf\{
     Controller_Abstract,
     Registry,
 };
+use Swoole\Coroutine;
 use Swoole\WebSocket\Server;
 use Swoole\Http\Response;
 use Exception;
+use App\Domain\Index\Login as LoginDomain;
 
 /**
  * 测试用例
@@ -36,11 +37,13 @@ class Login extends Controller_Abstract
      * @var \Redis
      */
     private $redis;
+    private $cid;
 
     public function init()
     {
+        $this->cid      = Coroutine::getCid();
         $this->server   = Registry::get('server');
-        $this->response = Registry::get('response');
+        $this->response = Registry::get('response_' . $this->cid);
     }
 
     /**
@@ -398,9 +401,19 @@ class Login extends Controller_Abstract
         //$this->response->end($this->redis->get('key'));
         //\Yaf\Registry::get('redis_pool')->put($this->redis);
 
-        $value = RedisFactory::login()->getKey('key');
-        //$value = (new \App\Models\Redis\Login())->getKey('key');
-        $this->response->end($value);
+
+        /*
+         * 不推荐在协程框架中使用协程隔离的单例模式
+         * $value = RedisFactory::login()->getKey('key');
+         * */
+
+        //print_r('123');
+        //这里会自动触发协程切换
+        $value = (new LoginDomain())->getKey('key');
+        //print_r('456' . PHP_EOL);
+        $resp_content = http_response(200, '', ['content' => $value]);
+        sign($this->cid, $resp_content);
+        $this->response->end($resp_content);
     }
 
     public function publisherRedisAction(): void
@@ -587,8 +600,9 @@ class Login extends Controller_Abstract
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        //$user              = new \App\Domain\System\User();
+        //print_r('123');
         $res = (new User())->getInfoList($data);
+        //print_r('456' . PHP_EOL);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -1044,19 +1058,28 @@ class Login extends Controller_Abstract
         $mysql = Registry::get('co_mysql_pool')->get();
         $stmt  = $mysql->prepare($sql);
         $get   = $stmt->execute([1]);
+        $this->response->header('sign', 'qwe123');
+
         $this->response->end(http_response(200, '', $get));
+
     }
 
     public function getCoRedisAction(): void
     {
-        $ch = new Channel(1);
-        go(function () use ($ch) {
-            $value = RedisFactory::login()->getKey('key');
-            $ch->push($value);
-        });
-        $res = $ch->pop(3);
+        //$ch = new Channel(1);
+        print_r('123');
+        $response = $this->response;
+        //go(function () use ($ch, $response) {
+        //\Co::sleep(0.1);
+        $value = RedisFactory::login()->getKey('key');
+        print_r('456' . PHP_EOL);
+        //$ch->push($value);
+        $response->end($value);
+        //});
+        //$res = $ch->pop(3);
 
-        $this->response->end($res);
+
+        //$this->response->end($res);
     }
 
     /**
@@ -1071,6 +1094,21 @@ class Login extends Controller_Abstract
 
         $value = RedisFactory::login()->setKey('setKey', '123');
         $this->response->end($value);
+    }
+
+    /**
+     * 在SWOOLE_BASE模式下用ab压测以下两种代码方式输出的效果，会发现协程模式提速很快
+     * User: hanhyu
+     * Date: 19-7-25
+     * Time: 下午4:18
+     */
+    public function testCoAction(): void
+    {
+        //在开启Swoole\Runtime::enableCoroutine()模式下
+        print_r('123');
+        sleep(1);
+        print_r('456' . PHP_EOL);
+        $this->response->end();
     }
 
 

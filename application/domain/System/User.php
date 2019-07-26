@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
+use App\Models\Mysql\SystemUser;
 use App\Models\MysqlFactory;
 use Exception;
 
@@ -14,6 +15,16 @@ use Exception;
  */
 class User
 {
+    /**
+     * @var SystemUser
+     */
+    private $system_user;
+
+    public function __construct()
+    {
+        $this->system_user = new SystemUser();
+    }
+
     public function getInfoByName(string $name): array
     {
         return MysqlFactory::systemUser()->getInfo($name);
@@ -24,13 +35,6 @@ class User
         return MysqlFactory::systemUser()->setUser($data);
     }
 
-    /**
-     * 获取用户列表数据
-     *
-     * @param array $data
-     *
-     * @return array|null
-     */
     public function getInfoList(array $data): ?array
     {
         $res = [];
@@ -41,31 +45,8 @@ class User
         }
         $data['where'] = [];
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan) { //获取总数
-            try {
-                $count = MysqlFactory::systemUser()->getListCount();
-                $chan->push(['count' => $count]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list = MysqlFactory::systemUser()->getUserList($data);
-                $chan->push(['list' => $list]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
-
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getUserListAction mysql异常');
-                return null;
-            }
-        }
+        $res['count'] = $this->system_user->getListCount();
+        $res['list']  = $this->system_user->getUserList($data);
 
         return $res;
     }
