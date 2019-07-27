@@ -9,7 +9,6 @@ use App\Models\Redis\Login;
 use Swoole\Coroutine;
 
 /**
- * 不建议在协程框架中使用单例写法
  * Class RedisFactory
  * @package App\Models
  */

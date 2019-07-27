@@ -15,15 +15,6 @@ use Exception;
  */
 class User
 {
-    /**
-     * @var SystemUser
-     */
-    private $system_user;
-
-    public function __construct()
-    {
-        $this->system_user = new SystemUser();
-    }
 
     public function getInfoByName(string $name): array
     {
@@ -33,6 +24,42 @@ class User
     public function setUser(array $data): int
     {
         return MysqlFactory::systemUser()->setUser($data);
+    }
+
+    public function getInfoList_back(array $data): ?array
+    {
+        $res = [];
+        if ($data['curr_page'] > 0) {
+            $data['curr_data'] = ($data['curr_page'] - 1) * $data['page_size'];
+        } else {
+            $data['curr_data'] = 0;
+        }
+        $data['where'] = [];
+        $chan          = new \Swoole\Coroutine\Channel(2);
+        go(function () use ($chan) { //获取总数
+            try {
+                $count = MysqlFactory::systemUser()->getListCount();
+                $chan->push(['count' => $count]);
+            } catch (\Throwable $e) {
+                $chan->push(['500' => $e->getMessage()]);
+            }
+        });
+        go(function () use ($chan, $data) { //获取列表数据
+            try {
+                $list = MysqlFactory::systemUser()->getUserList($data);
+                $chan->push(['list' => $list]);
+            } catch (\Throwable $e) {
+                $chan->push(['500' => $e->getMessage()]);
+            }
+        });
+        for ($i = 0; $i < 2; $i++) {
+            $res += $chan->pop(7);
+            if (isset($res['500'])) {
+                co_log(['exception' => $res['500']], 'getUserListAction mysql异常');
+                return null;
+            }
+        }
+        return $res;
     }
 
     public function getInfoList(array $data): ?array
@@ -45,8 +72,8 @@ class User
         }
         $data['where'] = [];
 
-        $res['count'] = $this->system_user->getListCount();
-        $res['list']  = $this->system_user->getUserList($data);
+        $res['count'] = MysqlFactory::systemUser()->getListCount();
+        $res['list']  = MysqlFactory::systemUser()->getUserList($data);
 
         return $res;
     }
@@ -75,16 +102,12 @@ class User
 
     public function setLoginLog(array $data): void
     {
-        go(function () use ($data) {
-            MysqlFactory::systemUserLog()->setLoginLog($data);
-        });
+        MysqlFactory::systemUserLog()->setLoginLog($data);
     }
 
     public function setLogoutLog(array $data): void
     {
-        go(function () use ($data) {
-            MysqlFactory::systemUserLog()->setLogoutLog($data);
-        });
+        MysqlFactory::systemUserLog()->setLogoutLog($data);
     }
 
     /**
@@ -92,12 +115,11 @@ class User
      *
      * @param array $data
      *
-     * @return array|null
-     * @throws \Exception
+     * @return array
+     * @throws Exception
      */
-    public function getLogList(array $data): ?array
+    public function getLogList(array $data): array
     {
-        $res = [];
         if ($data['curr_page'] > 0) {
             $data['curr_data'] = ($data['curr_page'] - 1) * $data['page_size'];
         } else {
@@ -118,43 +140,21 @@ class User
             $data['where']['user_id'] = $arr_uid[0]['id'] ?? 0;
         }
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan, $data) { //获取总数
-            try {
-                $count = MysqlFactory::systemUserLog()->getListCount($data['where']);
-                $chan->push(['count' => $count]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list    = MysqlFactory::systemUserLog()->getList($data);
-                $arr_uid = array_column($list, 'user_id');
+        $res['count'] = MysqlFactory::systemUserLog()->getListCount($data['where']);
 
-                $arr_name = MysqlFactory::systemUser()->getNameById(array_unique($arr_uid));
-                $arr_let  = array_column($arr_name, 'name', 'id');
+        $list    = MysqlFactory::systemUserLog()->getList($data);
+        $arr_uid = array_column($list, 'user_id');
 
-                foreach ($list as $k => &$v) {
-                    $list[$k]['user_name'] = $arr_let[$v['user_id']];
-                    $v['login_ip']         = long2ip((int)$v['login_ip']);
-                }
-                unset($v);
+        $arr_name = MysqlFactory::systemUser()->getNameById(array_unique($arr_uid));
+        $arr_let  = array_column($arr_name, 'name', 'id');
 
-                $chan->push(['list' => $list]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
-
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getLogList mysql异常');
-                return null;
-            }
+        foreach ($list as $k => &$v) {
+            $list[$k]['user_name'] = $arr_let[$v['user_id']];
+            $v['login_ip']         = long2ip((int)$v['login_ip']);
         }
+        unset($v);
 
+        $res['list'] = $list;
         return $res;
     }
 
@@ -178,33 +178,40 @@ class User
 
         $data['where']['user_name'] = $data['uname'] ?? 0;
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan, $data) { //获取总数
-            try {
-                $count = MysqlFactory::userLogView()->getListCount($data['where']);
-                $chan->push(['count' => $count]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list = MysqlFactory::userLogView()->getList($data);
-                $chan->push(['list' => $list]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
 
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getLogList mysql异常');
-                return null;
-            }
-        }
+        $res['count'] = MysqlFactory::userLogView()->getListCount($data['where']);
+        $res['list']  = MysqlFactory::userLogView()->getList($data);
 
         return $res;
+    }
+
+    /**
+     * 压测协程数据结果是否错乱，连接池大小
+     * User: hanhyu
+     * Date: 2019/7/27
+     * Time: 下午10:16
+     */
+    public function testName(): void
+    {
+        go(function () {
+            $name = MysqlFactory::systemUser()->testNameById(1);
+            if ('ceshi001' != $name) print_r('name:' . $name);
+        });
+
+        go(function () {
+            $name = MysqlFactory::systemUser()->testNameById(7);
+            if ('ceshi12' != $name) print_r('name:' . $name);
+        });
+
+        go(function () {
+            $name2 = MysqlFactory::systemUser()->getNameById([7]);
+            if ('ceshi12' != $name2[0]['name']) print_r('name2:' . $name2);
+        });
+
+        /*go(function (){
+            $name2 = MysqlFactory::systemMenu()->getMenu(5);
+        });*/
+
     }
 
 }

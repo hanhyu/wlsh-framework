@@ -45,7 +45,7 @@ class Backup extends Controller_Abstract
     public function indexAction(): void
     {
         $res = $this->backup_domain->getTables();
-        echo http_response(200, '', $res);
+        $this->response->end(http_response(200, '', $res));
     }
 
     /**
@@ -74,10 +74,10 @@ class Backup extends Controller_Abstract
                 $arr['md5']      = hash_file('md5', $filename);
                 $arr['rand']     = $rand;
                 $let             = $this->backup_domain->setBackup($arr);
-                if (empty($let)) {
-                    $this->response->end(http_response(400, '存入数据失败'));
-                } else {
+                if ($let) {
                     $this->response->end(http_response());
+                } else {
+                    $this->response->end(http_response(400, '存入数据失败'));
                 }
             } else {
                 $this->response->end(http_response(400, '生成备份数据文件失败'));

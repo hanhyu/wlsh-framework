@@ -56,17 +56,15 @@ class Server
         $this->server = new Swoole\WebSocket\Server(
             "0.0.0.0",
             9770,
-            SWOOLE_BASE,
-            //SWOOLE_PROCESS,
+            SWOOLE_PROCESS,
             SWOOLE_SOCK_TCP | SWOOLE_SSL
-        //SWOOLE_SOCK_TCP
         );
 
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
         $this->server->set([
             //'reactor_num' => 16,
-            'worker_num'            => 1,
-            'task_worker_num'       => 1,
+            'worker_num'            => 8,
+            'task_worker_num'       => 8,
             'task_enable_coroutine' => true,
             'daemonize'             => SWOOLE_DAEMONIZE,
             'max_request'           => 300000,
@@ -76,7 +74,7 @@ class Server
             'log_level'             => SWOOLE_LOG_LEVEL,
             'trace_flags'           => SWOOLE_TRACE_ALL,
             'log_file'              => ROOT_PATH . '/log/swoole.log',
-            'pid_file'                   => ROOT_PATH . '/log/swoolePid.log',
+            'pid_file'              => ROOT_PATH . '/log/swoolePid.log',
             'package_max_length'         => 200000,
             'reload_async'               => true,
             'max_wait_time'              => 7,

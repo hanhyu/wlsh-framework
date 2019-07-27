@@ -41,11 +41,7 @@ class Menu extends Controller_Abstract
     {
         $data = $this->validator(SystemMenuForms::$getMenuList);
         $res  = $this->menu->getList($data);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
     public function getMenuInfoAction():void {
@@ -77,9 +73,8 @@ class Menu extends Controller_Abstract
     {
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->getMenuById((int)$data['id']);
-        if ($res) {
+        if (!empty($res)) {
             $this->response->end(http_response(200, '', $res));
-            return;
         } else {
             $this->response->end(http_response(500, '获取菜单失败'));
         }

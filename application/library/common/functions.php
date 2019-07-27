@@ -43,7 +43,6 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
         $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
         return $res;
     }
-    //sign(stripslashes($res));
     //debug_print_backtrace();
     return $res;
 }
@@ -83,7 +82,6 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
         $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
         return $res;
     }
-    sign(stripslashes($res));
     return $res;
 }
 

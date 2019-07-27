@@ -36,11 +36,7 @@ class LogMongo extends \Yaf\Controller_Abstract
     {
         $data = $this->validator(SystemLogForms::$getMongoList);
         $res  = $this->log->getMongoList($data);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
     /**
@@ -53,9 +49,7 @@ class LogMongo extends \Yaf\Controller_Abstract
     {
         $data = $this->validator(SystemLogForms::$getMongoInfo);
         $res  = $this->log->getMongoById($data['id']);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
 }

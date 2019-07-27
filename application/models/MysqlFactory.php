@@ -3,93 +3,115 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Swoole\Coroutine;
 use App\Models\Mysql\{SystemBackup, SystemMenu, SystemMsg, SystemRouter, SystemUser, SystemUserLog, UserLogView};
 
 class MysqlFactory
 {
-    /**
-     * @var SystemUser
-     */
-    private static $system_user;
-    /**
-     * @var SystemUserLog
-     */
-    private static $system_user_log;
-    /**
-     * @var UserLogView
-     */
-    private static $userLogView;
-    /**
-     * @var SystemRouter
-     */
-    private static $systemRouter;
-    /**
-     * @var SystemMsg
-     */
-    private static $systemMsg;
-    /**
-     * @var SystemMenu
-     */
-    private static $systemMenu;
-    /**
-     * @var SystemBackup
-     */
-    private static $systemBackup;
+    private static $system_user = [];
+    private static $system_user_log = [];
+    private static $userLogView = [];
+    private static $systemRouter = [];
+    private static $systemMsg = [];
+    private static $systemMenu = [];
+    private static $systemBackup = [];
 
     public static function systemUser(): SystemUser
     {
-        if (!self::$system_user) {
-            self::$system_user = new SystemUser();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$system_user[$cid])) {
+            self::$system_user[$cid] = new SystemUser();
         }
-        return self::$system_user;
+
+        defer(function () use ($cid) {
+            unset(self::$system_user[$cid]);
+        });
+
+        return self::$system_user[$cid];
     }
 
     public static function systemUserLog(): SystemUserLog
     {
-        if (!self::$system_user_log) {
-            self::$system_user_log = new SystemUserLog();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$system_user_log[$cid])) {
+            self::$system_user_log[$cid] = new SystemUserLog();
         }
-        return self::$system_user_log;
+
+        defer(function () use ($cid) {
+            unset(self::$system_user_log[$cid]);
+        });
+
+        return self::$system_user_log[$cid];
     }
 
     public static function userLogView(): UserLogView
     {
-        if (!self::$userLogView) {
-            self::$userLogView = new UserLogView();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$userLogView[$cid])) {
+            self::$userLogView[$cid] = new UserLogView();
         }
-        return self::$userLogView;
+
+        defer(function () use ($cid) {
+            unset(self::$userLogView[$cid]);
+        });
+
+        return self::$userLogView[$cid];
     }
 
     public static function systemRouter(): SystemRouter
     {
-        if (!self::$systemRouter) {
-            self::$systemRouter = new SystemRouter();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$systemRouter[$cid])) {
+            self::$systemRouter[$cid] = new SystemRouter();
         }
-        return self::$systemRouter;
+
+        defer(function () use ($cid) {
+            unset(self::$systemRouter[$cid]);
+        });
+
+        return self::$systemRouter[$cid];
     }
 
     public static function systemMsg(): SystemMsg
     {
-        if (!self::$systemMsg) {
-            self::$systemMsg = new SystemMsg();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$systemMsg[$cid])) {
+            self::$systemMsg[$cid] = new SystemMsg();
         }
-        return self::$systemMsg;
+
+        defer(function () use ($cid) {
+            unset(self::$systemMsg[$cid]);
+        });
+
+        return self::$systemMsg[$cid];
     }
 
     public static function systemMenu(): SystemMenu
     {
-        if (!self::$systemMenu) {
-            self::$systemMenu = new SystemMenu();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$systemMenu[$cid])) {
+            self::$systemMenu[$cid] = new SystemMenu();
         }
-        return self::$systemMenu;
+
+        defer(function () use ($cid) {
+            unset(self::$systemMenu[$cid]);
+        });
+
+        return self::$systemMenu[$cid];
     }
 
     public static function systemBackup(): SystemBackup
     {
-        if (!self::$systemBackup) {
-            self::$systemBackup = new SystemBackup();
+        $cid = Coroutine::getCid();
+        if (!isset(self::$systemBackup[$cid])) {
+            self::$systemBackup[$cid] = new SystemBackup();
         }
-        return self::$systemBackup;
+
+        defer(function () use ($cid) {
+            unset(self::$systemBackup[$cid]);
+        });
+
+        return self::$systemBackup[$cid];
     }
 
 }

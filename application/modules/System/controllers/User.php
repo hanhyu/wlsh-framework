@@ -58,11 +58,7 @@ class User extends Controller_Abstract
     {
         $data = $this->validator(SystemUserForms::$getUserList);
         $res  = $this->user->getInfoList($data);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
     /**
@@ -88,8 +84,10 @@ class User extends Controller_Abstract
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->getUserById((int)$data['id']);
-        if ($res) {
+        if (!empty($res)) {
             $this->response->end(http_response(200, '', $res));
+        } else {
+            $this->response->end(http_response(500, '查询失败'));
         }
     }
 
@@ -118,24 +116,27 @@ class User extends Controller_Abstract
         $info = $this->user->getInfoByName($data['name']);
         if (!empty($info)) {
             if ($info[0]['status'] == 0) {
-                $this->response->end(http_response(400, '该用户处于禁用状态'));
-                return;
+                $resp_content = http_response(400, '该用户处于禁用状态');
             } else if (password_verify($data['pwd'], $info[0]['pwd'])) {
                 $params['id']   = $info[0]['id'];
                 $params['name'] = $info[0]['name'];
                 $params['time'] = time();
                 $token          = get_token($params);
                 //$this->response->cookie('token', $token);
-                $this->response->end(http_response(200, '', ['token' => $token]));
+                $resp_content = http_response(200, '', ['token' => $token]);
 
                 $params['ip'] = ip2long($this->request->header['x-real-ip'] ?? get_ip($this->request->server));
                 $this->user->setLoginLog($params);
                 //模拟日志发送邮件
                 //task_log($this->server, $data['name'], '用户登录:', 'alert');
-                return;
+            } else {
+                $resp_content = http_response(400, '用户名或密码错误');
             }
+        } else {
+            $resp_content = http_response(400, '用户名或密码错误');
         }
-        $this->response->end(http_response(400, '用户名或密码错误'));
+        sign($this->cid, $resp_content);
+        $this->response->end($resp_content);
     }
 
     /**

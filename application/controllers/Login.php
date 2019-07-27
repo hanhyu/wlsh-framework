@@ -402,18 +402,14 @@ class Login extends Controller_Abstract
         //\Yaf\Registry::get('redis_pool')->put($this->redis);
 
 
-        /*
-         * 不推荐在协程框架中使用协程隔离的单例模式
-         * $value = RedisFactory::login()->getKey('key');
-         * */
+        $value = RedisFactory::login()->getKey('key');
+
 
         //print_r('123');
         //这里会自动触发协程切换
-        $value = (new LoginDomain())->getKey('key');
+        //$value = (new LoginDomain())->getKey('key');
         //print_r('456' . PHP_EOL);
-        $resp_content = http_response(200, '', ['content' => $value]);
-        sign($this->cid, $resp_content);
-        $this->response->end($resp_content);
+        $this->response->end(http_response(200, '', ['content' => $value]));
     }
 
     public function publisherRedisAction(): void
@@ -603,7 +599,7 @@ class Login extends Controller_Abstract
         //print_r('123');
         $res = (new User())->getInfoList($data);
         //print_r('456' . PHP_EOL);
-        if ($res) {
+        if (!empty($res)) {
             $this->response->end(http_response(200, '', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
@@ -1053,14 +1049,18 @@ class Login extends Controller_Abstract
      */
     public function coMysqlAction(): void
     {
-        $sql = "select * from `users` where id=? limit 1 ";
+        /*  $sql = "select * from `users` where id=? limit 1 ";
 
-        $mysql = Registry::get('co_mysql_pool')->get();
-        $stmt  = $mysql->prepare($sql);
-        $get   = $stmt->execute([1]);
-        $this->response->header('sign', 'qwe123');
+          $mysql = Registry::get('co_mysql_pool')->get();
+          $stmt  = $mysql->prepare($sql);
+          $get   = $stmt->execute([1]);
+          $this->response->header('sign', 'qwe123');
 
-        $this->response->end(http_response(200, '', $get));
+          $this->response->end(http_response(200, '', $get));*/
+
+        //压测协程数据结果是否错乱，连接池大小
+        (new User())->testName();
+        $this->response->end();
 
     }
 
@@ -1105,9 +1105,29 @@ class Login extends Controller_Abstract
     public function testCoAction(): void
     {
         //在开启Swoole\Runtime::enableCoroutine()模式下
+        /* print_r('123');
+         sleep(1);
+         print_r('456' . PHP_EOL);*/
+
         print_r('123');
-        sleep(1);
-        print_r('456' . PHP_EOL);
+        $res  = [];
+        $chan = new Coroutine\Channel(1);
+        go(function () use ($chan) {
+            Coroutine::sleep(1);
+            $chan->push(456);
+        });
+
+        go(function () use ($chan) {
+            Coroutine::sleep(2);
+            $chan->push(789);
+        });
+
+        for ($i = 0; $i < 2; $i++) {
+            $res[$i] = $chan->pop();
+        }
+
+        print_r($res);
+
         $this->response->end();
     }
 

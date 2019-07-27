@@ -12,6 +12,7 @@ namespace App\Domain\System;
 
 use App\Models\MysqlFactory;
 use App\Models\Redis\Login;
+use Exception;
 
 class Menu
 {
@@ -23,6 +24,7 @@ class Menu
      * @param array $data
      *
      * @return array|null
+     * @throws Exception
      */
     public function getList(array $data): ?array
     {
@@ -35,35 +37,9 @@ class Menu
 
         $data['where'] = [];
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan) { //获取总数
-            try {
-                $count = MysqlFactory::systemMenu()->getListCount();
-                $chan->push(['count' => $count]);
-            } catch (\Exception $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list = MysqlFactory::systemMenu()->getMenuList($data);
-                $chan->push(['list' => $list]);
-            } catch (\Exception $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
+        $res['count'] = MysqlFactory::systemMenu()->getListCount();
+        $res['list']  = MysqlFactory::systemMenu()->getMenuList($data);
 
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(
-                    ['message' => $res['500']],
-                    '协程mysql异常：' . __FILE__ . ':' . __LINE__,
-                    'mysql'
-                );
-                return null;
-            }
-        }
         return $res;
     }
 
@@ -72,7 +48,7 @@ class Menu
      * Date: 19-6-16
      * Time: 下午9:39
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getInfo(): array
     {
