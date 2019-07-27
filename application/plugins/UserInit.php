@@ -16,6 +16,7 @@ use Yaf\{
     Response_Abstract,
 };
 use Exception;
+use Swoole\Coroutine;
 
 class UserInit extends Plugin_Abstract
 {
@@ -167,7 +168,8 @@ class UserInit extends Plugin_Abstract
         //该接口是否需要token认证
         if ($auth_flag) {
             //验证授权token的合法性与过期时间
-            $headers = Registry::get('request')->header;
+            $cid     = Coroutine::getCid();
+            $headers = Registry::get('request_' . $cid)->header;
             $token   = $headers['authorization'] ?? '0';
 
             $res = validate_token($token);

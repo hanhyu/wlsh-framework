@@ -6,13 +6,18 @@ namespace App\Models;
 
 
 use App\Models\Redis\Login;
+use Swoole\Coroutine;
 
+/**
+ * Class RedisFactory
+ * @package App\Models
+ */
 class RedisFactory
 {
     /**
      * @var Login
      */
-    private static $login;
+    private static $login = [];
 
     /**
      * User: hanhyu
@@ -23,10 +28,17 @@ class RedisFactory
      */
     public static function login(): Login
     {
-        if (!self::$login) {
-            self::$login = new Login();
+        $cid = Coroutine::getCid();
+        //单例对象协程隔离
+        if (!isset(self::$login[$cid])) {
+            self::$login[$cid] = new Login();
         }
-        return self::$login;
+
+        defer(function () use ($cid) {
+            unset(self::$login[$cid]);
+        });
+
+        return self::$login[$cid];
     }
 
 }

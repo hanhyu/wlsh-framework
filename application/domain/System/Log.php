@@ -24,9 +24,8 @@ class Log
         $this->monolog = MongoFactory::monolog('baseFrame', 'monolog');
     }
 
-    public function getMongoList(array $data): ?array
+    public function getMongoList(array $data): array
     {
-        $res = [];
         if ($data['curr_page'] > 0) {
             $data['curr_data'] = ($data['curr_page'] - 1) * $data['page_size'];
         } else {
@@ -45,31 +44,9 @@ class Log
 
         if (!empty($data['channel'])) $data['where']['channel'] = $data['channel'];
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan, $data) { //获取总数
-            try {
-                $count = $this->monolog->getMongoCount($data['where']);
-                $chan->push(['count' => $count]);
-            } catch (\Exception $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list = $this->monolog->getMongoList($data);
-                $chan->push(['list' => $list]);
-            } catch (\Exception $e) {
-                $chan->push(['500' => $e->getMessage()]);
-            }
-        });
+        $res['count'] = $this->monolog->getMongoCount($data['where']);
+        $res['list']  = $this->monolog->getMongoList($data);
 
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getUserListAction mysql异常');
-                return null;
-            }
-        }
         return $res;
     }
 

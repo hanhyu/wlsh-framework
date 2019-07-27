@@ -63,10 +63,12 @@ CwIDAQAB
                 })
                     .then(function (response) {
                         //测试验证数据签名
-                        let sign = CryptoJS.MD5(JSON.stringify(response.data) + response.headers.timestamp);
-                        if (response.headers.sign != sign) {
-                            layer.msg('非法的数据内容');
-                            return;
+                        if (response.headers.sign) {
+                            let sign = CryptoJS.MD5(JSON.stringify(response.data) + response.headers.timestamp);
+                            if (response.headers.sign != sign) {
+                                layer.msg('非法的数据内容');
+                                return;
+                            }
                         }
 
                         if (response.data.code === 200) {

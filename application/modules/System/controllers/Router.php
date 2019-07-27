@@ -29,11 +29,7 @@ class Router extends \Yaf\Controller_Abstract
     {
         $data = $this->validator(SystemRouterForms::$getList);
         $res  = $this->router->getList($data);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
 
@@ -86,7 +82,7 @@ class Router extends \Yaf\Controller_Abstract
     public function getInfoAction(): void
     {
         $res = $this->router->getInfo();
-        if ($res) {
+        if (!empty($res)) {
             $this->response->end(http_response(200, '', ['list' => $res]));
         } else {
             $this->response->end(http_response(500, '查询失败'));

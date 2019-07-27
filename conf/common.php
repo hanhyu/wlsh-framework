@@ -5,11 +5,8 @@ return [
     'application' => [
         'directory'      => ROOT_PATH . "/application",
         'modules'        => "Index,Task,Finish,Ws,Tcp,Close,System",
-        'showErrors'     => 1,
-        'throwException' => 1,
         'dispatcher'     => [
             'defaultController' => 'login',
-            'catchException'    => 1,
         ],
     ],
 

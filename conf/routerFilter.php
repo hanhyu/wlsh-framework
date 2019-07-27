@@ -21,6 +21,7 @@ return [
     '/login/get_log_user_view'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_user_info'      => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/get_co_redis'       => ['auth' => false, 'method' => 'GET', 'action' => '*'],
+    '/login/test_co'            => ['auth' => false, 'method' => 'GET', 'action' => '*'],
 
     '/login/publisher_redis' => ['auth' => false, 'method' => 'GET', 'action' => '*'],
     '/login/consumer_redis'  => ['auth' => false, 'method' => 'GET', 'action' => '*'],
@@ -92,7 +93,7 @@ return [
 
     /******************************** 连接完成关闭时close回调处理相关路由 ****************************/
 
-    '/close/index/index' => ['auth' => false, 'method' => 'Cli', 'action' => '/close/index/index'],
+    '/close/index/index' => ['auth' => false, 'method' => 'Cli', 'action' => '*'],
 
     /******************************** 业务流程管理相关路由 ****************************/
 

@@ -37,11 +37,7 @@ class LogUser extends \Yaf\Controller_Abstract
         $data = $this->validator(SystemLogForms::$getUserList);
         //$data['uid'] = get_token_params($this->request->header['authorization'])['id'];
         $res = $this->log->getLogList($data);
-        if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
-        }
+        $this->response->end(http_response(200, '', $res));
     }
 
 }

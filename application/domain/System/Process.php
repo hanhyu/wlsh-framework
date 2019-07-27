@@ -27,31 +27,8 @@ class Process
 
         if (!empty($data['id'])) $data['where']['id'] = $data['id'];
 
-        $chan = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan, $data) { //获取总数
-            try {
-                $count = MysqlFactory::systemMsg()->getListCount($data['where']);
-                $chan->push(['count' => $count]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
-        go(function () use ($chan, $data) { //获取列表数据
-            try {
-                $list = MysqlFactory::systemMsg()->getList($data);
-                $chan->push(['list' => $list]);
-            } catch (\Throwable $e) {
-                $chan->push(['500' => $e->getMessage() . __LINE__]);
-            }
-        });
-
-        for ($i = 0; $i < 2; $i++) {
-            $res += $chan->pop(7);
-            if (isset($res['500'])) {
-                co_log(['exception' => $res['500']], 'getMsgList mysql异常');
-                return null;
-            }
-        }
+        $res['count'] = MysqlFactory::systemMsg()->getListCount($data['where']);
+        $res['list']  = MysqlFactory::systemMsg()->getList($data);
 
         return $res;
     }

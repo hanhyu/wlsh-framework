@@ -168,4 +168,9 @@ class SystemUser extends AbstractMysql
         return $datas;
     }
 
+    protected function testNameById(int $id): ?string
+    {
+        return $this->db->get($this->table, 'name', ['id' => $id]);
+    }
+
 }
