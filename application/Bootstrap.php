@@ -57,8 +57,8 @@ class Bootstrap extends Bootstrap_Abstract
         //$mysql_slave = new \PdoPool('mysql_slave');
 
         //添加pgsql数据库连接池
-        $pgsql_pool = new \PdoPool('pgsql');
-        Registry::set('pgsql_pool', $pgsql_pool);
+        //$pgsql_pool = new \PdoPool('pgsql');
+        //Registry::set('pgsql_pool', $pgsql_pool);
 
         //添加协程mysql数据库连接池
         $co_mysql_pool = new \CoMysqlPool();

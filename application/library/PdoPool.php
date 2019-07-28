@@ -19,10 +19,25 @@ class PdoPool
     protected $ch;
     private $config;
 
+    /**
+     * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
+     * PdoPool constructor.
+     *
+     * @param string $db_type
+     *
+     * @throws PDOException
+     */
     public function __construct(string $db_type)
     {
         $this->ch     = new Channel(300);
         $this->config = Registry::get('config')->$db_type;
+        try {
+            for ($i = 0; $i < 5; $i++) {
+                $this->ch->push($this->connect());
+            }
+        } catch (Exception $e) {
+            throw new PDOException($e->getMessage());
+        }
     }
 
     /**
@@ -31,17 +46,13 @@ class PdoPool
      */
     public function get(): Medoo
     {
-        $db = false;
-        //有空闲连接
-        if ($this->ch->length() > 0) $db = $this->ch->pop(3);
+        $db = $this->ch->pop(3);
         /**
          * 判断此空闲连接是否已被断开，已断开就重新请求连接，
          * 这里使用channel的pop功能就实现了一个判断池子中的连接是否超过空闲时间，如超时mysql则会自动断开此连接，
          * 当ping检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
          * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
          */
-        //todo 可以自定义一个定时器来检测空闲连接或连接时间超时操作
-
         if ($db === false) $db = $this->connect();
 
         /*

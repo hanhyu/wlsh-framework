@@ -182,7 +182,9 @@ class Server
             //$this->yaf_obj = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
             $this->yaf_obj = new Application($this->config_file);
             $this->yaf_obj->bootstrap()->run();
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
+            var_dump($e->getMessage());
+        } catch (Throwable $e) {
             var_dump($e->getMessage());
         }
 

@@ -17,9 +17,22 @@ class RedisPool
      */
     protected $ch;
 
+    /**
+     * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
+     * RedisPool constructor.
+     * @throws Exception
+     */
     public function __construct()
     {
         $this->ch = new Channel(300);
+        try {
+            for ($i = 0; $i < 5; $i++) {
+                $this->ch->push($this->connect());
+            }
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+
     }
 
     /**
@@ -29,9 +42,7 @@ class RedisPool
      */
     public function get(): Redis
     {
-        $db = false;
-        //有空闲连接
-        if ($this->ch->length() > 0) $db = $this->ch->pop(3);
+        $db = $this->ch->pop(1);
         /**
          * 判断此空闲连接是否已被断开，已断开就重新请求连接，
          * 这里使用channel的pop功能就实现了一个判断池子中的连接是否超过空闲时间，如超时redis则会自动断开此连接，
@@ -39,6 +50,7 @@ class RedisPool
          * 此功能依赖于redis的timeout参数值。
          */
         if ($db === false) $db = $this->connect();
+
         /*
          * 每次提前检测一下该池子中的连接是否可用，压测性能：
          * 1、在使用单例工厂模式下不影响性能

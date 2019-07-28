@@ -121,7 +121,7 @@ class SystemUser extends AbstractMysql
             'id' => (int)$post['id'],
         ]);
         if ($datas == false) throw new Exception($this->db->last());
-        return $datas->rowCount();;
+        return $datas->rowCount();
     }
 
     /**
@@ -172,5 +172,6 @@ class SystemUser extends AbstractMysql
     {
         return $this->db->get($this->table, 'name', ['id' => $id]);
     }
+
 
 }

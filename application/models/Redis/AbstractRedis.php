@@ -25,20 +25,6 @@ abstract class AbstractRedis
      */
     protected static $dbindex = 0;
 
-    /*
-     * 协程模式中不建议使用单例对象
-     * public function __construct()
-    {
-        try {
-            $this->db = Registry::get('redis_pool')->get();
-            $this->db->select(static::$dbindex);
-        } catch (Exception $e) {
-            co_log($e->getMessage(), "redis数据连接异常", 'alert');
-            throw new Exception('redis数据连接异常', 500);
-        }
-    }*/
-
-
     /**
      * 在协程中单例模式下使用
      *
