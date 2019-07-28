@@ -18,7 +18,7 @@ use Yaf\{
 use Exception;
 use Swoole\Coroutine;
 
-class UserInit extends Plugin_Abstract
+class UserInitBack extends Plugin_Abstract
 {
     /**
      *
@@ -50,11 +50,34 @@ class UserInit extends Plugin_Abstract
                 $uri = '/error/router';
             } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
                 $uri = '/error/method';
-            } else { //转发指定的路由
+            } else if ('*' != $router[$uri]['action']) { //转发指定的路由
                 $uri = $router[$uri]['action'];
             }
             //默认转发请求的路由
             $request->setRequestUri($uri);
+        }
+    }
+
+    /**
+     * 请求授权的token,过滤掉配置中不需要授权认证的路由与合法性
+     *
+     * @param bool $auth_flag
+     *
+     * @throws Exception
+     */
+    private function authToken(bool $auth_flag): void
+    {
+        //该接口是否需要token认证
+        if ($auth_flag) {
+            //验证授权token的合法性与过期时间
+            $cid     = Coroutine::getCid();
+            $headers = Registry::get('request_' . $cid)->header;
+            $token   = $headers['authorization'] ?? '0';
+
+            $res = validate_token($token);
+            if (!empty($res)) {
+                throw new ProgramException($res['msg'], $res['code']);
+            }
         }
     }
 
@@ -68,13 +91,40 @@ class UserInit extends Plugin_Abstract
     public function routerShutdown(Request_Abstract $request, Response_Abstract $response)
     {
         if (!empty($request->getRequestUri())) {
+            //标记uri中是否存在下划线
+            $flg = 0;
+            if (strpos($request->getRequestUri(), '_')) $flg = 1;
             $request_uri = explode('/', $request->getRequestUri());
-            if (5 == count($request_uri)) {
-                $request->controller = $request_uri[2] . '\\' . ucfirst($request_uri[3]);
-                $request->action     = $request_uri[4];
-            }
-        }
 
+            switch (count($request_uri)) {
+                case 5:
+                    if ($flg) {
+                        $request->module     = convert_string($request_uri[1], true);
+                        $request->controller = $request_uri[2] . '\\' . convert_string($request_uri[3], true);
+                        $request->action     = convert_string($request_uri[4], false);
+                    } else {
+                        $request->controller = $request_uri[2] . '\\' . ucfirst($request_uri[3]);
+                    }
+                    break;
+                case 4:
+                    if ($flg) {
+                        $request->module     = convert_string($request_uri[1], true);
+                        $request->controller = convert_string($request_uri[2], true);
+                        $request->action     = convert_string($request_uri[3], false);
+                    } else {
+                        $request->controller = ucfirst($request_uri[2]);
+                    }
+                    break;
+                default:
+                    if ($flg) {
+                        $request->controller = convert_string($request_uri[1], true);
+                        $request->action     = convert_string($request_uri[2], false);
+                    } else {
+                        $request->controller = ucfirst($request_uri[1]);
+                    }
+            }
+
+        }
         /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，
         若存在则停止解析，直接输出页面，缓存数据页。
         或做防重复操作提交*/
@@ -127,29 +177,6 @@ class UserInit extends Plugin_Abstract
      */
     public function dispatchLoopShutdown(Request_Abstract $request, Response_Abstract $response)
     {
-    }
-
-    /**
-     * 请求授权的token,过滤掉配置中不需要授权认证的路由与合法性
-     *
-     * @param bool $auth_flag
-     *
-     * @throws Exception
-     */
-    private function authToken(bool $auth_flag): void
-    {
-        //该接口是否需要token认证
-        if ($auth_flag) {
-            //验证授权token的合法性与过期时间
-            $cid     = Coroutine::getCid();
-            $headers = Registry::get('request_' . $cid)->header;
-            $token   = $headers['authorization'] ?? '0';
-
-            $res = validate_token($token);
-            if (!empty($res)) {
-                throw new ProgramException($res['msg'], $res['code']);
-            }
-        }
     }
 
 }
