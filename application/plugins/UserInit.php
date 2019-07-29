@@ -69,10 +69,21 @@ class UserInit extends Plugin_Abstract
     {
         if (!empty($request->getRequestUri())) {
             $request_uri = explode('/', $request->getRequestUri());
-            if (5 == count($request_uri)) {
-                $request->controller = $request_uri[2] . '\\' . ucfirst($request_uri[3]);
-                $request->action     = $request_uri[4];
+            switch (count($request_uri)) {
+                case 5:
+                    $request->controller = $request_uri[2] . '\\' . $request_uri[3];
+                    $request->action     = $request_uri[4];
+                    break;
+                case 4:
+                    $request->controller = $request_uri[2];
+                    $request->action     = $request_uri[3];
+                    break;
+                default:
+                    //$request->controller = ucfirst($request_uri[1]);
+                    $request->controller = $request_uri[1];
+                    $request->action     = $request_uri[2];
             }
+
         }
 
         /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，

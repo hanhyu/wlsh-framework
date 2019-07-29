@@ -135,17 +135,17 @@ function co_log($content, string $info, string $channel = 'system', string $leve
  */
 function monolog_by_mongodb($content, string $info, string $channel, string $level): bool
 {
-    $log = new \Monolog\Logger($channel);
+    $log    = new \Monolog\Logger($channel);
+    $config = Registry::get('config')->log;
 
     $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
-        new \MongoDB\Driver\Manager(
-            Registry::get('config')->log->mongo, [
-            'username'   => Registry::get('config')->log->username,
-            'password'   => Registry::get('config')->log->pwd,
-            'authSource' => Registry::get('config')->log->database,
+        new \MongoDB\Driver\Manager($config->mongo, [
+            'username'   => $config->username,
+            'password'   => $config->pwd,
+            'authSource' => $config->database,
         ]),
-        Registry::get('config')->log->database,
-        Registry::get('config')->log->collection,
+        $config->database,
+        $config->collection,
         $level
     ));
 
