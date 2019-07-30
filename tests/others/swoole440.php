@@ -5,6 +5,7 @@ declare(strict_types=1);
 class Server12
 {
     private $http;
+    protected $response;
 
     public function __construct()
     {
@@ -12,11 +13,24 @@ class Server12
         $this->http->set([
             //'worker_num' => 16,
             'daemonize'                => false,
-            'max_request'              => 100000,
+            'max_request'              => 50000,
             'dispatch_mode'            => 2,
             //'task_worker_num' => 16,
             'heartbeat_check_interval' => 660,
             'heartbeat_idle_time'      => 1200,
+
+            'worker_num'                 => 4,
+            'max_coroutine'              => 10000,
+            'enable_reuse_port'          => false,
+            'package_max_length'         => 200000,
+            'reload_async'               => true,
+            'max_wait_time'              => 7,
+            'buffer_output_size'         => 8 * 1024 * 1024,
+            //'open_http2_protocol'      => true,
+            //'open_mqtt_protocol' => true,
+            'open_websocket_close_frame' => true,
+            'send_yield'                 => true,
+
         ]);
         $this->http->on('start', [$this, 'onStart']);
         $this->http->on('managerStart', [$this, 'onManagerStart']);
@@ -42,7 +56,9 @@ class Server12
 
     public function onRequest($request, $response)
     {
-        var_dump($request->server['request_uri']);
+        //var_dump($request->server['request_uri']);
+        $this->response = $response;
+        $this->test();
     }
 
     public function onClose($http, $fd)
@@ -54,6 +70,10 @@ class Server12
     {
     }
 
+    public function test()
+    {
+        $this->response->end('test');
+    }
 
 }
 

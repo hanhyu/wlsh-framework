@@ -63,26 +63,26 @@ class Server
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
         $this->server->set([
             //'reactor_num' => 16,
-            'worker_num'               => 8,
-            'task_worker_num'          => 8,
-            'task_enable_coroutine'    => true,
-            'daemonize'                => SWOOLE_DAEMONIZE,
-            'max_request'              => 100000,
-            'max_coroutine'            => 100000,
-            'dispatch_mode'            => 2,
-            'enable_reuse_port'        => false,
-            'log_level'                => SWOOLE_LOG_LEVEL,
-            'trace_flags'              => SWOOLE_TRACE_ALL,
-            'log_file'                 => ROOT_PATH . '/log/swoole.log',
-            'pid_file'                 => ROOT_PATH . '/log/swoolePid.log',
-            'package_max_length'       => 200000,
-            'reload_async'             => true,
-            'max_wait_time'            => 7,
-            'heartbeat_idle_time'      => 600,
-            'heartbeat_check_interval' => 60,
-            'buffer_output_size'       => 8 * 1024 * 1024,
-            'ssl_cert_file'            => ROOT_PATH . '/tests/opensslRsa/cert.crt',
-            'ssl_key_file'             => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            'worker_num'                 => 4,
+            'task_worker_num'            => 4,
+            'task_enable_coroutine'      => true,
+            'daemonize'                  => SWOOLE_DAEMONIZE,
+            'max_request'                => 50000,
+            'max_coroutine'              => 10000,
+            'dispatch_mode'              => 2,
+            'enable_reuse_port'          => false,
+            'log_level'                  => SWOOLE_LOG_LEVEL,
+            'trace_flags'                => SWOOLE_TRACE_ALL,
+            'log_file'                   => ROOT_PATH . '/log/swoole.log',
+            'pid_file'                   => ROOT_PATH . '/log/swoolePid.log',
+            'package_max_length'         => 200000,
+            'reload_async'               => true,
+            'max_wait_time'              => 7,
+            'heartbeat_idle_time'        => 600,
+            'heartbeat_check_interval'   => 60,
+            'buffer_output_size'         => 8 * 1024 * 1024,
+            'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
+            'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
             //'open_http2_protocol'      => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,
@@ -142,7 +142,6 @@ class Server
      */
     public function onWorkerStart(Swoole\WebSocket\Server $server, int $worker_id): void
     {
-        Swoole\Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
         /* array(3) {
                  [0]=>
            string(26) "/home/baseFrame/swoole.php"
@@ -178,6 +177,7 @@ class Server
         Loader::import(LIBRARY_PATH . '/common/functions.php');
 
         //实例化yaf
+        //todo 这里当进程达到max_request设置数量
         try {
             //$this->yaf_obj = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
             $this->yaf_obj = new Application($this->config_file);
@@ -185,7 +185,7 @@ class Server
         } catch (PDOException $e) {
             var_dump($e->getMessage());
         } catch (Throwable $e) {
-            var_dump($e->getMessage());
+            print_r($e . PHP_EOL);
         }
 
 
@@ -208,6 +208,7 @@ class Server
             });
         }
 
+        Swoole\Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
     }
 
     /**
@@ -393,15 +394,15 @@ class Server
         /*多个协程是并发执行的，因此不能使用类静态变量/全局变量保存协程上下文内容。
         使用局部变量是安全的，因为局部变量的值会自动保存在协程栈中，
         其他协程访问不到协程的局部变量。*/
+
         $cid = Swoole\Coroutine::getCid();
         Registry::set('request_' . $cid, $request);
         Registry::set('response_' . $cid, $response);
 
-        defer(function () use ($cid) {
-            Registry::del('request_' . $cid);
-            Registry::del('response_' . $cid);
-        });
-
+        /* defer(function () use ($cid) {
+             Registry::del('request_' . $cid);
+             Registry::del('response_' . $cid);
+         });*/
 
         try {
             $this->yaf_obj->getDispatcher()->dispatch($req_obj);
@@ -419,6 +420,10 @@ class Server
                 'http'
             );
         }
+
+        Registry::del('request_' . $cid);
+        Registry::del('response_' . $cid);
+
     }
 
     /**
