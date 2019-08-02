@@ -44,7 +44,8 @@ class UserInit extends Plugin_Abstract
 
             $router = Registry::get('router_filter_config')->toArray();
 
-            $this->authToken($router[$uri]['auth'] ?? true);
+            $auth_token = $router[$uri]['auth'] ?? true;
+            $this->authToken($auth_token);
 
             if (!isset($router[$uri])) { //请求的路由错误
                 $uri = '/error/router';

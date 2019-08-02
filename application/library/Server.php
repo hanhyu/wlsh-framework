@@ -13,7 +13,6 @@ use Yaf\{
     Registry,
     Loader,
     Application,
-    Exception
 };
 
 class Server
@@ -67,7 +66,8 @@ class Server
             'task_worker_num'            => 4,
             'task_enable_coroutine'      => true,
             'daemonize'                  => SWOOLE_DAEMONIZE,
-            'max_request'                => 50000,
+            //swoole4.4.2版本开始，已稳定内存，协程模式下无需再开启此参数。
+            //'max_request'                => 300000,
             'max_coroutine'              => 10000,
             'dispatch_mode'              => 2,
             'enable_reuse_port'          => false,
@@ -355,7 +355,7 @@ class Server
     {
         //TODO 绑定固定域名才能访问
         //请求过滤,会请求2次
-        if (in_array('/favicon.ico', [$request->server['request_uri']])) {
+        if ('/favicon.ico' == $request->server['path_info'] || '/favicon.ico' == $request->server['request_uri']) {
             $response->end();
             return;
         }

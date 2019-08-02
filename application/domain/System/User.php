@@ -26,6 +26,16 @@ class User
         return MysqlFactory::systemUser()->setUser($data);
     }
 
+    /**
+     * 在开启Swoole\Runtime::enableCoroutine的情况下，压测结果，协程并行与不使用并行一样。
+     * User: hanhyu
+     * Date: 2019/8/2
+     * Time: 下午3:33
+     *
+     * @param array $data
+     *
+     * @return array|null
+     */
     public function getInfoList_back(array $data): ?array
     {
         $res = [];
