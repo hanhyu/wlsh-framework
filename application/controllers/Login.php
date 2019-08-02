@@ -591,6 +591,63 @@ class Login extends Controller_Abstract
      * 98%    118
      * 99%    121
      * 100%   1148 (longest request)
+     *
+     *
+     * ab -c 1000 -n 1000000 -k http://127.0.0.1:9770/login/get_user_list
+     * This is ApacheBench, Version 2.3 <$Revision: 1807734 $>
+     * Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+     * Licensed to The Apache Software Foundation, http://www.apache.org/
+     *
+     * Benchmarking 127.0.0.1 (be patient)
+     * Completed 100000 requests
+     * Completed 200000 requests
+     * Completed 300000 requests
+     * Completed 400000 requests
+     * Completed 500000 requests
+     * Completed 600000 requests
+     * Completed 700000 requests
+     * Completed 800000 requests
+     * Completed 900000 requests
+     * Completed 1000000 requests
+     * Finished 1000000 requests
+     *
+     *
+     * Server Software:        swoole-http-server
+     * Server Hostname:        127.0.0.1
+     * Server Port:            9770
+     *
+     * Document Path:          /login/get_user_list
+     * Document Length:        1162 bytes
+     *
+     * Concurrency Level:      1000
+     * Time taken for tests:   92.105 seconds
+     * Complete requests:      1000000
+     * Failed requests:        0
+     * Keep-Alive requests:    1000000
+     * Total transferred:      1637000000 bytes
+     * HTML transferred:       1162000000 bytes
+     * Requests per second:    10857.20 [#/sec] (mean)
+     * Time per request:       92.105 [ms] (mean)
+     * Time per request:       0.092 [ms] (mean, across all concurrent requests)
+     * Transfer rate:          17356.67 [Kbytes/sec] received
+     *
+     * Connection Times (ms)
+     * min  mean[+/-sd] median   max
+     * Connect:        0    0   2.8      0    1022
+     * Processing:    16   92   4.0     91     129
+     * Waiting:       16   92   4.0     91     129
+     * Total:         35   92   4.7     91    1113
+     *
+     * Percentage of the requests served within a certain time (ms)
+     * 50%     91
+     * 66%     92
+     * 75%     93
+     * 80%     93
+     * 90%     96
+     * 95%     98
+     * 98%    105
+     * 99%    109
+     * 100%   1113 (longest request)
      */
     public function getUserListAction(): void
     {
@@ -598,6 +655,10 @@ class Login extends Controller_Abstract
         $data['page_size'] = 7;
         //print_r('123');
         $res = (new User())->getInfoList($data);
+
+        //压测使用两个协程并行执行，结果与不使用并行一样。
+        //$res = (new User())->getInfoList_back($data);
+
         //print_r('456' . PHP_EOL);
         if (!empty($res)) {
             $this->response->end(http_response(200, '', $res));
