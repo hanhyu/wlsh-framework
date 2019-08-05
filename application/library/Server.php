@@ -23,7 +23,6 @@ class Server
     private $server;
     private $table;
     private $atomic;
-    private $config_file;
     /**
      * @var Yaf\Application
      */
@@ -40,14 +39,6 @@ class Server
 
     private function __construct()
     {
-    }
-
-    public function setConfigIni($config_ini): void
-    {
-        /*if (!is_file($config_ini)) {
-            trigger_error('Server Config File Not Exist!', E_USER_ERROR);
-        }*/
-        $this->config_file = $config_ini;
     }
 
     public function start(): void
@@ -179,8 +170,17 @@ class Server
         //实例化yaf
         //todo 这里当进程达到max_request设置数量
         try {
+            $common  = require CONF_PATH . DS . 'common.php';
+            $develop = require CONF_PATH . DS . 'develop.php';
+            $test    = require CONF_PATH . DS . 'test.php';
+            $devtest = require CONF_PATH . DS . 'devtest.php';
+            $product = require CONF_PATH . DS . 'product.php';
+
+            $yaf_conf       = ini_get('yaf.environ');
+            $yaf_conf_array = array_merge($common, $$yaf_conf);
+
             //$this->yaf_obj = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
-            $this->yaf_obj = new Application($this->config_file);
+            $this->yaf_obj = new Application($yaf_conf_array);
             $this->yaf_obj->bootstrap()->run();
         } catch (PDOException $e) {
             var_dump($e->getMessage());
