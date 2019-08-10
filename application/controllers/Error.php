@@ -2,7 +2,10 @@
 
 namespace App\Controllers;
 
+use Swoole\Coroutine;
+use Swoole\Http\Response;
 use Yaf\Registry;
+use Yaf\Controller_Abstract;
 
 /**
  * Created by PhpStorm.
@@ -10,13 +13,17 @@ use Yaf\Registry;
  * Date: 18-7-25
  * Time: 上午10:38
  */
-class Error extends \Yaf\Controller_Abstract
+class Error extends Controller_Abstract
 {
-    use \ControllersTrait;
+    /**
+     * @var Response
+     */
+    private $response;
 
     public function init()
     {
-        $this->beforeInit();
+        $cid            = Coroutine::getCid();
+        $this->response = Registry::get('response_' . $cid);
     }
 
     /**
