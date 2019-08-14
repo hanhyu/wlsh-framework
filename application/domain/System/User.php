@@ -224,4 +224,17 @@ class User
 
     }
 
+    public function editPwd(array $data): int
+    {
+        $pwd = MysqlFactory::systemUser()->getPwdByUid($data['uid']);
+
+        if (!password_verify($data['old_pwd'], $pwd)) {
+            $res = -1;
+        } else {
+            $res = MysqlFactory::systemUser()->editPwd($data);
+        }
+        return $res;
+    }
+
+
 }

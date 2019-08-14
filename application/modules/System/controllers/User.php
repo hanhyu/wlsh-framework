@@ -174,4 +174,23 @@ class User extends Controller_Abstract
         }
     }
 
+    public function editPwdAction(): void
+    {
+        $data = $this->validator(SystemUserForms::$editPwd);
+
+        $headers     = $this->request->header;
+        $data['uid'] = get_token_params($headers['authorization'])['id'];
+
+        $res = $this->user->editPwd($data);
+
+        if (-1 == $res) {
+            $this->response->end(http_response(400, '旧密码错误'));
+        } else if (!empty($res)) {
+            $this->response->end(http_response(200, '密码修改成功'));
+        } else {
+            $this->response->end(http_response(500, '修改密码失败，请重新操作'));
+        }
+    }
+
+
 }

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>修改密码</title>
+    <link href="view/head_js.html" rel="import">
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up all">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="pwd">
+                <span class="x-red">*</span>旧密码
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="pwd" name="pwd"
+                       required="" type="password" v-model="old_pwd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="L_repass">
+                <span class="x-red">*</span>新密码
+            </label>
+            <div class="layui-input-inline">
+                <input autocomplete="off" class="layui-input" id="L_repass" name="repass"
+                       required="" type="password" v-model="new_pwd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="L_repass">
+            </label>
+            <button @click.prevent="edit" class="layui-btn" lay-filter="add">
+                修改
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+<script src="controller/pwd.js"></script>
+</html>

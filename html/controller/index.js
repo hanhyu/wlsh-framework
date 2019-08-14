@@ -70,6 +70,9 @@ new Vue({
                     layer.close(loadIndex);
                     console.log(error);
                 });
+        },
+        pwd() {
+            x_admin_show('修改密码', "pwd.html", 600, 400);
         }
     },
     watch: {},

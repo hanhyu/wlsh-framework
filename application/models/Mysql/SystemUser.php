@@ -173,5 +173,42 @@ class SystemUser extends AbstractMysql
         return $this->db->get($this->table, 'name', ['id' => $id]);
     }
 
+    /**
+     * 根据用户uid获取密码
+     * User: hanhyu
+     * Date: 2019/8/14
+     * Time: 下午4:10
+     *
+     * @param int $uid
+     *
+     * @return string|null
+     */
+    protected function getPwdByUid(int $uid): ?string
+    {
+        return $this->db->get($this->table, 'pwd', ['id' => $uid]);
+    }
+
+    /**
+     * 用户修改密码
+     * User: hanhyu
+     * Date: 2019/8/14
+     * Time: 下午4:11
+     *
+     * @param array $data
+     *
+     * @return int
+     * @throws Exception
+     */
+    protected function editPwd(array $data): int
+    {
+        $datas = $this->db->update($this->table, [
+            'pwd' => password_hash($data['new_pwd'], PASSWORD_DEFAULT),
+        ], [
+            'id' => $data['uid'],
+        ]);
+        if ($datas === false) throw new Exception($this->db->last());
+        return $datas->rowCount();
+    }
+
 
 }
