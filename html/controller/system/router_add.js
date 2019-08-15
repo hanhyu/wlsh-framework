@@ -23,7 +23,10 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        this.getMenu();
+        let self = this;
+        $(function () {
+            self.getMenu();
+        });
     },
     beforeUpdate: function () {
     },

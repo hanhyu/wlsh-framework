@@ -17,10 +17,13 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        this.getMenu();
         window.onbeforeunload = function (e) {
             localStorage.clear();
-        }
+        };
+        let self = this;
+        window.onload = function () {
+            self.getMenu();
+        };
     },
     methods: {
         getMenu() {

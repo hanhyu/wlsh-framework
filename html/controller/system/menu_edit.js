@@ -24,8 +24,11 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        this.getMenuLevel();
-        this.getMenu();
+        let self = this;
+        $(function () {
+            self.getMenuLevel();
+            self.getMenu();
+        });
     },
     methods: {
         //显示一级菜单列表

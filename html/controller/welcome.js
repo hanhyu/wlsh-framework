@@ -16,7 +16,10 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        this.getStatus();
+        let self = this;
+        window.onload = function () {
+            self.getStatus();
+        };
     },
     methods: {
         getStatus() {

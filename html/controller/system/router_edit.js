@@ -36,7 +36,10 @@ new Vue({
         this.menu_id = list.menu_id;
         this.comment = list.comment;
         if (this.type == 0) this.show = true;
-        this.getMenu();
+        let self = this;
+        $(function () {
+            self.getMenu();
+        });
     },
     methods: {
         //修改路由
