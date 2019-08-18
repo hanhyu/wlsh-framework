@@ -132,5 +132,11 @@ new Vue({
             }
         }
     },
+    updated: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
+    },
     filters: {}
 });

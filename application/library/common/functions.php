@@ -8,6 +8,7 @@ declare(strict_types=1);
  * Time: 下午9:03
  */
 
+use Swoole\Coroutine;
 use Yaf\Registry;
 
 /**
@@ -25,8 +26,13 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
     $result         = [];
     $result['code'] = $code;
 
-    $lang_code = Registry::get('request')->header['language'] ?? '';
+    //由于只是获取header中的language值，为静态值，所以这里无需考虑协程数据混乱问题。
+    $cid       = Coroutine::getCid();
+    $lang_code = Registry::get('request_' . $cid)->header['language'] ?? '';
+
+    //屏蔽中文简体
     if ('zh-cn' == $lang_code) $vail = true;
+
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
     } else {

@@ -47,6 +47,7 @@ return [
     '/system/user/del_user'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/system/User/delUser'],
     '/system/user/edit_user'     => ['auth' => true, 'method' => 'PUT', 'action' => '/system/User/editUser'],
     '/system/user/pull'          => ['auth' => true, 'method' => 'POST', 'action' => '/system/User/pull'],
+    '/system/user/edit_pwd'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/User/editPwd'],
 
     /***************************************** 系统菜单相关路由 *****************************************/
 

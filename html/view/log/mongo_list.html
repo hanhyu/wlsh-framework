@@ -17,61 +17,64 @@
       </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
        href="javascript:location.replace(location.href);" title="刷新">
-        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body all">
-    <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so">
-            <input class="layui-input" id="start_time" name="start" placeholder="开始时间">
-            <input class="layui-input" id="end_time" name="end" placeholder="结束时间">
-            <input class="layui-input" id="channel" name="channel" placeholder="channel">
-            <button id="search" class="layui-btn" @click.prevent="mongoList"><i class="layui-icon"></i>查询</button>
-            <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>
-            <!--<button type="reset" class="layui-btn"><i class="layui-icon"></i>清空</button>-->
-        </form>
-    </div>
-    <table class="layui-table">
-        <thead>
-        <tr>
-            <th>
-                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i
-                        class="layui-icon">&#xe605;</i></div>
-            </th>
-            <th width="100px">ID</th>
-            <th width="170px">提示信息</th>
-            <th>数据</th>
-            <th width="60px">日志等级</th>
-            <th width="60px">channel</th>
-            <th width="75px">记录时间</th>
-            <th width="310px">使用内存</th>
-            <th width="150px">操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in privmessage">
-            <td>
-                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-input-inline">
+                        <input class="layui-input" id="start_time" name="start" placeholder="开始时间"></div>
+                    <div class="layui-input-inline">
+                        <input class="layui-input" id="end_time" name="end" placeholder="结束时间"></div>
+                    <div class="layui-input-inline">
+                        <input class="layui-input" id="channel" name="channel" placeholder="channel"></div>
+
+                    <button @click.prevent="mongoList" class="layui-btn" id="search"><i class="layui-icon"></i>查询
+                    </button>
+                    <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>
+                    <!--<button type="reset" class="layui-btn"><i class="layui-icon"></i>清空</button>-->
                 </div>
-            </td>
-            <td>{{item._id.$oid}}</td>
-            <td>{{item.message}}</td>
-            <td @click.prevent="getMongo(item)" style="cursor: pointer">{{item.context}}</td>
-            <td>{{item.level_name}}</td>
-            <td>{{item.channel}}</td>
-            <td>{{item.datetime.$date.$numberLong | timestampFilter}}</td>
-            <td>{{item.extra}}</td>
-            <td class="td-manage">
-                <button @click.prevent="getMongo(item)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe642;</i>查看
-                </button>
-                <button @click.prevent="delMongo(item._id.$oid)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe640;</i>删除
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div id="list_page"></div>
+                <div class="layui-card-body ">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th width="100px">ID</th>
+                            <th width="170px">提示信息</th>
+                            <th>数据</th>
+                            <th width="60px">日志等级</th>
+                            <th width="60px">channel</th>
+                            <th width="75px">记录时间</th>
+                            <th width="310px">使用内存</th>
+                            <th width="150px">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in privmessage">
+                            <td>{{item._id.$oid}}</td>
+                            <td>{{item.message}}</td>
+                            <td @click.prevent="getMongo(item)" style="cursor: pointer">{{item.context}}</td>
+                            <td>{{item.level_name}}</td>
+                            <td>{{item.channel}}</td>
+                            <td>{{item.datetime.$date.$numberLong | timestampFilter}}</td>
+                            <td>{{item.extra}}</td>
+                            <td class="td-manage">
+                                <button @click.prevent="getMongo(item)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe642;</i>查看
+                                </button>
+                                <button @click.prevent="delMongo(item._id.$oid)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe640;</i>删除
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-card-body " id="list_page"></div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script src="../../controller/log/mongo_list.js"></script>

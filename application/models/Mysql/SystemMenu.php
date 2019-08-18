@@ -40,7 +40,7 @@ class SystemMenu extends AbstractMysql
 
         $datas = $this->db->select($this->table, '*', $wheres);
 
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
 
         return $datas;
     }
@@ -55,7 +55,7 @@ class SystemMenu extends AbstractMysql
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -77,7 +77,7 @@ class SystemMenu extends AbstractMysql
             'up_id',
             'level',
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -98,7 +98,7 @@ class SystemMenu extends AbstractMysql
             'up_id' => $post['up_id'],
             'level' => $post['level'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return (int)$this->db->id();
     }
 
@@ -121,7 +121,7 @@ class SystemMenu extends AbstractMysql
             'url',
             'up_id',
         ], ['id' => $id]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -146,7 +146,7 @@ class SystemMenu extends AbstractMysql
         ], [
             'id' => (int)$post['id'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
@@ -165,7 +165,7 @@ class SystemMenu extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 

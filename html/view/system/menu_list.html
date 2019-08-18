@@ -17,56 +17,57 @@
       </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
        href="javascript:location.replace(location.href);" title="刷新">
-        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body all">
-    <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="x_admin_show('添加菜单','./menu_add.html')"><i
-                class="layui-icon">&#xe608;</i>添加
-        </button>
-        <button id="search" class="layui-btn" @click.prevent="menuList" v-bind:disabled="dis"><i class="layui-icon"></i>查询
-        </button>
-    </xblock>
-    <table class="layui-table">
-        <thead>
-        <tr>
-            <th>
-                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i
-                        class="layui-icon">&#xe605;</i></div>
-            </th>
-            <th>ID</th>
-            <th>名称</th>
-            <th>icon</th>
-            <th>url</th>
-            <th>上级ID</th>
-            <th>层级</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in menu">
-            <td>
-                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <button class="layui-btn layui-btn-danger" onclick="x_admin_show('添加菜单','./menu_add.html')"><i
+                            class="layui-icon">&#xe608;</i>添加
+                    </button>
+                    <button @click.prevent="menuList" class="layui-btn" id="search" v-bind:disabled="dis"><i
+                            class="layui-icon"></i>查询
+                    </button>
                 </div>
-            </td>
-            <td>{{item.id}}</td>
-            <td>{{item.name}}</td>
-            <td>{{item.icon}}</td>
-            <td>{{item.url}}</td>
-            <td>{{item.up_id}}</td>
-            <td>{{item.level}}</td>
-            <td class="td-manage">
-                <button @click.prevent="editMenu(item.id)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe642;</i>编辑
-                </button>
-                <button @click.prevent="delMenu(item.id, item.name)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe640;</i>删除
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div id="list_page"></div>
+                <div class="layui-card-body ">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>icon</th>
+                            <th>url</th>
+                            <th>上级ID</th>
+                            <th>层级</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in menu">
+                            <td>{{item.id}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.icon}}</td>
+                            <td>{{item.url}}</td>
+                            <td>{{item.up_id}}</td>
+                            <td>{{item.level}}</td>
+                            <td class="td-manage">
+                                <button @click.prevent="editMenu(item.id)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe642;</i>编辑
+                                </button>
+                                <button @click.prevent="delMenu(item.id, item.name)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe640;</i>删除
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-card-body " id="list_page"></div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/menu_list.js"></script>

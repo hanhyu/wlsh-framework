@@ -166,12 +166,14 @@
     </fieldset>
 </div>
 <script>
-    $(function () {
+    layui.use('jquery', function () {
+        $ = layui.jquery;
         let name = window.location.host + '_name';
         let time = new Date();
         $("#username").html(localStorage.getItem(name));
         $("#time").html(formatDate(time.getTime()));
     });
+
 </script>
 </body>
 <script src="controller/welcome.js"></script>

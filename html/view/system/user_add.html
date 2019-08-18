@@ -8,52 +8,54 @@
 </head>
 
 <body>
-<div class="x-body layui-anim layui-anim-up all">
-    <form class="layui-form">
-        <div class="layui-form-item">
-            <label for="tel" class="layui-form-label">
-                <span class="x-red">*</span>用户名
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="name" name="name" required=""
-                       autocomplete="off" class="layui-input" v-model="name">
+<div class="layui-fluid all">
+    <div class="layui-row">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="tel">
+                    <span class="x-red">*</span>用户名
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="name" name="name"
+                           required="" type="text" v-model="name">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="pwd" class="layui-form-label">
-                <span class="x-red">*</span>密码
-            </label>
-            <div class="layui-input-inline">
-                <input type="password" id="pwd" name="pwd" required=""
-                       autocomplete="off" class="layui-input" v-model="pwd">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="pwd">
+                    <span class="x-red">*</span>密码
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="pwd" name="pwd"
+                           required="" type="password" v-model="pwd">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_repass" class="layui-form-label">
-                <span class="x-red">*</span>确认密码
-            </label>
-            <div class="layui-input-inline">
-                <input type="password" id="L_repass" name="repass" required=""
-                       autocomplete="off" class="layui-input" v-model="repwd">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_repass">
+                    <span class="x-red">*</span>确认密码
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="L_repass" name="repass"
+                           required="" type="password" v-model="repwd">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_remark" class="layui-form-label">
-                备注
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="L_remark" name="remark" required=""
-                       autocomplete="off" class="layui-input" v-model="remark">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_remark">
+                    备注
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="L_remark" name="remark"
+                           required="" type="text" v-model="remark">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_repass" class="layui-form-label">
-            </label>
-            <button class="layui-btn" lay-filter="add" @click.prevent="setUser">
-                增加
-            </button>
-        </div>
-    </form>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_repass">
+                </label>
+                <button @click.prevent="setUser" class="layui-btn" lay-filter="add">
+                    增加
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/user_add.js"></script>

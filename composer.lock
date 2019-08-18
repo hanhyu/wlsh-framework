@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7aa846fbf856d9f93fd87c141d9ab807",
+  "content-hash": "29eaeaf6665c2cb24c77fbe674e9294d",
     "packages": [
         {
             "name": "catfan/medoo",
-            "version": "v1.6.1",
+          "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "53a02b300d673f716cb06bf0e24fd774ec53939f"
+              "reference": "b9dfce4046f3eb48a647ef72991bb65012f99376"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/53a02b300d673f716cb06bf0e24fd774ec53939f",
-                "reference": "53a02b300d673f716cb06bf0e24fd774ec53939f",
+              "url": "https://api.github.com/repos/catfan/Medoo/zipball/b9dfce4046f3eb48a647ef72991bb65012f99376",
+              "reference": "b9dfce4046f3eb48a647ef72991bb65012f99376",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -37,7 +37,7 @@
                 "ext-pdo_oci8": "For Oracle version 8 database",
                 "ext-pdo_pqsql": "For PostgreSQL database",
                 "ext-pdo_sqlite": "For SQLite database",
-                "ext-pdo_sqlsrv": "For MSSQL database"
+              "ext-pdo_sqlsrv": "For MSSQL database on both Window/Liunx platform"
             },
             "type": "framework",
             "autoload": {
@@ -55,10 +55,11 @@
                     "email": "angel@catfan.me"
                 }
             ],
-            "description": "The lightest PHP database framework to accelerate development",
+          "description": "The lightweight PHP database framework to accelerate development",
             "homepage": "https://medoo.in",
             "keywords": [
                 "database",
+              "database library",
                 "lightweight",
                 "mariadb",
                 "mssql",
@@ -69,7 +70,7 @@
                 "sql",
                 "sqlite"
             ],
-            "time": "2018-12-08T20:24:23+00:00"
+          "time": "2019-07-13T14:52:50+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -884,7 +885,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/5e2a174052995663dd68e6b5ad838afd47dd615b",
                 "reference": "5e2a174052995663dd68e6b5ad838afd47dd615b",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "guzzlehttp/streams": "~3.0",
@@ -935,7 +942,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/guzzle/streams/zipball/47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
                 "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": ">=5.4.0"
@@ -985,7 +998,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/hightman/xs-sdk-php/zipball/6781b1b92bc7cb3a507510cf31bcede8668e201a",
                 "reference": "6781b1b92bc7cb3a507510cf31bcede8668e201a",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "ext-mbstring": "*",
@@ -1043,7 +1062,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/bd148eab0493e38354e45e2cd7db59b90fdcad79",
                 "reference": "bd148eab0493e38354e45e2cd7db59b90fdcad79",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "ext-hash": "*",
@@ -1162,7 +1187,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/paragonie/random_compat/zipball/84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
                 "reference": "84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7"
@@ -1207,7 +1238,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phar-io/manifest/zipball/7761fcacf03b4d4f16e7ccb606d4879ca431fcf4",
                 "reference": "7761fcacf03b4d4f16e7ccb606d4879ca431fcf4",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "ext-dom": "*",
@@ -1262,7 +1299,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phar-io/version/zipball/45a2ec53a73c70ce41d55cedef9063630abaf1b6",
                 "reference": "45a2ec53a73c70ce41d55cedef9063630abaf1b6",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^5.6 || ^7.0"
@@ -1309,7 +1352,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/PHP-CS-Fixer/diff/zipball/78bb099e9c16361126c86ce82ec4405ebab8e756",
                 "reference": "78bb099e9c16361126c86ce82ec4405ebab8e756",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^5.6 || ^7.0"
@@ -1360,7 +1409,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
                 "reference": "21bdeb5f65d7ebf9f43b1b25d404f87deab5bfb6",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": ">=5.5"
@@ -1471,7 +1526,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/9c977708995954784726e25d0cd1dddf4e65b0f7",
                 "reference": "9c977708995954784726e25d0cd1dddf4e65b0f7",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^5.5 || ^7.0",
@@ -1587,7 +1648,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/807e6013b00af69b6c5d9ceb4282d0393dbb9d8d",
                 "reference": "807e6013b00af69b6c5d9ceb4282d0393dbb9d8d",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "ext-dom": "*",
@@ -1650,7 +1717,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/050bedf145a257b1ff02746c31894800e5122946",
                 "reference": "050bedf145a257b1ff02746c31894800e5122946",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.1"
@@ -1700,7 +1773,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-text-template/zipball/31f8b717e51d9a2afca6c9f046f5d69fc27c8686",
                 "reference": "31f8b717e51d9a2afca6c9f046f5d69fc27c8686",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": ">=5.3.3"
@@ -1796,7 +1875,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/c99e3be9d3e85f60646f152f9002d46ed7770d18",
                 "reference": "c99e3be9d3e85f60646f152f9002d46ed7770d18",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "ext-tokenizer": "*",
@@ -1990,7 +2075,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
                 "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": ">=5.4.0"
@@ -2036,7 +2127,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/code-unit-reverse-lookup/zipball/4419fcdb5eabb9caa61a27c7a1db532a6b55dd18",
                 "reference": "4419fcdb5eabb9caa61a27c7a1db532a6b55dd18",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^5.6 || ^7.0"
@@ -2081,7 +2178,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/5de4fc177adf9bce8df98d8d141a7559d7ccf6da",
                 "reference": "5de4fc177adf9bce8df98d8d141a7559d7ccf6da",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.1",
@@ -2145,7 +2248,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/720fcc7e9b5cf384ea68d9d930d480907a0c1a29",
                 "reference": "720fcc7e9b5cf384ea68d9d930d480907a0c1a29",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.1"
@@ -2260,7 +2369,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/234199f4528de6d12aaa58b612e98f7d36adb937",
                 "reference": "234199f4528de6d12aaa58b612e98f7d36adb937",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.0",
@@ -2327,7 +2442,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/e8ba02eed7bbbb9e59e43dedd3dddeff4a56b0c4",
                 "reference": "e8ba02eed7bbbb9e59e43dedd3dddeff4a56b0c4",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.0"
@@ -2378,7 +2499,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/object-enumerator/zipball/7cfd9e65d11ffb5af41198476395774d4c8a84c5",
                 "reference": "7cfd9e65d11ffb5af41198476395774d4c8a84c5",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.0",
@@ -2425,7 +2552,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/object-reflector/zipball/773f97c67f28de00d397be301821b06708fca0be",
                 "reference": "773f97c67f28de00d397be301821b06708fca0be",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.0"
@@ -2470,7 +2603,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/5b0cd723502bac3b006cbf3dbf7a1e3fcefe4fa8",
                 "reference": "5b0cd723502bac3b006cbf3dbf7a1e3fcefe4fa8",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.0"
@@ -2523,7 +2662,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/resource-operations/zipball/4d7a795d35b889bf80a0cc04e08d77cedfa917a9",
                 "reference": "4d7a795d35b889bf80a0cc04e08d77cedfa917a9",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^7.1"
@@ -2565,7 +2710,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/99732be0ddb3361e16ad77b68ba41efc8e979019",
                 "reference": "99732be0ddb3361e16ad77b68ba41efc8e979019",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": ">=5.6"
@@ -3540,7 +3691,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/webmozart/assert/zipball/83e253c8e0be5b0257b881e1827274667c5c17a9",
                 "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9",
-                "shasum": ""
+              "shasum": "",
+              "mirrors": [
+                {
+                  "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                  "preferred": true
+                }
+              ]
             },
             "require": {
                 "php": "^5.3.3 || ^7.0",

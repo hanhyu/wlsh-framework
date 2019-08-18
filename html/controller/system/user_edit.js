@@ -21,6 +21,10 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
     },
     methods: {
         //修改用户信息

@@ -27,6 +27,7 @@ class UserInit extends Plugin_Abstract
      *
      * @return bool|void
      * @throws Exception
+     * @todo 协程模式下不支持反射路由
      */
     public function routerStartup(Request_Abstract $request, Response_Abstract $response)
     {
@@ -44,14 +45,12 @@ class UserInit extends Plugin_Abstract
 
             $router = Registry::get('router_filter_config')->toArray();
 
-            $auth_token = $router[$uri]['auth'] ?? true;
-            $this->authToken($auth_token);
-
             if (!isset($router[$uri])) { //请求的路由错误
-                $uri = '/error/router';
+                $uri = '/Error/router';
             } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
-                $uri = '/error/method';
-            } else { //转发指定的路由
+                $uri = '/Error/method';
+            } else {
+                if ($router[$uri]['auth']) $this->authToken();
                 $uri = $router[$uri]['action'];
             }
             //默认转发请求的路由
@@ -142,25 +141,21 @@ class UserInit extends Plugin_Abstract
     }
 
     /**
-     * 请求授权的token,过滤掉配置中不需要授权认证的路由与合法性
-     *
-     * @param bool $auth_flag
+     * 请求该路由是否需要授权的token
      *
      * @throws Exception
+     * @todo 还需要进一步验证token是否属于用户
      */
-    private function authToken(bool $auth_flag): void
+    private function authToken(): void
     {
-        //该接口是否需要token认证
-        if ($auth_flag) {
-            //验证授权token的合法性与过期时间
-            $cid     = Coroutine::getCid();
-            $headers = Registry::get('request_' . $cid)->header;
-            $token   = $headers['authorization'] ?? '0';
+        //验证授权token的合法性与过期时间
+        $cid     = Coroutine::getCid();
+        $headers = Registry::get('request_' . $cid)->header;
+        $token   = $headers['authorization'] ?? '0';
 
-            $res = validate_token($token);
-            if (!empty($res)) {
-                throw new ProgramException($res['msg'], $res['code']);
-            }
+        $res = validate_token($token);
+        if (!empty($res)) {
+            throw new ProgramException($res['msg'], $res['code']);
         }
     }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title></title>
@@ -7,7 +7,8 @@
 </head>
 
 <body>
-<div class="x-body layui-anim layui-anim-up all">
+<div class="layui-fluid all">
+    <div class="layui-row">
     <form class="layui-form">
         <div class="layui-form-item">
             <label class="layui-form-label" for="name">
@@ -103,22 +104,8 @@
             </button>
         </div>
     </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/router_add.js"></script>
-<script>
-    $(function () {
-        layui.use('form', function () {
-            let form = layui.form;
-            form.on('select(search_type)', function (data) {
-                if (data.value == 1) {
-                    $(".rule_show").hide();
-                } else {
-                    $(".rule_show").show();
-                }
-            });
-        });
-
-    });
-</script>
 </html>

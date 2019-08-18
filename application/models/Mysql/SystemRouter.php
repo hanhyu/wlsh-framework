@@ -45,7 +45,7 @@ class SystemRouter extends AbstractMysql
                 'frame_system_router.comment(comment)',
                 'frame_system_menu.name(menu_name)',
             ], $wheres);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -59,7 +59,7 @@ class SystemRouter extends AbstractMysql
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -87,7 +87,7 @@ class SystemRouter extends AbstractMysql
             'menu_id' => (int)$post['menu_id'],
             'comment' => $post['comment'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return (int)$this->db->id();
     }
 
@@ -113,7 +113,7 @@ class SystemRouter extends AbstractMysql
         ], [
             'id' => (int)$post['id'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
@@ -130,7 +130,7 @@ class SystemRouter extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
@@ -150,7 +150,7 @@ class SystemRouter extends AbstractMysql
                 'frame_system_router.comment(comment)',
                 'frame_system_menu.name(menu_name)',
             ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 

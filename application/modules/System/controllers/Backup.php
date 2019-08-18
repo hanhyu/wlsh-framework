@@ -93,7 +93,8 @@ class Backup extends Controller_Abstract
      */
     public function getListAction(): void
     {
-        $list = $this->backup_domain->getList();
+        $data = $this->validator(SystemUserForms::$getList);
+        $list = $this->backup_domain->getList($data);
         $this->response->end(http_response(200, '', $list));
     }
 
@@ -105,7 +106,7 @@ class Backup extends Controller_Abstract
     public function downAction(): void
     {
         $data = $this->validator(SystemUserForms::$getUser);
-        $res  = $this->backup_domain->getFileName($data['id']);
+        $res  = $this->backup_domain->getFileName((int)$data['id']);
         if (!empty($res)) {
             $res[0]['file_name'] = Registry::get('config')->backup->downUrl . $res[0]['file_name'];
             $this->response->end(http_response(200, '', $res[0]));
@@ -123,7 +124,7 @@ class Backup extends Controller_Abstract
         //$id = intval($data['id'] ?? 0);
         //$fileName = strval($data['fileName'] ?? 0);
         //删除数据库备份表中的信息
-        $res = $this->backup_domain->delBackup($data['id']);
+        $res = $this->backup_domain->delBackup((int)$data['id']);
         if ($res) {
             $linkname = Registry::get('config')->backup->path . '/' . $data['filename'];
             if (is_file($linkname)) {

@@ -22,6 +22,16 @@ new Vue({
     beforeMount: function () {
     },
     mounted: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.on('select(search_type)', function (data) {
+                if (data.value == 1) {
+                    $(".rule_show").hide();
+                } else {
+                    $(".rule_show").show();
+                }
+            });
+        });
         this.axios = axios;
         this.getMenu();
     },
@@ -128,5 +138,11 @@ new Vue({
     },
     computed: {},
     watch: {},
+    updated: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
+    },
     filters: {}
 });

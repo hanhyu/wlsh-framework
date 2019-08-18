@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>登录</title>
     <link rel="import" href="view/head_js.html">
+    <link href="static/css/login.css" rel="stylesheet">
     <script type="text/javascript" src="static/js/jsencrypt.min.js"></script>
     <script type="text/javascript" src="static/js/cryptojs/core.js"></script>
     <script type="text/javascript" src="static/js/cryptojs/md5-min.js"></script>
@@ -27,19 +28,17 @@
 </div>
 
 <script>
-    $(function () {
+    layui.use('form', function () {
+        let form = layui.form;
         let name = window.location.host + '_name';
         let token = window.location.host + '_token';
-        $("input[name='uname']").val(localStorage.getItem(name));
 
-        layui.use('form', function () {
-            let form = layui.form;
-            form.on('submit(login)', function (data) {
-                axiosConfig();
+        form.on('submit(login)', function (data) {
+            axiosConfig();
 
-                //用户名与密码采取数据加密方式传递
-                let encrypt = new JSEncrypt();
-                encrypt.setPublicKey(`-----BEGIN PUBLIC KEY-----
+            //用户名与密码采取数据加密方式传递
+            let encrypt = new JSEncrypt();
+            encrypt.setPublicKey(`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApWYrE/+O2UHETNCOpMdO
 Nvnyakra2N3MsGEKOqNxd6X1PmcRPysliaQVjWlaakB8mtJpMeZzN/crncmGyndS
 fJuqC0T7oWM11yqdkp/AXVMZ8PHarrg/27TjkxGjANQ9X7wCSQmgglx51nhjNOZT
@@ -48,44 +47,43 @@ w4Ttu0gpRGP/KF6aEtXpOqIPVvla/GTUsgjeMJ5geYxldS+xKJiy3i1JqDax1rfd
 meSm7eRWa+Kiqp3IFYXb0yNhSLRkY1/Rmb2Wx6xaptz7s3+gAorLQ8ICyjqaS3oK
 CwIDAQAB
 -----END PUBLIC KEY-----`);
-                let encrypted = encrypt.encrypt(JSON.stringify({"name": data.field.uname, "pwd": data.field.pwd}));
+            let encrypted = encrypt.encrypt(JSON.stringify({"name": data.field.uname, "pwd": data.field.pwd}));
 
-                axios({
-                    url: 'system/user/login',
-                    method: 'post',
-                    /*data: {
-                        name: data.field.uname,
-                        pwd: data.field.pwd
-                    }*/
-                    data: {
-                        login_data: encrypted
+            axios({
+                url: 'system/user/login',
+                method: 'post',
+                /*data: {
+                    name: data.field.uname,
+                    pwd: data.field.pwd
+                }*/
+                data: {
+                    login_data: encrypted
+                }
+            })
+                .then(function (response) {
+                    //测试验证数据签名
+                    if (response.headers.sign) {
+                        let sign = CryptoJS.MD5(JSON.stringify(response.data) + response.headers.timestamp);
+                        if (response.headers.sign != sign) {
+                            layer.msg('非法的数据内容');
+                            return;
+                        }
+                    }
+
+                    if (response.data.code === 200) {
+                        localStorage.setItem(name, data.field.uname);
+                        localStorage.setItem(token, response.data.data.token);
+                        location.href = 'index.html';
+                    } else {
+                        layer.msg(response.data.msg);
                     }
                 })
-                    .then(function (response) {
-                        //测试验证数据签名
-                        if (response.headers.sign) {
-                            let sign = CryptoJS.MD5(JSON.stringify(response.data) + response.headers.timestamp);
-                            if (response.headers.sign != sign) {
-                                layer.msg('非法的数据内容');
-                                return;
-                            }
-                        }
-
-                        if (response.data.code === 200) {
-                            localStorage.setItem(name, data.field.uname);
-                            localStorage.setItem(token, response.data.data.token);
-                            location.href = 'index.html';
-                        } else {
-                            layer.msg(response.data.msg);
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                return false;
-            });
+                .catch(function (error) {
+                    console.log(error);
+                });
+            return false;
         });
-    })
+    });
 </script>
 </body>
 </html>
