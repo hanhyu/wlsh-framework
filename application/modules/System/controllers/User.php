@@ -36,7 +36,7 @@ class User extends Controller_Abstract
     public function setUserAction(): void
     {
         $data = $this->validator(SystemUserForms::$userLogin);
-        $info = $this->user->getInfoByName($data['name']);
+        $info = $this->user->existName($data['name']);
         if (!empty($info)) {
             $this->response->end(http_response(400, '该用户名已存在'));
             return;

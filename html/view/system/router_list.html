@@ -17,54 +17,64 @@
       </span>
     <a class="layui-btn layui-btn-small" href="javascript:location.replace(location.href);"
        style="line-height:1.6em;margin-top:3px;float:right" title="刷新">
-        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body all">
-    <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="x_admin_show('添加路由','./router_add.html', 700, 500)"><i
-                class="layui-icon">&#xe608;</i>添加
-        </button>
-        <button @click.prevent="getList" class="layui-btn" id="search" v-bind:disabled="dis"><i class="layui-icon"></i>查询
-        </button>
-    </xblock>
-    <table class="layui-table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>路由名称</th>
-            <th>请求链接</th>
-            <th>认证</th>
-            <th>请求方法</th>
-            <th>实际路由</th>
-            <th>路由类型</th>
-            <th>所属类别</th>
-            <th>说明</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in menu">
-            <td>{{item.id}}</td>
-            <td>{{item.name}}</td>
-            <td>{{item.url}}</td>
-            <td>{{item.auth | authFilter}}</td>
-            <td>{{item.method}}</td>
-            <td>{{item.action}}</td>
-            <td>{{item.type | typeFilter}}</td>
-            <td>{{item.menu_name}}</td>
-            <td>{{item.comment}}</td>
-            <td class="td-manage">
-                <button @click.prevent="editRouter(item)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe642;</i>编辑
-                </button>
-                <button @click.prevent="delRouter(item.id, item.url)" class="layui-btn layui-btn-sm"><i
-                        class="layui-icon">&#xe640;</i>删除
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div id="list_page"></div>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <button class="layui-btn layui-btn-danger"
+                            onclick="x_admin_show('添加路由','./router_add.html', 700, 500)"><i
+                            class="layui-icon">&#xe608;</i>添加
+                    </button>
+                    <button @click.prevent="getList" class="layui-btn" id="search" v-bind:disabled="dis"><i
+                            class="layui-icon"></i>查询
+                    </button>
+                </div>
+                <div class="layui-card-body ">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>路由名称</th>
+                            <th>请求链接</th>
+                            <th>认证</th>
+                            <th>请求方法</th>
+                            <th>实际路由</th>
+                            <th>路由类型</th>
+                            <th>所属类别</th>
+                            <th>说明</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in menu">
+                            <td>{{item.id}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.url}}</td>
+                            <td>{{item.auth | authFilter}}</td>
+                            <td>{{item.method}}</td>
+                            <td>{{item.action}}</td>
+                            <td>{{item.type | typeFilter}}</td>
+                            <td>{{item.menu_name}}</td>
+                            <td>{{item.comment}}</td>
+                            <td class="td-manage">
+                                <button @click.prevent="editRouter(item)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe642;</i>编辑
+                                </button>
+                                <button @click.prevent="delRouter(item.id, item.url)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe640;</i>删除
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-card-body " id="list_page"></div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/router_list.js"></script>

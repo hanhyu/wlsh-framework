@@ -24,7 +24,7 @@ class SystemBackup extends AbstractMysql
     protected function getTables(): array
     {
         $datas = $this->db->query("show  tables ")->fetchAll();
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -44,23 +44,42 @@ class SystemBackup extends AbstractMysql
             'file_md5'  => $data['md5'],
             'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return (int)$this->db->id();
     }
 
     /**
+     * User: hanhyu
+     * Date: 2019/8/18
+     * Time: 下午8:48
+     *
+     * @param array $data
+     *
      * @return array
      * @throws Exception
      */
-    protected function getList(): array
+    protected function getList(array $data): array
     {
+        if (!empty($data['where'])) {
+            $wheres = [
+                'AND'   => $data['where'],
+                'ORDER' => ['id' => 'DESC'],
+                'LIMIT' => [$data['curr_data'], $data['page_size']],
+            ];
+        } else {
+            $wheres = [
+                'ORDER' => ['id' => 'DESC'],
+                'LIMIT' => [$data['curr_data'], $data['page_size']],
+            ];
+        }
+
         $datas = $this->db->select($this->table, [
             'id',
             'file_name',
             'file_size',
             'crt_dt',
-        ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        ], $wheres);
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -79,7 +98,7 @@ class SystemBackup extends AbstractMysql
         ], [
             'id' => $id,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -98,9 +117,15 @@ class SystemBackup extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
+    protected function getListCount(): int
+    {
+        $datas = $this->db->count($this->table);
+        if (false === $datas) throw new Exception($this->db->last());
+        return $datas;
+    }
 
 }

@@ -24,11 +24,8 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        let self = this;
-        $(function () {
-            self.getMenuLevel();
-            self.getMenu();
-        });
+        this.getMenuLevel();
+        this.getMenu();
     },
     methods: {
         //显示一级菜单列表
@@ -158,6 +155,10 @@ new Vue({
         }
     },
     updated: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
     },
     filters: {}
 });

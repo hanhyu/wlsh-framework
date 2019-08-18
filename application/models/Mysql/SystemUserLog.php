@@ -30,7 +30,7 @@ class SystemUserLog extends AbstractMysql
             'login_dt' => date('Y-m-d H:i:s', $data['time']),
             'login_ip' => $data['ip'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return (int)$this->db->id();
     }
 
@@ -50,7 +50,7 @@ class SystemUserLog extends AbstractMysql
             'user_id'  => (int)$data['id'],
             'login_dt' => date('Y-m-d H:i:s', $data['time']),
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
@@ -84,7 +84,7 @@ class SystemUserLog extends AbstractMysql
             //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
         ],
             $wheres);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -101,7 +101,7 @@ class SystemUserLog extends AbstractMysql
     protected function getListCount(array $where): int
     {
         $datas = $this->db->count($this->table, $where);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 

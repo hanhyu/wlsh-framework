@@ -24,6 +24,16 @@ new Vue({
     beforeMount: function () {
     },
     mounted: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.on('select(search_type)', function (data) {
+                if (data.value == 1) {
+                    $(".rule_show").hide();
+                } else {
+                    $(".rule_show").show();
+                }
+            });
+        });
         this.axios = axios;
         let list = JSON.parse(getUrlParam('content'));
         this.id = list.id;
@@ -36,10 +46,8 @@ new Vue({
         this.menu_id = list.menu_id;
         this.comment = list.comment;
         if (this.type == 0) this.show = true;
-        let self = this;
-        $(function () {
-            self.getMenu();
-        });
+
+        this.getMenu();
     },
     methods: {
         //修改路由
@@ -146,6 +154,10 @@ new Vue({
         }
     },
     updated: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
     },
     filters: {}
 });

@@ -45,7 +45,11 @@ class Log
         if (!empty($data['channel'])) $data['where']['channel'] = $data['channel'];
 
         $res['count'] = $this->monolog->getMongoCount($data['where']);
-        $res['list']  = $this->monolog->getMongoList($data);
+        if (0 == $res['count']) {
+            $res['list'] = [];
+        } else {
+            $res['list'] = $this->monolog->getMongoList($data);
+        }
 
         return $res;
     }

@@ -146,25 +146,29 @@ class User
         }
 
         if (!empty($data['uname'])) {
-            $arr_uid                  = MysqlFactory::systemUser()->getInfo($data['uname']);
+            $arr_uid = MysqlFactory::systemUser()->getInfo($data['uname']);
+            if (empty($arr_uid)) throw new \ProgramException('用户名不存在', 400);
             $data['where']['user_id'] = $arr_uid[0]['id'] ?? 0;
         }
 
         $res['count'] = MysqlFactory::systemUserLog()->getListCount($data['where']);
+        if (0 == $res['count']) {
+            $res['list'] = [];
+        } else {
+            $list    = MysqlFactory::systemUserLog()->getList($data);
+            $arr_uid = array_column($list, 'user_id');
 
-        $list    = MysqlFactory::systemUserLog()->getList($data);
-        $arr_uid = array_column($list, 'user_id');
+            $arr_name = MysqlFactory::systemUser()->getNameById(array_unique($arr_uid));
+            $arr_let  = array_column($arr_name, 'name', 'id');
 
-        $arr_name = MysqlFactory::systemUser()->getNameById(array_unique($arr_uid));
-        $arr_let  = array_column($arr_name, 'name', 'id');
+            foreach ($list as $k => &$v) {
+                $list[$k]['user_name'] = $arr_let[$v['user_id']];
+                $v['login_ip']         = long2ip((int)$v['login_ip']);
+            }
+            unset($v);
 
-        foreach ($list as $k => &$v) {
-            $list[$k]['user_name'] = $arr_let[$v['user_id']];
-            $v['login_ip']         = long2ip((int)$v['login_ip']);
+            $res['list'] = $list;
         }
-        unset($v);
-
-        $res['list'] = $list;
         return $res;
     }
 
@@ -234,6 +238,21 @@ class User
             $res = MysqlFactory::systemUser()->editPwd($data);
         }
         return $res;
+    }
+
+    /**
+     * 判断用户名是否已注册
+     * User: hanhyu
+     * Date: 2019/8/18
+     * Time: 下午7:58
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function existName(string $name): bool
+    {
+        return MysqlFactory::systemUser()->existName($name);
     }
 
 

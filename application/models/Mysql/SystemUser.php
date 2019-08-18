@@ -30,7 +30,7 @@ class SystemUser extends AbstractMysql
             'crt_dt' => date('y-m-d H:i:s'),
             'remark' => $post['remark'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return (int)$this->db->id();
     }
 
@@ -56,7 +56,7 @@ class SystemUser extends AbstractMysql
         }
 
         $datas = $this->db->select($this->table, '*', $wheres);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -70,7 +70,7 @@ class SystemUser extends AbstractMysql
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -85,7 +85,7 @@ class SystemUser extends AbstractMysql
         $datas = $data = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $data->rowCount();;
     }
 
@@ -102,7 +102,7 @@ class SystemUser extends AbstractMysql
             'status',
             'remark',
         ], ['id' => $id]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -120,7 +120,7 @@ class SystemUser extends AbstractMysql
         ], [
             'id' => (int)$post['id'],
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas->rowCount();
     }
 
@@ -142,7 +142,7 @@ class SystemUser extends AbstractMysql
         ], [
             'name' => $name,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -164,7 +164,7 @@ class SystemUser extends AbstractMysql
         ], [
             'id' => $uid,
         ]);
-        if ($datas == false) throw new Exception($this->db->last());
+        if (false === $datas) throw new Exception($this->db->last());
         return $datas;
     }
 
@@ -208,6 +208,21 @@ class SystemUser extends AbstractMysql
         ]);
         if ($datas === false) throw new Exception($this->db->last());
         return $datas->rowCount();
+    }
+
+    /**
+     * 判断用户名是否存在
+     * User: hanhyu
+     * Date: 2019/8/18
+     * Time: 下午7:58
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function existName(string $name): bool
+    {
+        return $this->db->has($this->table, ['name' => $name]);
     }
 
 

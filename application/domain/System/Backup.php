@@ -40,14 +40,27 @@ class Backup
 
     /**
      * User: hanhyu
-     * Date: 19-6-22
-     * Time: 下午10:13
+     * Date: 2019/8/18
+     * Time: 下午8:33
+     *
+     * @param array $data
+     *
      * @return array
      * @throws Exception
      */
-    public function getList(): array
+    public function getList(array $data): array
     {
-        return MysqlFactory::systemBackup()->getList();
+        $res = [];
+        if ($data['curr_page'] > 0) {
+            $data['curr_data'] = ($data['curr_page'] - 1) * $data['page_size'];
+        } else {
+            $data['curr_data'] = 0;
+        }
+        $data['where'] = [];
+
+        $res['count'] = MysqlFactory::systemBackup()->getListCount();
+        $res['list']  = MysqlFactory::systemBackup()->getList($data);
+        return $res;
     }
 
     /**

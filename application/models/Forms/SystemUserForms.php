@@ -45,4 +45,9 @@ class SystemUserForms
         'new_pwd' => 'Required|StrLenGeLe:3,50',
     ];
 
+    public static $getList = [
+        'curr_page' => 'IntGe:1',
+        'page_size' => 'Required|IntGe:1',
+    ];
+
 }

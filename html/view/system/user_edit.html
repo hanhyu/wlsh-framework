@@ -8,37 +8,39 @@
 </head>
 
 <body>
-<div class="x-body layui-anim layui-anim-up all">
-    <form class="layui-form">
-        <input type="text" id="uid" name="uid" hidden="hidden" v-model="uid">
-        <div class="layui-form-item">
-            <label for="status" class="layui-form-label">
-                <span class="x-red">*</span>状态
-            </label>
-            <div class="layui-input-inline">
-                <select id="status" name="status" class="valid">
-                    <option value="20" v-bind:selected="status == 20">禁用</option>
-                    <option value="10" v-bind:selected="status == 10">启用</option>
-                </select>
+<div class="layui-fluid all">
+    <div class="layui-row">
+        <form class="layui-form">
+            <input hidden="hidden" id="uid" name="uid" type="text" v-model="uid">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="status">
+                    <span class="x-red">*</span>状态
+                </label>
+                <div class="layui-input-inline">
+                    <select class="valid" id="status" name="status">
+                        <option v-bind:selected="status == 20" value="20">禁用</option>
+                        <option v-bind:selected="status == 10" value="10">启用</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_remark" class="layui-form-label">
-                备注
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="L_remark" name="remark" required=""
-                       autocomplete="off" class="layui-input" v-model="remark">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_remark">
+                    备注
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="L_remark" name="remark"
+                           required="" type="text" v-model="remark">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_repass" class="layui-form-label">
-            </label>
-            <button class="layui-btn" lay-filter="add" @click.prevent="editUser">
-                修改
-            </button>
-        </div>
-    </form>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_repass">
+                </label>
+                <button @click.prevent="editUser" class="layui-btn" lay-filter="add">
+                    修改
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/user_edit.js"></script>

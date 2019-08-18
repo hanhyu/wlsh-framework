@@ -16,22 +16,33 @@
       </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
        href="javascript:location.replace(location.href);" title="刷新">
-        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body all">
-    <xblock class="layui-row layui-col-md12 x-so">
-        <button id="search" class="layui-btn" @click.prevent="getPull"><i class="layui-icon"></i>查询</button>
-        <input type="text" id="pwd" name="pwd" required="" placeholder="请输入密码"
-               autocomplete="off" class="layui-input" v-model="pwd">
-    </xblock>
-    <form class="layui-form layui-form-pane" action="">
-        <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label">更新内容</label>
-            <div class="layui-input-block">
-                <textarea placeholder="请输入内容" class="layui-textarea" style="height: 500px">{{content}}</textarea>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <button @click.prevent="getPull" class="layui-btn" id="search"><i class="layui-icon"></i>查询</button>
+                    <div class="layui-input-inline">
+                        <input autocomplete="off" class="layui-input" id="pwd" name="pwd" placeholder="请输入密码"
+                               required="" type="text" v-model="pwd">
+                    </div>
+                </div>
+                <div class="layui-card-body ">
+                    <form action="" class="layui-form layui-form-pane">
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">更新内容</label>
+                            <div class="layui-input-block">
+                            <textarea class="layui-textarea" placeholder="请输入内容"
+                                      style="height: 500px">{{content}}</textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/pull.js"></script>

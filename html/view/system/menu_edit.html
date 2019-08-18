@@ -8,63 +8,65 @@
 </head>
 
 <body>
-<div class="x-body layui-anim layui-anim-up all">
-    <form class="layui-form">
-        <input type="hidden" name="id" v-model="id"/>
-        <div class="layui-form-item">
-            <label for="name" class="layui-form-label">
-                <span class="x-red">*</span>菜单名称
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="name" name="name" required=""
-                       autocomplete="off" class="layui-input" v-model="name">
+<div class="layui-fluid all">
+    <div class="layui-row">
+        <form class="layui-form">
+            <input name="id" type="hidden" v-model="id"/>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="name">
+                    <span class="x-red">*</span>菜单名称
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="name" name="name"
+                           required="" type="text" v-model="name">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">{{name_check}}</span>
+                </div>
             </div>
-            <div class="layui-form-mid layui-word-aux">
-                <span class="x-red">{{name_check}}</span>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="icon">
+                    <span class="x-red">*</span>菜单图标
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="icon" name="icon"
+                           required="" type="text" v-model="icon">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="icon" class="layui-form-label">
-                <span class="x-red">*</span>菜单图标
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="icon" name="icon" required=""
-                       autocomplete="off" class="layui-input" v-model="icon">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="url">
+                    <span class="x-red">*</span>菜单链接
+                </label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="url" name="url"
+                           required="" type="text" v-model="url">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    示例：view/system/menu_list.html
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="url" class="layui-form-label">
-                <span class="x-red">*</span>菜单链接
-            </label>
-            <div class="layui-input-inline">
-                <input type="text" id="url" name="url" required=""
-                       autocomplete="off" class="layui-input" v-model="url">
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="up_id">
+                    <span class="x-red">*</span>上级菜单
+                </label>
+                <div class="layui-input-inline">
+                    <select class="valid" id="up_id" ref="up_id">
+                        <option value="0">顶级菜单</option>
+                        <option v-bind:selected="item.id == up_id" v-bind:value="item.id" v-for="item in menu">
+                            ---{{item.name}}
+                        </option>
+                    </select>
+                </div>
             </div>
-            <div class="layui-form-mid layui-word-aux">
-                示例：view/system/menu_list.html
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="L_repass">
+                </label>
+                <button @click.prevent="editMenu" class="layui-btn" lay-filter="add">
+                    增加
+                </button>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="up_id" class="layui-form-label">
-                <span class="x-red">*</span>上级菜单
-            </label>
-            <div class="layui-input-inline">
-                <select id="up_id" ref="up_id" class="valid">
-                    <option value="0">顶级菜单</option>
-                    <option v-bind:value="item.id" v-for="item in menu" v-bind:selected="item.id == up_id">
-                        ---{{item.name}}
-                    </option>
-                </select>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label for="L_repass" class="layui-form-label">
-            </label>
-            <button class="layui-btn" lay-filter="add" @click.prevent="editMenu">
-                增加
-            </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/system/menu_edit.js"></script>

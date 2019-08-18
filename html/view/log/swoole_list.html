@@ -17,34 +17,48 @@
       </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
        href="javascript:location.replace(location.href);" title="刷新">
-        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body all">
-    <xblock class="layui-row layui-col-md12 x-so">
-        <button class="layui-btn" @click.prevent="cleanLog(dirName)"><i class="layui-icon"></i>清空日志</button>
-        <!--<button class="layui-btn" @click.prevent="logList('slow.log')">
-            <i class="layui-icon"></i>slow.log
-        </button>-->
-        <button class="layui-btn" @click.prevent="logList('swoole.log')">
-            <i class="layui-icon"></i>swoole.log
-        </button>
-        <button class="layui-btn" @click.prevent="logList('swoolePid.log')">
-            <i class="layui-icon"></i>swoolePid.log
-        </button>
-        |
-        monolog
-        <input class="layui-input" placeholder="点击查询日期" name="start" id="startTime">
-        <button id="sreachOrder" class="layui-btn" lay-submit="" lay-filter="sreach" @click.prevent="sreachMonolog">
-            <i class="layui-icon">&#xe615;</i></button>
-    </xblock>
-    <form class="layui-form layui-form-pane" action="">
-        <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label layui-bg-red">日志内容 [ {{dirName}} ]</label>
-            <div class="layui-input-block">
-                <textarea placeholder="请输入内容" class="layui-textarea" style="height: 500px" v-model="info"></textarea>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <button @click.prevent="cleanLog(dirName)" class="layui-btn"><i class="layui-icon"></i>清空日志</button>
+                    <!--<button class="layui-btn" @click.prevent="logList('slow.log')">
+                        <i class="layui-icon"></i>slow.log
+                    </button>-->
+                    <button @click.prevent="logList('swoole.log')" class="layui-btn">
+                        <i class="layui-icon"></i>swoole.log
+                    </button>
+                    <button @click.prevent="logList('swoolePid.log')" class="layui-btn">
+                        <i class="layui-icon"></i>swoolePid.log
+                    </button>
+                    |
+                    monolog
+                    <div class="layui-input-inline">
+                        <input class="layui-input" id="startTime" name="start" placeholder="点击查询日期">
+                    </div>
+
+                    <button @click.prevent="sreachMonolog" class="layui-btn" id="sreachOrder" lay-filter="sreach"
+                            lay-submit="">
+                        <i class="layui-icon">&#xe615;</i></button>
+
+                </div>
+                <div class="layui-card-body ">
+                    <form action="" class="layui-form layui-form-pane">
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label layui-bg-red">日志内容 [ {{dirName}} ]</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea" placeholder="请输入内容" style="height: 500px"
+                                          v-model="info"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 </body>
 <script src="../../controller/log/swoole_list.js"></script>

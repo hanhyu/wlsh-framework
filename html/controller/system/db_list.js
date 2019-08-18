@@ -32,12 +32,16 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/backup/get_list'
+                url: 'system/backup/get_list',
+                params: {
+                    curr_page: self.curr_page,
+                    page_size: self.page_size
+                }
             })
                 .then(function (response) {
                     switch (response.data.code) {
                         case 200:
-                            self.privmessage = response.data.data;
+                            self.privmessage = response.data.data.list;
                             self.count = response.data.data.count;
                             layer.msg('查询数据完成', {icon: 6, time: 1000}, function () {
                                 self.dis = false;
@@ -185,7 +189,7 @@ new Vue({
                     jump: function (obj, first) {
                         if (!first) {
                             self.curr_page = obj.curr;
-                            self.mongoList();
+                            self.backupList();
                         }
                     }
                 });

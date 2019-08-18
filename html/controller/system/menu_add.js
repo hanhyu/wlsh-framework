@@ -22,10 +22,7 @@ new Vue({
     },
     mounted: function () {
         this.axios = axios;
-        let self = this;
-        $(function () {
-            self.getMenu();
-        });
+        this.getMenu();
     },
     beforeUpdate: function () {
     },
@@ -134,6 +131,12 @@ new Vue({
                 this.name_check = '✓';
             }
         }
+    },
+    updated: function () {
+        layui.use('form', function () {
+            let form = layui.form;
+            form.render();
+        })
     },
     filters: {}
 });
