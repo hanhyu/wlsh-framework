@@ -39,66 +39,57 @@ return [
 
     /***************************************** 用户设置相关路由 *****************************************/
 
-    '/system/user/login'         => ['auth' => false, 'method' => 'POST', 'action' => '/system/User/login'],
-    '/system/user/logout'        => ['auth' => true, 'method' => 'POST', 'action' => '/system/User/logout'],
-    '/system/user/get_user'      => ['auth' => true, 'method' => 'GET', 'action' => '/system/User/getUser'],
-    '/system/user/get_user_list' => ['auth' => true, 'method' => 'GET', 'action' => '/system/User/getUserList'],
-    '/system/user/set_user'      => ['auth' => true, 'method' => 'POST', 'action' => '/system/User/setUser'],
-    '/system/user/del_user'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/system/User/delUser'],
-    '/system/user/edit_user'     => ['auth' => true, 'method' => 'PUT', 'action' => '/system/User/editUser'],
-    '/system/user/pull'          => ['auth' => true, 'method' => 'POST', 'action' => '/system/User/pull'],
+    '/system/user/login'         => ['auth' => false, 'method' => 'POST', 'action' => '/System/User/login'],
+    '/system/user/logout'        => ['auth' => true, 'method' => 'POST', 'action' => '/System/User/logout'],
+    '/system/user/get_user'      => ['auth' => true, 'method' => 'GET', 'action' => '/System/User/getUser'],
+    '/system/user/get_user_list' => ['auth' => true, 'method' => 'GET', 'action' => '/System/User/getUserList'],
+    '/system/user/set_user'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/User/setUser'],
+    '/system/user/del_user'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/System/User/delUser'],
+    '/system/user/edit_user'     => ['auth' => true, 'method' => 'PUT', 'action' => '/System/User/editUser'],
+    '/system/user/pull'          => ['auth' => true, 'method' => 'POST', 'action' => '/System/User/pull'],
     '/system/user/edit_pwd'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/User/editPwd'],
 
     /***************************************** 系统菜单相关路由 *****************************************/
 
-    '/system/menu/get_menu_info'    => ['auth' => true, 'method' => 'GET', 'action' => '/system/Menu/getMenuInfo'],
-    '/system/menu/get_menu_list'    => ['auth' => true, 'method' => 'GET', 'action' => '/system/Menu/getMenuList'],
-    '/system/v1/menu/get_menu_list' => ['auth' => true, 'method' => 'GET', 'action' => '/system/v1/Menu/getMenuList'],
-    '/system/v1/menu/get_menu_info' => ['auth' => true, 'method' => 'GET', 'action' => '/system/v1/Menu/getMenuInfo'],
-    '/system/v1/menu/get_redis'     => ['auth' => false, 'method' => 'GET', 'action' => '/system/v1/Menu/getRedis'],
+    '/system/menu/get_menu_info'    => ['auth' => true, 'method' => 'GET', 'action' => '/System/Menu/getMenuInfo'],
+    '/system/menu/get_menu_list'    => ['auth' => true, 'method' => 'GET', 'action' => '/System/Menu/getMenuList'],
+    '/system/v1/menu/get_menu_list' => ['auth' => true, 'method' => 'GET', 'action' => '/System/V1/Menu/getMenuList'],
+    '/system/v1/menu/get_menu_info' => ['auth' => true, 'method' => 'GET', 'action' => '/System/V1/Menu/getMenuInfo'],
+    '/system/v1/menu/get_redis'     => ['auth' => false, 'method' => 'GET', 'action' => '/System/V1/Menu/getRedis'],
 
-    '/system/menu/set_menu'      => ['auth' => true, 'method' => 'POST', 'action' => '/system/Menu/setMenu'],
-    '/system/menu/get_menu'      => ['auth' => true, 'method' => 'GET', 'action' => '/system/Menu/getMenu'],
-    '/system/menu/edit_menu'     => ['auth' => true, 'method' => 'PUT', 'action' => '/system/Menu/editMenu'],
-    '/system/menu/del_menu'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/system/Menu/delMenu'],
-    '/system/router/get_list'    => ['auth' => true, 'method' => 'GET', 'action' => '/system/Router/getList'],
-    '/system/router/set_router'  => ['auth' => true, 'method' => 'POST', 'action' => '/system/Router/setRouter'],
-    '/system/router/del_router'  => ['auth' => true, 'method' => 'DELETE', 'action' => '/system/Router/delRouter'],
-    '/system/router/edit_router' => ['auth' => true, 'method' => 'PUT', 'action' => '/system/Router/editRouter'],
+    '/system/menu/set_menu'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/Menu/setMenu'],
+    '/system/menu/get_menu'      => ['auth' => true, 'method' => 'GET', 'action' => '/System/Menu/getMenu'],
+    '/system/menu/edit_menu'     => ['auth' => true, 'method' => 'PUT', 'action' => '/System/Menu/editMenu'],
+    '/system/menu/del_menu'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/System/Menu/delMenu'],
+    '/system/router/get_list'    => ['auth' => true, 'method' => 'GET', 'action' => '/System/Router/getList'],
+    '/system/router/set_router'  => ['auth' => true, 'method' => 'POST', 'action' => '/System/Router/setRouter'],
+    '/system/router/del_router'  => ['auth' => true, 'method' => 'DELETE', 'action' => '/System/Router/delRouter'],
+    '/system/router/edit_router' => ['auth' => true, 'method' => 'PUT', 'action' => '/System/Router/editRouter'],
 
     /***************************************** 首页服务状况相关路由 *************************************/
 
-    '/system/server_status/get_status' => ['auth' => true, 'method' => 'GET', 'action' => '/system/ServerStatus/getStatus'],
+    '/system/server_status/get_status' => ['auth' => true, 'method' => 'GET', 'action' => '/System/ServerStatus/getStatus'],
 
     /***************************************** 数据库备份相关路由 ***************************************/
 
-    '/system/backup/index'    => ['auth' => true, 'method' => 'GET', 'action' => '/system/Backup/index'],
-    '/system/backup/add'      => ['auth' => true, 'method' => 'POST', 'action' => '/system/Backup/add'],
-    '/system/backup/get_list' => ['auth' => true, 'method' => 'GET', 'action' => '/system/Backup/getList'],
-    '/system/backup/down'     => ['auth' => true, 'method' => 'POST', 'action' => '/system/Backup/down'],
-    '/system/backup/del'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/system/Backup/del'],
+    '/system/backup/index'    => ['auth' => true, 'method' => 'GET', 'action' => '/System/Backup/index'],
+    '/system/backup/add'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/Backup/add'],
+    '/system/backup/get_list' => ['auth' => true, 'method' => 'GET', 'action' => '/System/Backup/getList'],
+    '/system/backup/down'     => ['auth' => true, 'method' => 'POST', 'action' => '/System/Backup/down'],
+    '/system/backup/del'      => ['auth' => true, 'method' => 'DELETE', 'action' => '/System/Backup/del'],
 
     /***************************************** 日志中心相关路由 *****************************************/
 
-    '/system/log_mongo/get_mongo_list' => ['auth' => true, 'method' => 'GET', 'action' => '/system/LogMongo/getMongoList'],
-    '/system/log_mongo/get_mongo_info' => ['auth' => true, 'method' => 'GET', 'action' => '/system/LogMongo/getMongoInfo'],
-    '/system/log_swoole/get_info'      => ['auth' => true, 'method' => 'GET', 'action' => '/system/LogSwoole/getInfo'],
-    '/system/log_swoole/clean_log'     => ['auth' => true, 'method' => 'POST', 'action' => '/system/LogSwoole/cleanLog'],
-    '/system/log_swoole/get_monolog'   => ['auth' => true, 'method' => 'GET', 'action' => '/system/LogSwoole/getMonolog'],
-    '/system/log_user/get_user_list'   => ['auth' => true, 'method' => 'GET', 'action' => '/system/LogUser/getUserList'],
-
-    /******************************** 投递task任务处理相关路由 ****************************/
-
-    '/task/log/index'   => ['auth' => false, 'method' => 'Cli', 'action' => '/task/Log/index'],
-    '/finish/log/index' => ['auth' => false, 'method' => 'Cli', 'action' => '/finish/Flog/index'],
-
-    /******************************** 连接完成关闭时close回调处理相关路由 ****************************/
-
-    '/close/index/index' => ['auth' => false, 'method' => 'Cli', 'action' => '/close/Index/index'],
+    '/system/log_mongo/get_mongo_list' => ['auth' => true, 'method' => 'GET', 'action' => '/System/LogMongo/getMongoList'],
+    '/system/log_mongo/get_mongo_info' => ['auth' => true, 'method' => 'GET', 'action' => '/System/LogMongo/getMongoInfo'],
+    '/system/log_swoole/get_info'      => ['auth' => true, 'method' => 'GET', 'action' => '/System/LogSwoole/getInfo'],
+    '/system/log_swoole/clean_log'     => ['auth' => true, 'method' => 'POST', 'action' => '/System/LogSwoole/cleanLog'],
+    '/system/log_swoole/get_monolog'   => ['auth' => true, 'method' => 'GET', 'action' => '/System/LogSwoole/getMonolog'],
+    '/system/log_user/get_user_list'   => ['auth' => true, 'method' => 'GET', 'action' => '/System/LogUser/getUserList'],
 
     /******************************** 业务流程管理相关路由 ****************************/
 
-    '/system/process/get_msg_list' => ['auth' => true, 'method' => 'GET', 'action' => '/system/Process/getMsgList'],
-    '/system/process/set_msg'      => ['auth' => true, 'method' => 'POST', 'action' => '/system/Process/setMsg'],
+    '/system/process/get_msg_list' => ['auth' => true, 'method' => 'GET', 'action' => '/System/Process/getMsgList'],
+    '/system/process/set_msg'      => ['auth' => true, 'method' => 'POST', 'action' => '/System/Process/setMsg'],
 
 ];

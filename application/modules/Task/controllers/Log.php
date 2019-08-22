@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\Task\Controllers;
+namespace App\Modules\Task\controllers;
 
 /**
  * 操作日志类
