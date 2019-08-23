@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controllers;
+//由于使用yaf，需注意controllers命名空间必须与目录一样小写开头。
+namespace App\controllers;
 
 use App\Domain\System\User;
 use App\Models\RedisFactory;

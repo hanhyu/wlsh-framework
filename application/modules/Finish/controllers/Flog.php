@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Modules\Finish\Controllers;
+namespace App\Modules\Finish\controllers;
 
 /**
  * Created by PhpStorm.

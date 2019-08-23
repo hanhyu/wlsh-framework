@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 //注意这里的controllers必需要小写开头，yaf规范
-namespace App\Modules\System\controllers\v1;
+namespace App\Modules\System\controllers\V1;
 
 use App\Modules\System\controllers\Menu as BaseMenu;
 use App\Models\Forms\SystemMenuForms;

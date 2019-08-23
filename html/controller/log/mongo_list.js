@@ -93,7 +93,7 @@ new Vue({
         },
         //显示详细信息
         getMongo(item) {
-            let info = encodeURI(JSON.stringify(item));
+            let info = encodeURIComponent(JSON.stringify(item));
             x_admin_show('详细信息', "mongo_info.html?info=" + info, 800, 700);
         },
         //清空查询条件

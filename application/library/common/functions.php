@@ -243,7 +243,7 @@ function send_email($content, string $info): void
  */
 function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string $level): void
 {
-    $tasks['uri']     = '/task/log/index';
+    $tasks['uri']     = '/Task/Log/index';
     $tasks['content'] = $data;
     $tasks['info']    = $info;
     $tasks['level']   = $level;

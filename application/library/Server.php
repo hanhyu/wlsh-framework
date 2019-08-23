@@ -537,7 +537,7 @@ class Server
     {
         //echo "client-{$fd} is closed" . PHP_EOL;
         //echo '==============='. date("Y-m-d H:i:s", time()). '欢送' . $fd . '离开==============' . PHP_EOL;
-        $res['uri'] = '/close/index/index';
+        $res['uri'] = '/Close/Index/index';
         $res['fd']  = $fd;
 
         $req_obj = new Yaf\Request\Http($res['uri'], '/');

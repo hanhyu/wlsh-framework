@@ -64,32 +64,34 @@ trait ControllersTrait
                 case 'POST':
                     $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
                     $let          = stristr($content_type, 'json');
+
                     if ($let) {
-                        co_log(
-                            $this->request->rawContent(),
-                            "{$this->request->server['request_uri']} client json data:",
-                            $channel
-                        );
+                        $data = json_decode($this->request->rawContent(), true);
                     } else {
-                        co_log($this->request->post, "{$this->request->server['request_uri']} client post data:", $channel);
+                        $data = $this->request->post;
                     }
+
+                    co_log(
+                        $data,
+                        "{$this->request->server['request_uri']} client post data:",
+                        $channel
+                    );
                     break;
                 case 'PUT':
                     $data = [];
                     if (!empty($this->request->get)) {
                         $data = $this->request->get;
                     }
+
                     $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
                     $let          = stristr($content_type, 'json');
+
                     if ($let) {
-                        co_log(
-                            json_encode($data) . ': request rawContent is' . $this->request->rawContent(),
-                            "{$this->request->server['request_uri']} client put data:",
-                            $channel
-                        );
+                        $data += json_decode($this->request->rawContent(), true);
                     } else {
                         $data += $this->request->post;
                     }
+
                     co_log($data, "{$this->request->server['request_uri']} client put data:", $channel);
                     break;
                 case 'DELETE':
