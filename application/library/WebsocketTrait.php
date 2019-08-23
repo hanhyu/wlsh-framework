@@ -33,7 +33,7 @@ trait WebsocketTrait
         $this->data   = $this->getRequest()->getParam('data');
 
         Registry::get('atomic')->add(1);
-        if ($log) co_log($this->data, "websocket send data:", 'ws');
+        if ($log) co_log(json_decode($this->data, true), "websocket send data:", 'ws');
     }
 
     /**
