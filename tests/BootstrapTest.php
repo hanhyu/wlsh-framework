@@ -52,11 +52,12 @@ class BootstrapTest extends TestCase
         $product = require CONF_PATH . DS . 'product.php';
 
         $yaf_conf = ini_get('yaf.environ');
+
         try {
             $obj_yaf = new \Yaf\Application(array_merge($common, $$yaf_conf));
-            ob_start();
-            $obj_yaf->bootstrap()->run();
-            ob_end_clean();
+            go(function () use ($obj_yaf) {
+                $obj_yaf->bootstrap()->run();
+            });
         } catch (\Yaf\Exception $e) {
             var_dump($e->getMessage());
         }
