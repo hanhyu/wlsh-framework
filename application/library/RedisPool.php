@@ -88,10 +88,12 @@ class RedisPool
      */
     public function connect(): Redis
     {
-        $db  = new Redis();
-        $res = $db->connect(Registry::get('config')->redis->host, (int)Registry::get('config')->redis->port);
+        $redis_conf = Registry::get('config')->redis;
+        $db         = new Redis();
+
+        $res = $db->connect($redis_conf->host, $redis_conf->port);
         if (!$res) throw new Exception('redis数据连接异常');
-        $db->auth(Registry::get('config')->redis->auth);
+        $db->auth($redis_conf->auth);
 
         return $db;
     }

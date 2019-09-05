@@ -9,7 +9,7 @@ return [
     'mysql' => [
         'driver'    => 'mysql',
         'host'      => '172.17.0.1',
-        'port'      => '3306',
+        'port'      => 3306,
         'database'  => 'baseFrame',
         'username'  => 'root',
         'password'  => 'root',
@@ -22,7 +22,7 @@ return [
     'pgsql' => [
         'driver'    => 'pgsql',
         'host'      => '172.17.0.1',
-        'port'      => '5432',
+        'port'      => 5432,
         'database'  => 'baseframe',
         'username'  => 'postgres',
         'password'  => 'root',
@@ -34,7 +34,7 @@ return [
 
     'redis' => [
         'host' => '172.17.0.1',
-        'port' => '6379',
+        'port' => 6379,
         'auth' => '',
     ],
 
