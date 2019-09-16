@@ -5,3 +5,4 @@
 /backup
 *.DS_Store
 /conf/sendEmail.php
+/html/conf/axiosConfig.js
