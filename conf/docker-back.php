@@ -9,10 +9,10 @@ return [
     'mysql' => [
         'driver'    => 'mysql',
         'host'      => '172.17.0.1',
-        'port'      => 3306,
+        'port'      => 3308,
         'database'  => 'baseFrame',
         'username'  => 'root',
-        'password'  => 'root',
+        'password'  => 'wlsh_mysql',
         'charset'   => 'utf8mb4',
         'collation' => 'utf8_general_ci',
         'prefix'    => '',
@@ -34,12 +34,12 @@ return [
 
     'redis' => [
         'host' => '172.17.0.1',
-        'port' => 6379,
-        'auth' => '',
+        'port' => 6381,
+        'auth' => 'wlsh_redis',
     ],
 
     'log' => [
-        'mongo'      => 'mongodb://172.17.0.1:27017',
+        'mongo'      => 'mongodb://172.17.0.1:27018',
         'username'   => 'test',
         'pwd'        => 'test',
         'database'   => 'baseFrame',
