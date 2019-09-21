@@ -74,7 +74,7 @@ class Server
             'buffer_output_size'         => 8 * 1024 * 1024,
             'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
             'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
-            //'open_http2_protocol'      => true,
+            'open_http2_protocol'        => true,
             //'open_mqtt_protocol' => true,
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
