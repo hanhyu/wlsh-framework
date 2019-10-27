@@ -117,7 +117,7 @@ class Server
     public function onStart(Swoole\WebSocket\Server $server): void
     {
         echo "Swoole tcp server is started at tcp://127.0.0.1:9771" . PHP_EOL;
-        echo "Swoole http|ws server is started at http://127.0.0.1:9770" . PHP_EOL;
+        echo "Swoole http|ws server is started at http|s://127.0.0.1:9770" . PHP_EOL;
     }
 
     public function onManagerStart(Swoole\WebSocket\Server $server): void
@@ -182,10 +182,9 @@ class Server
             //$this->yaf_obj = new Yaf\Application($this->config_file, ini_get('yaf.environ'));
             $this->yaf_obj = new Application($yaf_conf_array);
             $this->yaf_obj->bootstrap()->run();
-        } catch (PDOException $e) {
-            var_dump($e->getMessage());
         } catch (Throwable $e) {
             print_r($e . PHP_EOL);
+            $this->server->shutdown();
         }
 
 

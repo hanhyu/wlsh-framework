@@ -102,7 +102,7 @@ function explain(): void
 {
     echo <<<EOT
         Usage:
-          php start.php {command} [arguments ...] [options ...]
+          php swoole.php {command} [arguments ...] [options ...]
         
         Commands:
           start     Start Swoole Server

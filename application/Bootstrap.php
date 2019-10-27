@@ -51,6 +51,9 @@ class Bootstrap extends Bootstrap_Abstract
         $mysql_pool = new \PdoPool('mysql');
         Registry::set('mysql_pool', $mysql_pool);
 
+        //启动前判断mongodb是否能连接上
+        $mongo_pool = new \MongoPool();
+        unset($mongo_pool);
 
         //如需主从、读写库请在这里自行配置添加
         //$mysql_master = new \PdoPool('mysql_master');
