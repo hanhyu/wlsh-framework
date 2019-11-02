@@ -31,10 +31,10 @@ class LineFormatter extends NormalizerFormatter
     protected $includeStacktraces;
 
     /**
-     * @param ?string $format                     The format of the message
-     * @param ?string $dateFormat                 The format of the timestamp: one supported by DateTime::format
-     * @param bool    $allowInlineLineBreaks      Whether to allow inline line breaks in log entries
-     * @param bool    $ignoreEmptyContextAndExtra
+     * @param string|null $format                     The format of the message
+     * @param string|null $dateFormat                 The format of the timestamp: one supported by DateTime::format
+     * @param bool        $allowInlineLineBreaks      Whether to allow inline line breaks in log entries
+     * @param bool        $ignoreEmptyContextAndExtra
      */
     public function __construct(?string $format = null, ?string $dateFormat = null, bool $allowInlineLineBreaks = false, bool $ignoreEmptyContextAndExtra = false)
     {
@@ -170,7 +170,22 @@ class LineFormatter extends NormalizerFormatter
 
     private function formatException(\Throwable $e): string
     {
-        $str = '[object] (' . Utils::getClass($e) . '(code: ' . $e->getCode() . '): ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine() . ')';
+        $str = '[object] (' . Utils::getClass($e) . '(code: ' . $e->getCode();
+        if ($e instanceof \SoapFault) {
+            if (isset($e->faultcode)) {
+                $str .= ' faultcode: ' . $e->faultcode;
+            }
+
+            if (isset($e->faultactor)) {
+                $str .= ' faultactor: ' . $e->faultactor;
+            }
+
+            if (isset($e->detail)) {
+                $str .= ' detail: ' . $e->detail;
+            }
+        }
+        $str .= '): ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine() . ')';
+
         if ($this->includeStacktraces) {
             $str .= "\n[stacktrace]\n" . $e->getTraceAsString() . "\n";
         }

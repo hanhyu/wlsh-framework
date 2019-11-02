@@ -189,9 +189,13 @@ Validation::validate($params, [
 
 ### 4.3 验证bool型参数
 
-bool型验证器只有两个：
+bool型验证器：
 * Bool: 合法的取值为: `true`, `false`, `"true"`, `"false"`（字符串忽略大小写）。
+* BoolTrue: 合法的取值为: `true`, `"true"`（字符串忽略大小写）。
+* BoolFalse: 合法的取值为: `false`, `"false"`（字符串忽略大小写）。
 * BoolSmart: 合法的取值为: `true`, `false`, `"true"`, `"false"`, `1`, `0`, `"1"`, `"0"`, `"yes"`, `"no"`, `"y"`, `"n"`（字符串忽略大小写）
+* BoolSmartTrue: 合法的取值为: `true`, `"true"`, `1`, `"1"`, `"yes"`, `"y"`（字符串忽略大小写）
+* BoolSmartFalse: 合法的取值为: `false`, `"false"`, `0`, `"0"`, `"no"`, `"n"`（字符串忽略大小写）
 
 例
 ```php
@@ -320,6 +324,8 @@ Validation::validate($params, $validations);
 
 条件判断型验证器都以"If"开头。
 
+如果条件不满足，则条件验证器后面的规则都不检测，忽略当前这条验证规则。
+
 比如你想招聘一批模特，男的要求180以上，女的要求170以上，验证可以这样写：
 ```php
 $validations = [
@@ -331,6 +337,16 @@ $validations = [
 ];
 ```
 参数"sex"的值不同，参数"height"的验证规则也不一样。
+
+除了`IfExist`和`IfNotExist`，其它的条件验证器 IfXxx 都要求*条件参数*必须存在。如果希望*条件参数*是可选的，那么可以结合`IfExist`或`IfNotExist`一起使用, 如:  
+```php
+"IfExist:sex|IfStrEq:sex,male|IntGe:180"
+```
+
+注意:  
+设计条件验证器的主要目的是根据一个参数的取值不同，对另外一个参数应用不同的验证规则。  
+"IfXxx:"的后面应该是另一个参数的名称，而不是当前参数，这一点一定要注意。  
+比如上面的例子中，是根据参数"sex"的取值不同，对参数"height"应用了不同的验证规则，"IfXxx:"后面跟的是"sex"。
 
 完整的条件判断型验证器的列表参考附录 A.9 。
 
@@ -565,6 +581,7 @@ MyValidation::validate(["var" => 1.0], [
 | :------| :------ | :------ |
 | Int | Int | “{{param}}”必须是整数 |
 | IntEq | IntEq:100 | “{{param}}”必须等于 {{value}} |
+| IntNe | IntNe:100 | “{{param}}”不能等于 {{value}} |
 | IntGt | IntGt:100 | “{{param}}”必须大于 {{min}} |
 | IntGe | IntGe:100 | “{{param}}”必须大于等于 {{min}} |
 | IntLt | IntLt:100 | “{{param}}”必须小于 {{max}} |
@@ -597,7 +614,11 @@ MyValidation::validate(["var" => 1.0], [
 | bool型验证器 | 示例 | 说明 |
 | :------| :------ | :------ |
 | Bool | Bool | 合法的取值为: `true`, `false`, `"true"`, `"false"`（忽略大小写） |
+| BoolTrue | BoolTrue | 合法的取值为: `true`, `"true"`（忽略大小写） |
+| BoolFalse | BoolFalse | 合法的取值为: `false`,`"false"`（忽略大小写） |
 | BoolSmart | BoolSmart | 合法的取值为: `true`, `false`, `"true"`, `"false"`, `1`, `0`, `"1"`, `"0"`, `"yes"`, `"no"`, `"y"`, `"n"`（忽略大小写） |
+| BoolSmartTrue | BoolSmartTrue | 合法的取值为: `true`, `"true"`, `1`, `"1"`, `"yes"`, `"y"`（忽略大小写） |
+| BoolSmartFalse | BoolSmartFalse | 合法的取值为: `false`, `"false"`, `0`, `"0"`, `"no"`, `"n"`（忽略大小写） |
 
 ### A.4 字符串型
 

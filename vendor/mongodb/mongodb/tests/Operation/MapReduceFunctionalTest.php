@@ -4,22 +4,23 @@ namespace MongoDB\Tests\Operation;
 
 use MongoDB\BSON\Javascript;
 use MongoDB\Driver\BulkWrite;
-use MongoDB\Operation\CreateCollection;
+use MongoDB\MapReduceResult;
 use MongoDB\Operation\DropCollection;
 use MongoDB\Operation\Find;
 use MongoDB\Operation\MapReduce;
 use MongoDB\Tests\CommandObserver;
-use stdClass;
+use function iterator_to_array;
+use function version_compare;
 
 class MapReduceFunctionalTest extends FunctionalTestCase
 {
     public function testDefaultReadConcernIsOmitted()
     {
-        $operation = new CreateCollection($this->getDatabaseName(), $this->getCollectionName());
-        $operation->execute($this->getPrimaryServer());
+        // Collection must exist for mapReduce command
+        $this->createCollection();
 
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $operation = new MapReduce(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -31,7 +32,7 @@ class MapReduceFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($this->getPrimaryServer());
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectNotHasAttribute('readConcern', $event['started']->getCommand());
             }
         );
@@ -39,11 +40,11 @@ class MapReduceFunctionalTest extends FunctionalTestCase
 
     public function testDefaultWriteConcernIsOmitted()
     {
-        $operation = new CreateCollection($this->getDatabaseName(), $this->getCollectionName());
-        $operation->execute($this->getPrimaryServer());
+        // Collection must exist for mapReduce command
+        $this->createCollection();
 
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $operation = new MapReduce(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -55,7 +56,7 @@ class MapReduceFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($this->getPrimaryServer());
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectNotHasAttribute('writeConcern', $event['started']->getCommand());
             }
         );
@@ -90,7 +91,7 @@ class MapReduceFunctionalTest extends FunctionalTestCase
         $operation = new MapReduce($this->getDatabaseName(), $this->getCollectionName(), $map, $reduce, $out);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\MapReduceResult', $result);
+        $this->assertInstanceOf(MapReduceResult::class, $result);
         $this->assertGreaterThanOrEqual(0, $result->getExecutionTimeMS());
         $this->assertNotEmpty($result->getCounts());
     }
@@ -106,7 +107,7 @@ class MapReduceFunctionalTest extends FunctionalTestCase
         $operation = new MapReduce($this->getDatabaseName(), $this->getCollectionName(), $map, $reduce, $out, ['verbose' => true]);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\MapReduceResult', $result);
+        $this->assertInstanceOf(MapReduceResult::class, $result);
         $this->assertGreaterThanOrEqual(0, $result->getExecutionTimeMS());
         $this->assertNotEmpty($result->getCounts());
         $this->assertNotEmpty($result->getTiming());
@@ -123,7 +124,7 @@ class MapReduceFunctionalTest extends FunctionalTestCase
         $operation = new MapReduce($this->getDatabaseName(), $this->getCollectionName(), $map, $reduce, $out, ['verbose' => false]);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\MapReduceResult', $result);
+        $this->assertInstanceOf(MapReduceResult::class, $result);
         $this->assertGreaterThanOrEqual(0, $result->getExecutionTimeMS());
         $this->assertNotEmpty($result->getCounts());
         $this->assertEmpty($result->getTiming());
@@ -137,8 +138,8 @@ class MapReduceFunctionalTest extends FunctionalTestCase
 
         $this->createFixtures(3);
 
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $operation = new MapReduce(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -150,8 +151,63 @@ class MapReduceFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($this->getPrimaryServer());
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectHasAttribute('lsid', $event['started']->getCommand());
+            }
+        );
+    }
+
+    public function testBypassDocumentValidationSetWhenTrue()
+    {
+        if (version_compare($this->getServerVersion(), '3.2.0', '<')) {
+            $this->markTestSkipped('bypassDocumentValidation is not supported');
+        }
+
+        $this->createFixtures(1);
+
+        (new CommandObserver())->observe(
+            function () {
+                $operation = new MapReduce(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    new Javascript('function() { emit(this.x, this.y); }'),
+                    new Javascript('function(key, values) { return Array.sum(values); }'),
+                    ['inline' => 1],
+                    ['bypassDocumentValidation' => true]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event) {
+                $this->assertObjectHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
+                $this->assertEquals(true, $event['started']->getCommand()->bypassDocumentValidation);
+            }
+        );
+    }
+
+    public function testBypassDocumentValidationUnsetWhenFalse()
+    {
+        if (version_compare($this->getServerVersion(), '3.2.0', '<')) {
+            $this->markTestSkipped('bypassDocumentValidation is not supported');
+        }
+
+        $this->createFixtures(1);
+
+        (new CommandObserver())->observe(
+            function () {
+                $operation = new MapReduce(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    new Javascript('function() { emit(this.x, this.y); }'),
+                    new Javascript('function(key, values) { return Array.sum(values); }'),
+                    ['inline' => 1],
+                    ['bypassDocumentValidation' => false]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event) {
+                $this->assertObjectNotHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
             }
         );
     }

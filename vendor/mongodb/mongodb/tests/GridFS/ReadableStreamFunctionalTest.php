@@ -5,19 +5,23 @@ namespace MongoDB\Tests\GridFS;
 use MongoDB\BSON\Binary;
 use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\GridFS\CollectionWrapper;
-use MongoDB\GridFS\ReadableStream;
 use MongoDB\GridFS\Exception\CorruptFileException;
+use MongoDB\GridFS\ReadableStream;
 use MongoDB\Tests\CommandObserver;
-use stdClass;
+use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
+use function array_filter;
 
 /**
  * Functional tests for the internal ReadableStream class.
  */
 class ReadableStreamFunctionalTest extends FunctionalTestCase
 {
+    use SetUpTearDownTrait;
+
+    /** @var CollectionWrapper */
     private $collectionWrapper;
 
-    public function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -116,8 +120,9 @@ class ReadableStreamFunctionalTest extends FunctionalTestCase
 
     public function provideFilteredFileIdAndExpectedBytes()
     {
-        return array_filter($this->provideFileIdAndExpectedBytes(),
-            function(array $args) {
+        return array_filter(
+            $this->provideFileIdAndExpectedBytes(),
+            function (array $args) {
                 return $args[1] > 0;
             }
         );
@@ -216,12 +221,12 @@ class ReadableStreamFunctionalTest extends FunctionalTestCase
 
         $commands = [];
 
-        (new CommandObserver)->observe(
-            function() use ($stream, $offset, $length, $expectedBytes) {
+        (new CommandObserver())->observe(
+            function () use ($stream, $offset, $length, $expectedBytes) {
                 $stream->seek($offset);
                 $this->assertSame($expectedBytes, $stream->readBytes($length));
             },
-            function(array $event) use (&$commands) {
+            function (array $event) use (&$commands) {
                 $commands[] = $event['started']->getCommandName();
             }
         );
@@ -252,12 +257,12 @@ class ReadableStreamFunctionalTest extends FunctionalTestCase
 
         $commands = [];
 
-        (new CommandObserver)->observe(
-            function() use ($stream, $offset, $length, $expectedBytes) {
+        (new CommandObserver())->observe(
+            function () use ($stream, $offset, $length, $expectedBytes) {
                 $stream->seek($offset);
                 $this->assertSame($expectedBytes, $stream->readBytes($length));
             },
-            function(array $event) use (&$commands) {
+            function (array $event) use (&$commands) {
                 $commands[] = $event['started']->getCommandName();
             }
         );
@@ -286,12 +291,12 @@ class ReadableStreamFunctionalTest extends FunctionalTestCase
 
         $commands = [];
 
-        (new CommandObserver)->observe(
-            function() use ($stream, $offset, $length, $expectedBytes) {
+        (new CommandObserver())->observe(
+            function () use ($stream, $offset, $length, $expectedBytes) {
                 $stream->seek($offset);
                 $this->assertSame($expectedBytes, $stream->readBytes($length));
             },
-            function(array $event) use (&$commands) {
+            function (array $event) use (&$commands) {
                 $commands[] = $event['started']->getCommandName();
             }
         );

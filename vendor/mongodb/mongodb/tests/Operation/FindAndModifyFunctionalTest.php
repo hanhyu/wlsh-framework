@@ -8,7 +8,7 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\FindAndModify;
 use MongoDB\Tests\CommandObserver;
-use stdClass;
+use function version_compare;
 
 class FindAndModifyFunctionalTest extends FunctionalTestCase
 {
@@ -17,11 +17,11 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
      */
     public function testManagerReadConcernIsOmitted()
     {
-        $manager = new Manager($this->getUri(), ['readConcernLevel' => 'majority']);
+        $manager = new Manager(static::getUri(), ['readConcernLevel' => 'majority']);
         $server = $manager->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
 
-        (new CommandObserver)->observe(
-            function() use ($server) {
+        (new CommandObserver())->observe(
+            function () use ($server) {
                 $operation = new FindAndModify(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -30,7 +30,7 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($server);
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectNotHasAttribute('readConcern', $event['started']->getCommand());
             }
         );
@@ -38,8 +38,8 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
 
     public function testDefaultWriteConcernIsOmitted()
     {
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $operation = new FindAndModify(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -48,7 +48,7 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($this->getPrimaryServer());
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectNotHasAttribute('writeConcern', $event['started']->getCommand());
             }
         );
@@ -60,8 +60,8 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
             $this->markTestSkipped('Sessions are not supported');
         }
 
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $operation = new FindAndModify(
                     $this->getDatabaseName(),
                     $this->getCollectionName(),
@@ -70,8 +70,53 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
 
                 $operation->execute($this->getPrimaryServer());
             },
-            function(array $event) {
+            function (array $event) {
                 $this->assertObjectHasAttribute('lsid', $event['started']->getCommand());
+            }
+        );
+    }
+
+    public function testBypassDocumentValidationSetWhenTrue()
+    {
+        if (version_compare($this->getServerVersion(), '3.2.0', '<')) {
+            $this->markTestSkipped('bypassDocumentValidation is not supported');
+        }
+
+        (new CommandObserver())->observe(
+            function () {
+                $operation = new FindAndModify(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    ['remove' => true, 'bypassDocumentValidation' => true]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event) {
+                $this->assertObjectHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
+                $this->assertEquals(true, $event['started']->getCommand()->bypassDocumentValidation);
+            }
+        );
+    }
+
+    public function testBypassDocumentValidationUnsetWhenFalse()
+    {
+        if (version_compare($this->getServerVersion(), '3.2.0', '<')) {
+            $this->markTestSkipped('bypassDocumentValidation is not supported');
+        }
+
+        (new CommandObserver())->observe(
+            function () {
+                $operation = new FindAndModify(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    ['remove' => true, 'bypassDocumentValidation' => false]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event) {
+                $this->assertObjectNotHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
             }
         );
     }
@@ -116,8 +161,12 @@ class FindAndModifyFunctionalTest extends FunctionalTestCase
                 ['_id' => 1, 'x' => (object) ['foo' => 'bar']],
             ],
             [
-                ['root' => 'MongoDB\Model\BSONDocument', 'document' => 'object'],
+                ['root' => BSONDocument::class, 'document' => 'object'],
                 new BSONDocument(['_id' => 1, 'x' => (object) ['foo' => 'bar']]),
+            ],
+            [
+                ['root' => 'array', 'document' => 'stdClass', 'fieldPaths' => ['x' => 'array']],
+                ['_id' => 1, 'x' => ['foo' => 'bar']],
             ],
         ];
     }

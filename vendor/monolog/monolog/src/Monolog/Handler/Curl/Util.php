@@ -11,7 +11,12 @@
 
 namespace Monolog\Handler\Curl;
 
-class Util
+/**
+ * This class is marked as internal and it is not under the BC promise of the package.
+ *
+ * @internal
+ */
+final class Util
 {
     private static $retriableErrorCodes = [
         CURLE_COULDNT_RESOLVE_HOST,
@@ -26,13 +31,16 @@ class Util
     /**
      * Executes a CURL request with optional retries and exception on failure
      *
-     * @param  resource          $ch curl handler
-     * @throws \RuntimeException
+     * @param  resource    $ch             curl handler
+     * @param  int         $retries
+     * @param  bool        $closeAfterDone
+     * @return bool|string @see curl_exec
      */
-    public static function execute($ch, int $retries = 5, bool $closeAfterDone = true): void
+    public static function execute($ch, int $retries = 5, bool $closeAfterDone = true)
     {
         while ($retries--) {
-            if (curl_exec($ch) === false) {
+            $curlResponse = curl_exec($ch);
+            if ($curlResponse === false) {
                 $curlErrno = curl_errno($ch);
 
                 if (false === in_array($curlErrno, self::$retriableErrorCodes, true) || !$retries) {
@@ -51,7 +59,10 @@ class Util
             if ($closeAfterDone) {
                 curl_close($ch);
             }
-            break;
+
+            return $curlResponse;
         }
+
+        return false;
     }
 }

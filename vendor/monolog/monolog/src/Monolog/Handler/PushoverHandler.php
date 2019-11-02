@@ -12,6 +12,7 @@
 namespace Monolog\Handler;
 
 use Monolog\Logger;
+use Monolog\Utils;
 
 /**
  * Sends notifications through the pushover api to mobile phones
@@ -67,7 +68,7 @@ class PushoverHandler extends SocketHandler
     /**
      * @param string       $token             Pushover api token
      * @param string|array $users             Pushover user id or array of ids the message will be sent to
-     * @param string       $title             Title sent to the Pushover API
+     * @param string|null  $title             Title sent to the Pushover API
      * @param string|int   $level             The minimum logging level at which this handler will be triggered
      * @param bool         $bubble            Whether the messages that are handled can bubble up the stack or not
      * @param bool         $useSSL            Whether to connect via SSL. Required when pushing messages to users that are not
@@ -118,7 +119,7 @@ class PushoverHandler extends SocketHandler
         $maxMessageLength = 512 - strlen($this->title);
 
         $message = ($this->useFormattedMessage) ? $record['formatted'] : $record['message'];
-        $message = substr($message, 0, $maxMessageLength);
+        $message = Utils::substr($message, 0, $maxMessageLength);
 
         $timestamp = $record['datetime']->getTimestamp();
 

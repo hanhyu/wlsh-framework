@@ -2,6 +2,7 @@
 
 namespace MongoDB\Tests\Collection;
 
+use Closure;
 use MongoDB\BSON\Javascript;
 use MongoDB\Collection;
 use MongoDB\Driver\BulkWrite;
@@ -9,10 +10,17 @@ use MongoDB\Driver\ReadConcern;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\InvalidArgumentException;
+use MongoDB\Exception\UnsupportedException;
+use MongoDB\MapReduceResult;
 use MongoDB\Operation\Count;
-use MongoDB\Operation\MapReduce;
 use MongoDB\Tests\CommandObserver;
-use stdClass;
+use function array_filter;
+use function call_user_func;
+use function is_scalar;
+use function json_encode;
+use function strchr;
+use function usort;
+use function version_compare;
 
 /**
  * Functional tests for the Collection class.
@@ -104,14 +112,45 @@ class CollectionFunctionalTest extends FunctionalTestCase
         $this->assertEquals($this->getNamespace(), $this->collection->getNamespace());
     }
 
+    public function testAggregateWithinTransaction()
+    {
+        $this->skipIfTransactionsAreNotSupported();
+
+        // Collection must be created before the transaction starts
+        $this->createCollection();
+
+        $session = $this->manager->startSession();
+        $session->startTransaction();
+
+        try {
+            $this->createFixtures(3, ['session' => $session]);
+
+            $cursor = $this->collection->aggregate(
+                [['$match' => ['_id' => ['$lt' => 3]]]],
+                ['session' => $session]
+            );
+
+            $expected = [
+                ['_id' => 1, 'x' => 11],
+                ['_id' => 2, 'x' => 22],
+            ];
+
+            $this->assertSameDocuments($expected, $cursor);
+
+            $session->commitTransaction();
+        } finally {
+            $session->endSession();
+        }
+    }
+
     public function testCreateIndexSplitsCommandOptions()
     {
         if (version_compare($this->getServerVersion(), '3.6.0', '<')) {
             $this->markTestSkipped('Sessions are not supported');
         }
 
-        (new CommandObserver)->observe(
-            function() {
+        (new CommandObserver())->observe(
+            function () {
                 $this->collection->createIndex(
                     ['x' => 1],
                     [
@@ -123,7 +162,7 @@ class CollectionFunctionalTest extends FunctionalTestCase
                     ]
                 );
             },
-            function(array $event) {
+            function (array $event) {
                 $command = $event['started']->getCommand();
                 $this->assertObjectHasAttribute('lsid', $command);
                 $this->assertObjectHasAttribute('maxTimeMS', $command);
@@ -132,6 +171,88 @@ class CollectionFunctionalTest extends FunctionalTestCase
                 $this->assertObjectHasAttribute('unique', $command->indexes[0]);
             }
         );
+    }
+
+    /**
+     * @dataProvider provideTypeMapOptionsAndExpectedDocuments
+     */
+    public function testDistinctWithTypeMap(array $typeMap, array $expectedDocuments)
+    {
+        $bulkWrite = new BulkWrite(['ordered' => true]);
+        $bulkWrite->insert([
+            'x' => (object) ['foo' => 'bar'],
+        ]);
+        $bulkWrite->insert(['x' => 4]);
+        $bulkWrite->insert([
+            'x' => (object) ['foo' => ['foo' => 'bar']],
+        ]);
+        $this->manager->executeBulkWrite($this->getNamespace(), $bulkWrite);
+
+        $values = $this->collection->withOptions(['typeMap' => $typeMap])->distinct('x');
+
+        /* This sort callable sorts all scalars to the front of the list. All
+         * non-scalar values are sorted by running json_encode on them and
+         * comparing their string representations.
+         */
+        $sort = function ($a, $b) {
+            if (is_scalar($a) && ! is_scalar($b)) {
+                return -1;
+            }
+
+            if (! is_scalar($a)) {
+                if (is_scalar($b)) {
+                    return 1;
+                }
+
+                $a = json_encode($a);
+                $b = json_encode($b);
+            }
+
+            return $a < $b ? -1 : 1;
+        };
+
+        usort($expectedDocuments, $sort);
+        usort($values, $sort);
+
+        $this->assertEquals($expectedDocuments, $values);
+    }
+
+    public function provideTypeMapOptionsAndExpectedDocuments()
+    {
+        return [
+            'No type map' => [
+                ['root' => 'array', 'document' => 'array'],
+                [
+                    ['foo' => 'bar'],
+                    4,
+                    ['foo' => ['foo' => 'bar']],
+                ],
+            ],
+            'array/array' => [
+                ['root' => 'array', 'document' => 'array'],
+                [
+                    ['foo' => 'bar'],
+                    4,
+                    ['foo' => ['foo' => 'bar']],
+                ],
+            ],
+            'object/array' => [
+                ['root' => 'object', 'document' => 'array'],
+                [
+                    (object) ['foo' => 'bar'],
+                    4,
+                    (object) ['foo' => ['foo' => 'bar']],
+                ],
+            ],
+            'array/stdClass' => [
+                ['root' => 'array', 'document' => 'stdClass'],
+                [
+                    ['foo' => 'bar'],
+                    4,
+                    ['foo' => (object) ['foo' => 'bar']],
+                ],
+            ],
+        ];
     }
 
     public function testDrop()
@@ -179,6 +300,37 @@ class CollectionFunctionalTest extends FunctionalTestCase
         $this->assertSameDocument($expected, $this->collection->findOne($filter, $options));
     }
 
+    public function testFindWithinTransaction()
+    {
+        $this->skipIfTransactionsAreNotSupported();
+
+        // Collection must be created before the transaction starts
+        $this->createCollection();
+
+        $session = $this->manager->startSession();
+        $session->startTransaction();
+
+        try {
+            $this->createFixtures(3, ['session' => $session]);
+
+            $cursor = $this->collection->find(
+                ['_id' => ['$lt' => 3]],
+                ['session' => $session]
+            );
+
+            $expected = [
+                ['_id' => 1, 'x' => 11],
+                ['_id' => 2, 'x' => 22],
+            ];
+
+            $this->assertSameDocuments($expected, $cursor);
+
+            $session->commitTransaction();
+        } finally {
+            $session->endSession();
+        }
+    }
+
     public function testWithOptionsInheritsOptions()
     {
         $collectionOptions = [
@@ -195,13 +347,13 @@ class CollectionFunctionalTest extends FunctionalTestCase
         $this->assertSame($this->manager, $debug['manager']);
         $this->assertSame($this->getDatabaseName(), $debug['databaseName']);
         $this->assertSame($this->getCollectionName(), $debug['collectionName']);
-        $this->assertInstanceOf('MongoDB\Driver\ReadConcern', $debug['readConcern']);
+        $this->assertInstanceOf(ReadConcern::class, $debug['readConcern']);
         $this->assertSame(ReadConcern::LOCAL, $debug['readConcern']->getLevel());
-        $this->assertInstanceOf('MongoDB\Driver\ReadPreference', $debug['readPreference']);
+        $this->assertInstanceOf(ReadPreference::class, $debug['readPreference']);
         $this->assertSame(ReadPreference::RP_SECONDARY_PREFERRED, $debug['readPreference']->getMode());
-        $this->assertInternalType('array', $debug['typeMap']);
+        $this->assertIsArray($debug['typeMap']);
         $this->assertSame(['root' => 'array'], $debug['typeMap']);
-        $this->assertInstanceOf('MongoDB\Driver\WriteConcern', $debug['writeConcern']);
+        $this->assertInstanceOf(WriteConcern::class, $debug['writeConcern']);
         $this->assertSame(WriteConcern::MAJORITY, $debug['writeConcern']->getW());
     }
 
@@ -217,13 +369,13 @@ class CollectionFunctionalTest extends FunctionalTestCase
         $clone = $this->collection->withOptions($collectionOptions);
         $debug = $clone->__debugInfo();
 
-        $this->assertInstanceOf('MongoDB\Driver\ReadConcern', $debug['readConcern']);
+        $this->assertInstanceOf(ReadConcern::class, $debug['readConcern']);
         $this->assertSame(ReadConcern::LOCAL, $debug['readConcern']->getLevel());
-        $this->assertInstanceOf('MongoDB\Driver\ReadPreference', $debug['readPreference']);
+        $this->assertInstanceOf(ReadPreference::class, $debug['readPreference']);
         $this->assertSame(ReadPreference::RP_SECONDARY_PREFERRED, $debug['readPreference']->getMode());
-        $this->assertInternalType('array', $debug['typeMap']);
+        $this->assertIsArray($debug['typeMap']);
         $this->assertSame(['root' => 'array'], $debug['typeMap']);
-        $this->assertInstanceOf('MongoDB\Driver\WriteConcern', $debug['writeConcern']);
+        $this->assertInstanceOf(WriteConcern::class, $debug['writeConcern']);
         $this->assertSame(WriteConcern::MAJORITY, $debug['writeConcern']->getW());
     }
 
@@ -237,7 +389,7 @@ class CollectionFunctionalTest extends FunctionalTestCase
 
         $result = $this->collection->mapReduce($map, $reduce, $out);
 
-        $this->assertInstanceOf('MongoDB\MapReduceResult', $result);
+        $this->assertInstanceOf(MapReduceResult::class, $result);
         $expected = [
             [ '_id' => 1.0, 'value' => 66.0 ],
         ];
@@ -248,12 +400,363 @@ class CollectionFunctionalTest extends FunctionalTestCase
         $this->assertNotEmpty($result->getCounts());
     }
 
+    public function collectionMethodClosures()
+    {
+        return [
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->aggregate(
+                        [['$match' => ['_id' => ['$lt' => 3]]]],
+                        ['session' => $session] + $options
+                    );
+                }, 'rw',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->bulkWrite(
+                        [['insertOne' => [['test' => 'foo']]]],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            /* Disabled, as count command can't be used in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->count(
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'r'
+            ],
+            */
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->countDocuments(
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'r',
+            ],
+
+            /* Disabled, as it's illegal to use createIndex command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->createIndex(
+                        ['test' => 1],
+                        ['session' => $session] + $options
+                    );
+                }, 'w'
+            ],
+            */
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->deleteMany(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->deleteOne(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->distinct(
+                        '_id',
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'r',
+            ],
+
+            /* Disabled, as it's illegal to use drop command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->drop(
+                        ['session' => $session] + $options
+                    );
+                }, 'w'
+            ],
+            */
+
+            /* Disabled, as it's illegal to use dropIndexes command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->dropIndex(
+                        '_id_1',
+                        ['session' => $session] + $options
+                    );
+                }, 'w'
+            ], */
+
+            /* Disabled, as it's illegal to use dropIndexes command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->dropIndexes(
+                        ['session' => $session] + $options
+                    );
+                }, 'w'
+            ],
+            */
+
+            /* Disabled, as count command can't be used in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->estimatedDocumentCount(
+                        ['session' => $session] + $options
+                    );
+                }, 'r'
+            ],
+            */
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->find(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'r',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->findOne(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'r',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->findOneAndDelete(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->findOneAndReplace(
+                        ['test' => 'foo'],
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->findOneAndUpdate(
+                        ['test' => 'foo'],
+                        ['$set' => ['updated' => 1]],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->insertMany(
+                        [
+                            ['test' => 'foo'],
+                            ['test' => 'bar'],
+                        ],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->insertOne(
+                        ['test' => 'foo'],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            /* Disabled, as it's illegal to use listIndexes command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->listIndexes(
+                        ['session' => $session] + $options
+                    );
+                }, 'r'
+            ],
+            */
+
+            /* Disabled, as it's illegal to use mapReduce command in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->mapReduce(
+                        new \MongoDB\BSON\Javascript('function() { emit(this.state, this.pop); }'),
+                        new \MongoDB\BSON\Javascript('function(key, values) { return Array.sum(values) }'),
+                        ['inline' => 1],
+                        ['session' => $session] + $options
+                    );
+                }, 'rw'
+            ],
+            */
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->replaceOne(
+                        ['test' => 'foo'],
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->updateMany(
+                        ['test' => 'foo'],
+                        ['$set' => ['updated' => 1]],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            [
+                function ($collection, $session, $options = []) {
+                    $collection->updateOne(
+                        ['test' => 'foo'],
+                        ['$set' => ['updated' => 1]],
+                        ['session' => $session] + $options
+                    );
+                }, 'w',
+            ],
+
+            /* Disabled, as it's illegal to use change streams in transactions
+            [
+                function($collection, $session, $options = []) {
+                    $collection->watch(
+                        [],
+                        ['session' => $session] + $options
+                    );
+                }, 'r'
+            ],
+            */
+        ];
+    }
+
+    public function collectionReadMethodClosures()
+    {
+        return array_filter(
+            $this->collectionMethodClosures(),
+            function ($rw) {
+                if (strchr($rw[1], 'r') !== false) {
+                    return true;
+                }
+            }
+        );
+    }
+
+    public function collectionWriteMethodClosures()
+    {
+        return array_filter(
+            $this->collectionMethodClosures(),
+            function ($rw) {
+                if (strchr($rw[1], 'w') !== false) {
+                    return true;
+                }
+            }
+        );
+    }
+
+    /**
+     * @dataProvider collectionMethodClosures
+     */
+    public function testMethodDoesNotInheritReadWriteConcernInTranasaction(Closure $method)
+    {
+        $this->skipIfTransactionsAreNotSupported();
+
+        $this->createCollection();
+
+        $session = $this->manager->startSession();
+        $session->startTransaction();
+
+        $collection = $this->collection->withOptions([
+            'readConcern' => new ReadConcern(ReadConcern::LOCAL),
+            'writeConcern' => new WriteConcern(1),
+        ]);
+
+        (new CommandObserver())->observe(
+            function () use ($method, $collection, $session) {
+                call_user_func($method, $collection, $session);
+            },
+            function (array $event) {
+                $this->assertObjectNotHasAttribute('writeConcern', $event['started']->getCommand());
+                $this->assertObjectNotHasAttribute('readConcern', $event['started']->getCommand());
+            }
+        );
+    }
+
+    /**
+     * @dataProvider collectionWriteMethodClosures
+     */
+    public function testMethodInTransactionWithWriteConcernOption($method)
+    {
+        $this->skipIfTransactionsAreNotSupported();
+
+        $this->createCollection();
+
+        $session = $this->manager->startSession();
+        $session->startTransaction();
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage('"writeConcern" option cannot be specified within a transaction');
+
+        try {
+            call_user_func($method, $this->collection, $session, ['writeConcern' => new WriteConcern(1)]);
+        } finally {
+            $session->endSession();
+        }
+    }
+
+    /**
+     * @dataProvider collectionReadMethodClosures
+     */
+    public function testMethodInTransactionWithReadConcernOption($method)
+    {
+        $this->skipIfTransactionsAreNotSupported();
+
+        $this->createCollection();
+
+        $session = $this->manager->startSession();
+        $session->startTransaction();
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage('"readConcern" option cannot be specified within a transaction');
+
+        try {
+            call_user_func($method, $this->collection, $session, ['readConcern' => new ReadConcern(ReadConcern::LOCAL)]);
+        } finally {
+            $session->endSession();
+        }
+    }
+
     /**
      * Create data fixtures.
      *
      * @param integer $n
+     * @param array   $executeBulkWriteOptions
      */
-    private function createFixtures($n)
+    private function createFixtures($n, array $executeBulkWriteOptions = [])
     {
         $bulkWrite = new BulkWrite(['ordered' => true]);
 
@@ -264,7 +767,7 @@ class CollectionFunctionalTest extends FunctionalTestCase
             ]);
         }
 
-        $result = $this->manager->executeBulkWrite($this->getNamespace(), $bulkWrite);
+        $result = $this->manager->executeBulkWrite($this->getNamespace(), $bulkWrite, $executeBulkWriteOptions);
 
         $this->assertEquals($n, $result->getInsertedCount());
     }

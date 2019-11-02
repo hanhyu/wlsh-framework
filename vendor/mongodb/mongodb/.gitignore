@@ -6,3 +6,8 @@ vendor/
 # PHPUnit
 phpunit.phar
 phpunit.xml
+.phpunit.result.cache
+
+# phpcs
+.phpcs-cache
+phpcs.xml

@@ -65,6 +65,7 @@ class StreamHandler extends AbstractProcessingHandler
             fclose($this->stream);
         }
         $this->stream = null;
+        $this->dirCreated = null;
     }
 
     /**
@@ -133,9 +134,11 @@ class StreamHandler extends AbstractProcessingHandler
         fwrite($stream, (string) $record['formatted']);
     }
 
-    private function customErrorHandler($code, $msg): void
+    private function customErrorHandler($code, $msg): bool
     {
         $this->errorMessage = preg_replace('{^(fopen|mkdir)\(.*?\): }', '', $msg);
+
+        return true;
     }
 
     private function getDirFromStream(string $stream): ?string

@@ -45,7 +45,7 @@ Errors/Exceptions
 .. include:: /includes/extracts/error-invalidargumentexception.rst
 .. include:: /includes/extracts/error-driver-runtimeexception.rst
 
-.. _php-agg-method-behavior:
+.. _php-coll-agg-method-behavior:
 
 Behavior
 --------
@@ -63,6 +63,7 @@ value will be :php:`Traversable <traversable>`.
 See Also
 --------
 
+- :phpmethod:`MongoDB\\Database::aggregate()`
 - :manual:`aggregate </reference/command/aggregate>` command reference in the
   MongoDB manual
 - :manual:`Aggregation Pipeline </core/aggregation-pipeline>` documentation in

@@ -19,7 +19,7 @@ class QuestionTest extends TestCase
 {
     private $question;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->question = new Question('Test question');
@@ -140,7 +140,7 @@ class QuestionTest extends TestCase
     {
         return [
             ['Potato'],
-            [new \stdclass()],
+            [new \stdClass()],
             [false],
         ];
     }

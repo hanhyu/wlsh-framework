@@ -24,6 +24,7 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface, Reset
     use ProcessableHandlerTrait;
 
     protected $handlers;
+    protected $bubble;
 
     /**
      * @param HandlerInterface[] $handlers Array of Handlers.
@@ -79,9 +80,7 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface, Reset
         if ($this->processors) {
             $processed = [];
             foreach ($records as $record) {
-                foreach ($this->processors as $processor) {
-                    $processed[] = call_user_func($processor, $record);
-                }
+                $processed[] = $this->processRecord($record);
             }
             $records = $processed;
         }

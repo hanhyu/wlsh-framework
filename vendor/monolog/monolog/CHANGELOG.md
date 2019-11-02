@@ -1,13 +1,38 @@
+### 2.0.0 (2019-08-30)
+
+  * BC Break: This is a major release, see [UPGRADE.md](UPGRADE.md) for details if you are coming from a 1.x release
+  * BC Break: Logger methods log/debug/info/notice/warning/error/critical/alert/emergency now have explicit void return types
+  * Added FallbackGroupHandler which works like the WhatFailureGroupHandler but stops dispatching log records as soon as one handler accepted it
+  * Fixed support for UTF-8 when cutting strings to avoid cutting a multibyte-character in half
+  * Fixed normalizers handling of exception backtraces to avoid serializing arguments in some cases
+  * Fixed date timezone handling in SyslogUdpHandler
+
+### 2.0.0-beta2 (2019-07-06)
+
+  * BC Break: This is a major release, see [UPGRADE.md](UPGRADE.md) for details if you are coming from a 1.x release
+  * BC Break: PHP 7.2 is now the minimum required PHP version.
+  * BC Break: Removed SlackbotHandler, RavenHandler and HipChatHandler, see [UPGRADE.md](UPGRADE.md) for details
+  * Added OverflowHandler which will only flush log records to its nested handler when reaching a certain amount of logs (i.e. only pass through when things go really bad)
+  * Added TelegramBotHandler to log records to a [Telegram](https://core.telegram.org/bots/api) bot account
+  * Added support for JsonSerializable when normalizing exceptions
+  * Added support for RFC3164 (outdated BSD syslog protocol) to SyslogUdpHandler
+  * Added SoapFault details to formatted exceptions
+  * Fixed DeduplicationHandler silently failing to start when file could not be opened
+  * Fixed issue in GroupHandler and WhatFailureGroupHandler where setting multiple processors would duplicate records
+  * Fixed GelfFormatter losing some data when one attachment was too long
+  * Fixed issue in SignalHandler restarting syscalls functionality
+  * Improved performance of LogglyHandler when sending multiple logs in a single request
+
 ### 2.0.0-beta1 (2018-12-08)
 
-  * BC Break: This is a major release, see [UPGRADE.md] for details if you are coming from a 1.x release
+  * BC Break: This is a major release, see [UPGRADE.md](UPGRADE.md) for details if you are coming from a 1.x release
   * BC Break: PHP 7.1 is now the minimum required PHP version.
   * BC Break: Quite a few interface changes, only relevant if you implemented your own handlers/processors/formatters
   * BC Break: Removed non-PSR-3 methods to add records, all the `add*` (e.g. `addWarning`) methods as well as `emerg`, `crit`, `err` and `warn`
   * BC Break: The record timezone is now set per Logger instance and not statically anymore
   * BC Break: There is no more default handler configured on empty Logger instances
   * BC Break: ElasticSearchHandler renamed to ElasticaHandler
-  * BC Break: Various handler-specific breaks, see [UPGRADE.md] for details
+  * BC Break: Various handler-specific breaks, see [UPGRADE.md](UPGRADE.md) for details
   * Added scalar type hints and return hints in all the places it was possible. Switched strict_types on for more reliability.
   * Added DateTimeImmutable support, all record datetime are now immutable, and will toString/json serialize with the correct date format, including microseconds (unless disabled)
   * Added timezone and microseconds to the default date format
@@ -21,6 +46,17 @@
   * Added a `$dateFormat` option to the PsrLogMessageProcessor which lets you format DateTime instances nicely
   * Added support for the PHP 7.x `mongodb` extension in the MongoDBHandler
   * Fixed many minor issues in various handlers, and probably added a few regressions too
+
+### 1.25.0 (xx)
+
+  * Deprecated SlackbotHandler, use SlackWebhookHandler or SlackHandler instead
+  * Deprecated RavenHandler, use sentry/sentry 2.x and their Sentry\Monolog\Handler instead
+  * Deprecated HipChatHandler, migrate to Slack and use SlackWebhookHandler or SlackHandler instead
+  * Added support for RFC3164 (outdated BSD syslog protocol) to SyslogUdpHandler
+  * Fixed issue in GroupHandler and WhatFailureGroupHandler where setting multiple processors would duplicate records
+  * Fixed issue in SignalHandler restarting syscalls functionality
+  * Fixed normalizers handling of exception backtraces to avoid serializing arguments in some cases
+  * Fixed ZendMonitorHandler to work with the latest Zend Server versions
 
 ### 1.24.0 (2018-11-05)
 

@@ -2,11 +2,31 @@
 
 namespace MongoDB\Tests\Collection;
 
-use MongoDB\Collection;
-use MongoDB\Operation\FindOneAndReplace;
 use IteratorIterator;
 use LogicException;
+use MongoDB\BulkWriteResult;
+use MongoDB\Collection;
+use MongoDB\DeleteResult;
+use MongoDB\Driver\Exception\BulkWriteException;
+use MongoDB\Driver\Exception\RuntimeException;
+use MongoDB\InsertManyResult;
+use MongoDB\InsertOneResult;
+use MongoDB\Operation\FindOneAndReplace;
+use MongoDB\UpdateResult;
 use MultipleIterator;
+use PHPUnit_Framework_SkippedTestError;
+use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
+use function array_diff_key;
+use function array_key_exists;
+use function array_map;
+use function file_get_contents;
+use function glob;
+use function json_decode;
+use function MongoDB\is_last_pipeline_operator_write;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function version_compare;
 
 /**
  * CRUD spec functional tests.
@@ -15,9 +35,12 @@ use MultipleIterator;
  */
 class CrudSpecFunctionalTest extends FunctionalTestCase
 {
+    use SetUpTearDownTrait;
+
+    /** @var Collection */
     private $expectedCollection;
 
-    public function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -30,8 +53,6 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
      */
     public function testSpecification(array $initialData, array $test, $minServerVersion, $maxServerVersion)
     {
-        $this->setName(str_replace(' ', '_', $test['description']));
-
         if (isset($minServerVersion) || isset($maxServerVersion)) {
             $this->checkServerVersion($minServerVersion, $maxServerVersion);
         }
@@ -39,8 +60,21 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
         $expectedData = isset($test['outcome']['collection']['data']) ? $test['outcome']['collection']['data'] : null;
         $this->initializeData($initialData, $expectedData);
 
-        $result = $this->executeOperation($test['operation']);
-        $this->executeOutcome($test['operation'], $test['outcome'], $result);
+        if (isset($test['outcome']['collection']['name'])) {
+            $outputCollection = new Collection($this->manager, $this->getDatabaseName(), $test['outcome']['collection']['name']);
+            $outputCollection->drop();
+        }
+
+        $result = null;
+        $exception = null;
+
+        try {
+            $result = $this->executeOperation($test['operation']);
+        } catch (RuntimeException $e) {
+            $exception = $e;
+        }
+
+        $this->executeOutcome($test['operation'], $test['outcome'], $result, $exception);
     }
 
     public function provideSpecificationTests()
@@ -54,7 +88,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
             $maxServerVersion = isset($json['maxServerVersion']) ? $json['maxServerVersion'] : null;
 
             foreach ($json['tests'] as $test) {
-                $testArgs[] = [$json['data'], $test, $minServerVersion, $maxServerVersion];
+                $name = str_replace(' ', '_', $test['description']);
+                $testArgs[$name] = [$json['data'], $test, $minServerVersion, $maxServerVersion];
             }
         }
 
@@ -69,7 +104,7 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
      */
     private function assertEquivalentCollections($expectedCollection, $actualCollection)
     {
-        $mi = new MultipleIterator;
+        $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
         $mi->attachIterator(new IteratorIterator($expectedCollection->find()));
         $mi->attachIterator(new IteratorIterator($actualCollection->find()));
 
@@ -84,7 +119,7 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
      *
      * @param string|null $minServerVersion
      * @param string|null $maxServerVersion
-     * @throws \PHPUnit_Framework_SkippedTestError
+     * @throws PHPUnit_Framework_SkippedTestError
      */
     private function checkServerVersion($minServerVersion, $maxServerVersion)
     {
@@ -114,14 +149,11 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     $operation['arguments']['pipeline'],
                     array_diff_key($operation['arguments'], ['pipeline' => 1])
                 );
-
             case 'bulkWrite':
-                $results = $this->prepareBulkWriteArguments($operation['arguments']);
                 return $this->collection->bulkWrite(
-                    array_diff_key($results, ['options' => 1]),
-                    $results['options']
+                    array_map([$this, 'prepareBulkWriteRequest'], $operation['arguments']['requests']),
+                    isset($operation['arguments']['options']) ? $operation['arguments']['options'] : []
                 );
-
             case 'count':
             case 'countDocuments':
             case 'find':
@@ -129,10 +161,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     isset($operation['arguments']['filter']) ? $operation['arguments']['filter'] : [],
                     array_diff_key($operation['arguments'], ['filter' => 1])
                 );
-
             case 'estimatedDocumentCount':
                 return $this->collection->estimatedDocumentCount($operation['arguments']);
-
             case 'deleteMany':
             case 'deleteOne':
             case 'findOneAndDelete':
@@ -140,14 +170,12 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     $operation['arguments']['filter'],
                     array_diff_key($operation['arguments'], ['filter' => 1])
                 );
-
             case 'distinct':
                 return $this->collection->distinct(
                     $operation['arguments']['fieldName'],
                     isset($operation['arguments']['filter']) ? $operation['arguments']['filter'] : [],
                     array_diff_key($operation['arguments'], ['fieldName' => 1, 'filter' => 1])
                 );
-
             case 'findOneAndReplace':
                 $operation['arguments'] = $this->prepareFindAndModifyArguments($operation['arguments']);
                 // Fall through
@@ -158,7 +186,6 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     $operation['arguments']['replacement'],
                     array_diff_key($operation['arguments'], ['filter' => 1, 'replacement' => 1])
                 );
-
             case 'findOneAndUpdate':
                 $operation['arguments'] = $this->prepareFindAndModifyArguments($operation['arguments']);
                 // Fall through
@@ -170,19 +197,16 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     $operation['arguments']['update'],
                     array_diff_key($operation['arguments'], ['filter' => 1, 'update' => 1])
                 );
-
             case 'insertMany':
                 return $this->collection->insertMany(
                     $operation['arguments']['documents'],
-                    array_diff_key($operation['arguments'], ['documents' => 1])
+                    isset($operation['arguments']['options']) ? $operation['arguments']['options'] : []
                 );
-
             case 'insertOne':
                 return $this->collection->insertOne(
                     $operation['arguments']['document'],
                     array_diff_key($operation['arguments'], ['document' => 1])
                 );
-
             default:
                 throw new LogicException('Unsupported operation: ' . $operation['name']);
         }
@@ -191,16 +215,26 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
     /**
      * Executes an "outcome" block.
      *
-     * @param array $operation
-     * @param array $outcome
-     * @param mixed $actualResult
+     * @param array            $operation
+     * @param array            $outcome
+     * @param mixed            $result
+     * @param RuntimeException $exception
      * @return mixed
      * @throws LogicException if the operation is unsupported
      */
-    private function executeOutcome(array $operation, array $outcome, $actualResult)
+    private function executeOutcome(array $operation, array $outcome, $result, RuntimeException $exception = null)
     {
+        $expectedError = array_key_exists('error', $outcome) ? $outcome['error'] : false;
+
+        if ($expectedError) {
+            $this->assertNull($result);
+            $this->assertNotNull($exception);
+
+            $result = $this->extractResultFromException($operation, $outcome, $exception);
+        }
+
         if (array_key_exists('result', $outcome)) {
-            $this->executeAssertResult($operation, $outcome['result'], $actualResult);
+            $this->executeAssertResult($operation, $outcome['result'], $result);
         }
 
         if (isset($outcome['collection'])) {
@@ -210,6 +244,42 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
 
             $this->assertEquivalentCollections($this->expectedCollection, $actualCollection);
         }
+    }
+
+    /**
+     * Extracts a result from an exception.
+     *
+     * Errors for bulkWrite and insertMany operations may still report a write
+     * result. This method will attempt to extract such a result so that it can
+     * be used in executeAssertResult().
+     *
+     * If no result can be extracted, null will be returned.
+     *
+     * @param array            $operation
+     * @param RuntimeException $exception
+     * @return mixed
+     */
+    private function extractResultFromException(array $operation, array $outcome, RuntimeException $exception)
+    {
+        switch ($operation['name']) {
+            case 'bulkWrite':
+                $insertedIds = isset($outcome['result']['insertedIds']) ? $outcome['result']['insertedIds'] : [];
+
+                if ($exception instanceof BulkWriteException) {
+                    return new BulkWriteResult($exception->getWriteResult(), $insertedIds);
+                }
+                break;
+
+            case 'insertMany':
+                $insertedIds = isset($outcome['result']['insertedIds']) ? $outcome['result']['insertedIds'] : [];
+
+                if ($exception instanceof BulkWriteException) {
+                    return new InsertManyResult($exception->getWriteResult(), $insertedIds);
+                }
+                break;
+        }
+
+        return null;
     }
 
     /**
@@ -230,14 +300,21 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                  * the result here; however, assertEquivalentCollections() will
                  * assert the output collection's contents later.
                  */
-                if ( ! \MongoDB\is_last_pipeline_operator_out($operation['arguments']['pipeline'])) {
+                if (! is_last_pipeline_operator_write($operation['arguments']['pipeline'])) {
                     $this->assertSameDocuments($expectedResult, $actualResult);
                 }
                 break;
 
             case 'bulkWrite':
+                $this->assertIsArray($expectedResult);
+                $this->assertInstanceOf(BulkWriteResult::class, $actualResult);
+
                 if (isset($expectedResult['deletedCount'])) {
                     $this->assertSame($expectedResult['deletedCount'], $actualResult->getDeletedCount());
+                }
+
+                if (isset($expectedResult['insertedCount'])) {
+                    $this->assertSame($expectedResult['insertedCount'], $actualResult->getInsertedCount());
                 }
 
                 if (isset($expectedResult['insertedIds'])) {
@@ -259,10 +336,10 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                     $this->assertSame($expectedResult['upsertedCount'], $actualResult->getUpsertedCount());
                 }
 
-                if (array_key_exists('upsertedId', $expectedResult)) {
+                if (isset($expectedResult['upsertedIds'])) {
                     $this->assertSameDocument(
-                        ['upsertedId' => $expectedResult['upsertedId']],
-                        ['upsertedId' => $actualResult->getUpsertedId()]
+                        ['upsertedIds' => $expectedResult['upsertedIds']],
+                        ['upsertedIds' => $actualResult->getUpsertedIds()]
                     );
                 }
                 break;
@@ -286,7 +363,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
 
             case 'deleteMany':
             case 'deleteOne':
-                $this->assertInstanceOf('MongoDB\DeleteResult', $actualResult);
+                $this->assertIsArray($expectedResult);
+                $this->assertInstanceOf(DeleteResult::class, $actualResult);
 
                 if (isset($expectedResult['deletedCount'])) {
                     $this->assertSame($expectedResult['deletedCount'], $actualResult->getDeletedCount());
@@ -303,7 +381,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                 break;
 
             case 'insertMany':
-                $this->assertInstanceOf('MongoDB\InsertManyResult', $actualResult);
+                $this->assertIsArray($expectedResult);
+                $this->assertInstanceOf(InsertManyResult::class, $actualResult);
 
                 if (isset($expectedResult['insertedCount'])) {
                     $this->assertSame($expectedResult['insertedCount'], $actualResult->getInsertedCount());
@@ -318,7 +397,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
                 break;
 
             case 'insertOne':
-                $this->assertInstanceOf('MongoDB\InsertOneResult', $actualResult);
+                $this->assertIsArray($expectedResult);
+                $this->assertInstanceOf(InsertOneResult::class, $actualResult);
 
                 if (isset($expectedResult['insertedCount'])) {
                     $this->assertSame($expectedResult['insertedCount'], $actualResult->getInsertedCount());
@@ -335,7 +415,8 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
             case 'replaceOne':
             case 'updateMany':
             case 'updateOne':
-                $this->assertInstanceOf('MongoDB\UpdateResult', $actualResult);
+                $this->assertIsArray($expectedResult);
+                $this->assertInstanceOf(UpdateResult::class, $actualResult);
 
                 if (isset($expectedResult['matchedCount'])) {
                     $this->assertSame($expectedResult['matchedCount'], $actualResult->getMatchedCount());
@@ -370,45 +451,54 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
      */
     private function initializeData(array $initialData, array $expectedData = null)
     {
-        if ( ! empty($initialData)) {
+        if (! empty($initialData)) {
             $this->collection->insertMany($initialData);
         }
 
-        if ( ! empty($expectedData)) {
+        if (! empty($expectedData)) {
             $this->expectedCollection->insertMany($expectedData);
         }
     }
 
-    private function prepareBulkWriteArguments($arguments)
+    /**
+     * Prepares a request element for a bulkWrite operation.
+     *
+     * @param array $request
+     * @return array
+     */
+    private function prepareBulkWriteRequest(array $request)
     {
-        $operations = [];
-        $operations['options'] = $arguments['options'];
-        foreach ($arguments['requests'] as $request) {
-            $innerArray = [];
-            switch ($request['name']) {
-                case 'deleteMany':
-                case 'deleteOne':
-                    $options = array_diff_key($request['arguments'], ['filter' => 1]);
-                    $innerArray = [$request['arguments']['filter'], $options];
-                break;
-                case 'insertOne':
-                    $innerArray = [$request['arguments']['document']];
-                    break;
-                case 'replaceOne':
-                    $options = array_diff_key($request['arguments'], ['filter' => 1, 'replacement' => 1]);
-                    $innerArray = [$request['arguments']['filter'], $request['arguments']['replacement'], $options];
-                break;
-                case 'updateMany':
-                case 'updateOne':
-                    $options = array_diff_key($request['arguments'], ['filter' => 1, 'update' => 1]);
-                    $innerArray = [$request['arguments']['filter'], $request['arguments']['update'], $options];
-                break;
-                default:
-                    throw new LogicException('Unsupported bulk write request: ' . $request['name']);
-            }
-            $operations[] = [$request['name'] => $innerArray];
+        switch ($request['name']) {
+            case 'deleteMany':
+            case 'deleteOne':
+                return [
+                    $request['name'] => [
+                        $request['arguments']['filter'],
+                        array_diff_key($request['arguments'], ['filter' => 1]),
+                    ],
+                ];
+            case 'insertOne':
+                return [ 'insertOne' => [ $request['arguments']['document'] ]];
+            case 'replaceOne':
+                return [
+                    'replaceOne' => [
+                        $request['arguments']['filter'],
+                        $request['arguments']['replacement'],
+                        array_diff_key($request['arguments'], ['filter' => 1, 'replacement' => 1]),
+                    ],
+                ];
+            case 'updateMany':
+            case 'updateOne':
+                return [
+                    $request['name'] => [
+                        $request['arguments']['filter'],
+                        $request['arguments']['update'],
+                        array_diff_key($request['arguments'], ['filter' => 1, 'update' => 1]),
+                    ],
+                ];
+            default:
+                throw new LogicException('Unsupported bulk write request: ' . $request['name']);
         }
-        return $operations;
     }
 
     /**
@@ -417,10 +507,10 @@ class CrudSpecFunctionalTest extends FunctionalTestCase
      * @param array $arguments
      * @return array
      */
-    private function prepareFindAndModifyArguments($arguments)
+    private function prepareFindAndModifyArguments(array $arguments)
     {
         if (isset($arguments['returnDocument'])) {
-            $arguments['returnDocument'] = ('after' === strtolower($arguments['returnDocument']))
+            $arguments['returnDocument'] = 'after' === strtolower($arguments['returnDocument'])
                 ? FindOneAndReplace::RETURN_DOCUMENT_AFTER
                 : FindOneAndReplace::RETURN_DOCUMENT_BEFORE;
         }

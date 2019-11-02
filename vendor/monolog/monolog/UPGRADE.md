@@ -6,7 +6,7 @@
 - Removed non-PSR-3 methods to add records, all the `add*` (e.g. `addWarning`)
   methods as well as `emerg`, `crit`, `err` and `warn`.
 
-- DateTime are not formatted with a timezone and microseconds (unless disabled).
+- DateTime are now formatted with a timezone and microseconds (unless disabled).
   Various formatters and log output might be affected, which may mess with log parsing
   in some cases.
 
@@ -56,7 +56,15 @@
 
 #### HipChatHandler
 
-- Removed HipChat API v1 support
+- Removed deprecated HipChat handler, migrate to Slack and use SlackWebhookHandler or SlackHandler instead
+
+#### SlackbotHandler
+
+- Removed deprecated SlackbotHandler handler, use SlackWebhookHandler or SlackHandler instead
+
+#### RavenHandler
+
+- Removed deprecated RavenHandler handler, use sentry/sentry 2.x and their Sentry\Monolog\Handler instead
 
 #### ElasticSearchHandler
 

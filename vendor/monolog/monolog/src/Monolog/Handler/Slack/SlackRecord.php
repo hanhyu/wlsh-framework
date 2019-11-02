@@ -35,13 +35,13 @@ class SlackRecord
 
     /**
      * Slack channel (encoded ID or name)
-     * @var ?string
+     * @var string|null
      */
     private $channel;
 
     /**
      * Name of a bot
-     * @var ?string
+     * @var string|null
      */
     private $username;
 
@@ -85,26 +85,39 @@ class SlackRecord
      */
     private $normalizerFormatter;
 
-    public function __construct(?string $channel = null, ?string $username = null, bool $useAttachment = true, ?string $userIcon = null, bool $useShortAttachment = false, bool $includeContextAndExtra = false, array $excludeFields = array(), FormatterInterface $formatter = null)
-    {
-        $this->channel = $channel;
-        $this->username = $username;
-        $this->userIcon = $userIcon !== null ? trim($userIcon, ':') : null;
-        $this->useAttachment = $useAttachment;
-        $this->useShortAttachment = $useShortAttachment;
-        $this->includeContextAndExtra = $includeContextAndExtra;
-        $this->excludeFields = $excludeFields;
-        $this->formatter = $formatter;
+    public function __construct(
+        ?string $channel = null,
+        ?string $username = null,
+        bool $useAttachment = true,
+        ?string $userIcon = null,
+        bool $useShortAttachment = false,
+        bool $includeContextAndExtra = false,
+        array $excludeFields = array(),
+        FormatterInterface $formatter = null
+    ) {
+        $this
+            ->setChannel($channel)
+            ->setUsername($username)
+            ->useAttachment($useAttachment)
+            ->setUserIcon($userIcon)
+            ->useShortAttachment($useShortAttachment)
+            ->includeContextAndExtra($includeContextAndExtra)
+            ->excludeFields($excludeFields)
+            ->setFormatter($formatter);
 
         if ($this->includeContextAndExtra) {
             $this->normalizerFormatter = new NormalizerFormatter();
         }
     }
 
+    /**
+     * Returns required data in format that Slack
+     * is expecting.
+     */
     public function getSlackData(array $record): array
     {
         $dataArray = array();
-        $record = $this->excludeFields($record);
+        $record = $this->removeExcludedFields($record);
 
         if ($this->username) {
             $dataArray['username'] = $this->username;
@@ -175,7 +188,7 @@ class SlackRecord
     }
 
     /**
-     * Returned a Slack message attachment color associated with
+     * Returns a Slack message attachment color associated with
      * provided level.
      */
     public function getAttachmentColor(int $level): string
@@ -208,7 +221,78 @@ class SlackRecord
             : json_encode($normalized, JSON_UNESCAPED_UNICODE);
     }
 
-    public function setFormatter(FormatterInterface $formatter): self
+    /**
+     * Channel used by the bot when posting
+     *
+     * @param ?string $channel
+     *
+     * @return SlackHandler
+     */
+    public function setChannel(?string $channel = null): self
+    {
+        $this->channel = $channel;
+
+        return $this;
+    }
+
+    /**
+     * Username used by the bot when posting
+     *
+     * @param ?string $username
+     *
+     * @return SlackHandler
+     */
+    public function setUsername(?string $username = null): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    public function useAttachment(bool $useAttachment = true): self
+    {
+        $this->useAttachment = $useAttachment;
+
+        return $this;
+    }
+
+    public function setUserIcon(?string $userIcon = null): self
+    {
+        $this->userIcon = $userIcon;
+
+        if (\is_string($userIcon)) {
+            $this->userIcon = trim($userIcon, ':');
+        }
+
+        return $this;
+    }
+
+    public function useShortAttachment(bool $useShortAttachment = false): self
+    {
+        $this->useShortAttachment = $useShortAttachment;
+
+        return $this;
+    }
+
+    public function includeContextAndExtra(bool $includeContextAndExtra = false): self
+    {
+        $this->includeContextAndExtra = $includeContextAndExtra;
+
+        if ($this->includeContextAndExtra) {
+            $this->normalizerFormatter = new NormalizerFormatter();
+        }
+
+        return $this;
+    }
+
+    public function excludeFields(array $excludeFields = []): self
+    {
+        $this->excludeFields = $excludeFields;
+
+        return $this;
+    }
+
+    public function setFormatter(?FormatterInterface $formatter = null): self
     {
         $this->formatter = $formatter;
 
@@ -223,7 +307,7 @@ class SlackRecord
     private function generateAttachmentField(string $title, $value): array
     {
         $value = is_array($value)
-            ? sprintf('```%s```', $this->stringify($value))
+            ? sprintf('```%s```', substr($this->stringify($value), 0, 1990))
             : $value;
 
         return array(
@@ -249,7 +333,7 @@ class SlackRecord
     /**
      * Get a copy of record with fields excluded according to $this->excludeFields
      */
-    private function excludeFields(array $record): array
+    private function removeExcludedFields(array $record): array
     {
         foreach ($this->excludeFields as $field) {
             $keys = explode('.', $field);

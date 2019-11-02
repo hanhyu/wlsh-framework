@@ -3,9 +3,8 @@
 namespace MongoDB\Tests\Operation;
 
 use MongoDB\Exception\InvalidArgumentException;
-use MongoDB\Operation\Count;
-use MongoDB\Operation\Distinct;
 use MongoDB\Operation\Explain;
+use MongoDB\Operation\Explainable;
 
 class ExplainTest extends TestCase
 {
@@ -14,7 +13,7 @@ class ExplainTest extends TestCase
      */
     public function testConstructorOptionTypeChecks(array $options)
     {
-        $explainable = $this->getMockBuilder('MongoDB\Operation\Explainable')->getMock();
+        $explainable = $this->getMockBuilder(Explainable::class)->getMock();
         $this->expectException(InvalidArgumentException::class);
         new Explain($this->getDatabaseName(), $explainable, $options);
     }

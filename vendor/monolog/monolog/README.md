@@ -62,7 +62,7 @@ can also add your own there if you publish one.
 
 ### Requirements
 
-- Monolog 2.x works with PHP 7.1 or above, use Monolog `^1.0` for PHP 5.3+ support.
+- Monolog 2.x works with PHP 7.2 or above, use Monolog `^1.0` for PHP 5.3+ support.
 
 ### Submitting bugs and feature requests
 
@@ -75,7 +75,7 @@ Bugs and feature request are tracked on [GitHub](https://github.com/Seldaek/mono
 - [Symfony](http://symfony.com) comes out of the box with Monolog.
 - [Laravel 4 & 5](http://laravel.com/) come out of the box with Monolog.
 - [Lumen](http://lumen.laravel.com/) comes out of the box with Monolog.
-- [PPI](http://www.ppi.io/) comes out of the box with Monolog.
+- [PPI](https://github.com/ppi/framework) comes out of the box with Monolog.
 - [CakePHP](http://cakephp.org/) is usable with Monolog via the [cakephp-monolog](https://github.com/jadb/cakephp-monolog) plugin.
 - [Slim](http://www.slimframework.com/) is usable with Monolog via the [Slim-Monolog](https://github.com/Flynsarmy/Slim-Monolog) log writer.
 - [XOOPS 2.6](http://xoops.org/) comes out of the box with Monolog.
@@ -86,6 +86,7 @@ Bugs and feature request are tracked on [GitHub](https://github.com/Seldaek/mono
 - [Equip Framework](https://github.com/equip/framework) comes out of the box with Monolog.
 - [Yii 2](http://www.yiiframework.com/) is usable with Monolog via the [yii2-monolog](https://github.com/merorafael/yii2-monolog) or [yii2-psr-log-target](https://github.com/samdark/yii2-psr-log-target) plugins.
 - [Hawkbit Micro Framework](https://github.com/HawkBitPhp/hawkbit) comes out of the box with Monolog.
+- [SilverStripe 4](https://www.silverstripe.org/) comes out of the box with Monolog.
 
 ### Author
 
@@ -98,5 +99,5 @@ Monolog is licensed under the MIT License - see the `LICENSE` file for details
 
 ### Acknowledgements
 
-This library is heavily inspired by Python's [Logbook](http://packages.python.org/Logbook/)
+This library is heavily inspired by Python's [Logbook](https://logbook.readthedocs.io/en/stable/)
 library, although most concepts have been adjusted to fit to the PHP world.

@@ -21,7 +21,7 @@ class ExecutableFinderTest extends TestCase
 {
     private $path;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->path) {
             // Restore path if it was changed.
@@ -132,9 +132,6 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFindBatchExecutableOnWindows()
     {
         if (ini_get('open_basedir')) {

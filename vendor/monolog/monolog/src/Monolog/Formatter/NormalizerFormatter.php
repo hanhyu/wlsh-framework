@@ -31,7 +31,7 @@ class NormalizerFormatter implements FormatterInterface
     private $jsonEncodeOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION;
 
     /**
-     * @param ?string $dateFormat The format of the timestamp: one supported by DateTime::format
+     * @param string|null $dateFormat The format of the timestamp: one supported by DateTime::format
      */
     public function __construct(?string $dateFormat = null)
     {
@@ -182,6 +182,10 @@ class NormalizerFormatter implements FormatterInterface
      */
     protected function normalizeException(Throwable $e, int $depth = 0)
     {
+        if ($e instanceof \JsonSerializable) {
+            return (array) $e->jsonSerialize();
+        }
+
         $data = [
             'class' => Utils::getClass($e),
             'message' => $e->getMessage(),
@@ -207,23 +211,6 @@ class NormalizerFormatter implements FormatterInterface
         foreach ($trace as $frame) {
             if (isset($frame['file'])) {
                 $data['trace'][] = $frame['file'].':'.$frame['line'];
-            } elseif (isset($frame['function']) && $frame['function'] === '{closure}') {
-                // Simplify closures handling
-                $data['trace'][] = $frame['function'];
-            } else {
-                if (isset($frame['args'])) {
-                    // Make sure that objects present as arguments are not serialized nicely but rather only
-                    // as a class name to avoid any unexpected leak of sensitive information
-                    $frame['args'] = array_map(function ($arg) {
-                        if (is_object($arg) && !$arg instanceof \DateTimeInterface) {
-                            return sprintf("[object] (%s)", Utils::getClass($arg));
-                        }
-
-                        return $arg;
-                    }, $frame['args']);
-                }
-                // We should again normalize the frames, because it might contain invalid items
-                $data['trace'][] = $this->toJson($this->normalize($frame, $depth + 1), true);
             }
         }
 
@@ -374,5 +361,15 @@ class NormalizerFormatter implements FormatterInterface
         }
 
         return $date->format($this->dateFormat);
+    }
+
+    protected function addJsonEncodeOption($option)
+    {
+        $this->jsonEncodeOptions |= $option;
+    }
+
+    protected function removeJsonEncodeOption($option)
+    {
+        $this->jsonEncodeOptions ^= $option;
     }
 }
