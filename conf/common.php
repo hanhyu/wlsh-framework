@@ -3,8 +3,8 @@
 return [
 
     'application' => [
-        'directory'  => ROOT_PATH . "/application",
-        'modules'    => "Index,Task,Finish,Ws,Tcp,Close,System",
+        'directory'  => ROOT_PATH . '/application',
+        'modules'    => 'Index,Task,Finish,Ws,Tcp,Close,System',
         'dispatcher' => [
             'defaultController' => 'login',
         ],

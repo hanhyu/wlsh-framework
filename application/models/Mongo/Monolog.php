@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Models\Mongo;
 
+use MongoDB\BSON\ObjectId;
+use MongoDB\Driver\Exception\Exception;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
@@ -15,7 +18,7 @@ class Monolog extends AbstractMongo
      * @param array $data
      *
      * @return array
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function getMongoList(array $data): array
     {
@@ -37,7 +40,7 @@ class Monolog extends AbstractMongo
      * @param array $where
      *
      * @return int
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function getMongoCount(array $where): int
     {
@@ -48,11 +51,11 @@ class Monolog extends AbstractMongo
      * @param string $id
      *
      * @return array
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function getMongoInfo(string $id): array
     {
-        $id = new \MongoDB\BSON\ObjectId($id);
+        $id = new ObjectId($id);
         return $this->col->findOne(['_id' => $id])->toArray();
     }
 

@@ -23,8 +23,10 @@ class SystemBackup extends AbstractMysql
      */
     protected function getTables(): array
     {
-        $datas = $this->db->query("show  tables ")->fetchAll();
-        if (false === $datas) throw new Exception($this->db->last());
+        $datas = $this->db->query('show  tables')->fetchAll();
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -44,7 +46,9 @@ class SystemBackup extends AbstractMysql
             'file_md5'  => $data['md5'],
             'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return (int)$this->db->id();
     }
 
@@ -79,7 +83,9 @@ class SystemBackup extends AbstractMysql
             'file_size',
             'crt_dt',
         ], $wheres);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -98,7 +104,9 @@ class SystemBackup extends AbstractMysql
         ], [
             'id' => $id,
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -117,14 +125,18 @@ class SystemBackup extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas->rowCount();
     }
 
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 

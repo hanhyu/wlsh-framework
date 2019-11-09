@@ -3,13 +3,17 @@ declare(strict_types=1);
 
 namespace App\Modules\System\controllers;
 
+use Swoole\Coroutine;
+use Yaf\Controller_Abstract;
+use Yaf\Registry;
+
 /**
  * 查看服务器各种状态信息
  * User: hanhyu
  * Date: 18-12-10
  * Time: 上午9:44
  */
-class ServerStatus extends \Yaf\Controller_Abstract
+class ServerStatus extends Controller_Abstract
 {
     use \ControllersTrait;
 
@@ -26,14 +30,14 @@ class ServerStatus extends \Yaf\Controller_Abstract
     public function getStatusAction(): void
     {
         $swoole                = $this->server->stats();
-        $content['version']    = \Yaf\Registry::get('config')->version;
-        $content['before_url'] = \Yaf\Registry::get('config')->before_url;
+        $content['version']    = Registry::get('config')->version;
+        $content['before_url'] = Registry::get('config')->before_url;
         $content['uname']      = php_uname();
         $content['swoole_v']   = SWOOLE_VERSION;
         //exec('nginx -v', $content['nginxV']);
         //$content['nginxV'] = fgets(STDIN);
         $content['php_v']     = PHP_VERSION;
-        $content['mysql_v']   = \Swoole\Coroutine::exec('mysql -V')['output'];
+        $content['mysql_v']   = Coroutine::exec('mysql -V')['output'];
         $content['filesize']  = ini_get('upload_max_filesize');
         $content['exec_time'] = ini_get('max_execution_time');
         $content['memory']    = round(memory_get_usage()/1024/1024, 2);

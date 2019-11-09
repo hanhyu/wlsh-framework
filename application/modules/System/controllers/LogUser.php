@@ -6,6 +6,7 @@ namespace App\Modules\System\controllers;
 use App\Domain\System\User;
 use App\Models\Forms\SystemLogForms;
 use Exception;
+use Yaf\Controller_Abstract;
 
 /**
  * 登录日志
@@ -13,7 +14,7 @@ use Exception;
  * Date: 19-1-15
  * Time: 下午2:49
  */
-class LogUser extends \Yaf\Controller_Abstract
+class LogUser extends Controller_Abstract
 {
     use \ControllersTrait;
 

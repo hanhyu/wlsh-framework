@@ -6,8 +6,9 @@ namespace App\Modules\System\controllers;
 use App\Domain\System\Router as RouterDomain;
 use App\Models\Forms\SystemRouterForms;
 use Exception;
+use Yaf\Controller_Abstract;
 
-class Router extends \Yaf\Controller_Abstract
+class Router extends Controller_Abstract
 {
     use \ControllersTrait;
     /**

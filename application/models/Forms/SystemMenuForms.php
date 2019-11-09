@@ -37,8 +37,8 @@ class SystemMenuForms
     ];
 
     public static $getMenuList = [
-        "curr_page" => "Required|IntGe:1",
-        "page_size" => "Required|IntGe:1",
+        'curr_page' => 'Required|IntGe:1',
+        'page_size' => 'Required|IntGe:1',
     ];
 
 }

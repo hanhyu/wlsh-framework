@@ -20,7 +20,7 @@ class RedisPool
     /**
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
      * RedisPool constructor.
-     * @throws Exception
+     * @throws RedisException
      */
     public function __construct()
     {
@@ -29,8 +29,8 @@ class RedisPool
             for ($i = 0; $i < 5; $i++) {
                 $this->ch->push($this->connect());
             }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        } catch (RedisException $e) {
+            throw new RedisException($e->getMessage());
         }
 
     }
@@ -38,7 +38,7 @@ class RedisPool
     /**
      * 获取redis连接，如池子内有连接就取一个，连接不够则新建一个。
      * @return Redis
-     * @throws Exception
+     * @throws RedisException
      */
     public function get(): Redis
     {
@@ -49,7 +49,9 @@ class RedisPool
          * 当ping检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
          * 此功能依赖于redis的timeout参数值。
          */
-        if ($db === false) $db = $this->connect();
+        if ($db === false) {
+            $db = $this->connect();
+        }
 
         /*
          * 每次提前检测一下该池子中的连接是否可用，压测性能：
@@ -84,7 +86,7 @@ class RedisPool
      * Date: 19-7-5
      * Time: 上午11:29
      * @return Redis
-     * @throws Exception
+     * @throws RedisException
      */
     public function connect(): Redis
     {
@@ -92,7 +94,9 @@ class RedisPool
         $db         = new Redis();
 
         $res = $db->connect($redis_conf->host, $redis_conf->port);
-        if (!$res) throw new Exception('redis数据连接异常');
+        if (!$res) {
+            throw new RedisException('redis数据连接异常');
+        }
         $db->auth($redis_conf->auth);
 
         return $db;
@@ -109,8 +113,8 @@ class RedisPool
     {
         try {
             $dbconn->ping();
-        } catch (Exception $e) {
-            co_log($e->getMessage(), "redis pool error getMessage：");
+        } catch (RedisException $e) {
+            co_log($e->getMessage(), 'redis pool error getMessage：');
             //co_log($e->getCode(), "redis pool error getCode：");
             return true;
         }

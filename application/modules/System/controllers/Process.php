@@ -6,6 +6,7 @@ namespace App\Modules\System\controllers;
 use App\Domain\System\Process as ProcessDomain;
 use App\Models\Forms\SystemProcessForms;
 use Exception;
+use Yaf\Controller_Abstract;
 
 /**
  * Created by PhpStorm.
@@ -13,7 +14,7 @@ use Exception;
  * Date: 19-2-1
  * Time: 下午5:38
  */
-class Process extends \Yaf\Controller_Abstract
+class Process extends Controller_Abstract
 {
     use \ControllersTrait;
 

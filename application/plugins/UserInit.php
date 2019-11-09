@@ -41,7 +41,9 @@ class UserInit extends Plugin_Abstract
          * $arr[3] action
          */
         if ($uri) {
-            if ('Task' == $request_uri[1] or 'Finish' == $request_uri[1] or 'Close' == $request_uri[1]) return;
+            if ('Task' === $request_uri[1] or 'Finish' === $request_uri[1] or 'Close' === $request_uri[1]) {
+                return;
+            }
 
             $router = Registry::get('router_filter_config')->toArray();
 
@@ -50,7 +52,9 @@ class UserInit extends Plugin_Abstract
             } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
                 $uri = '/Error/method';
             } else {
-                if ($router[$uri]['auth']) $this->authToken();
+                if ($router[$uri]['auth']) {
+                    $this->authToken();
+                }
                 $uri = $router[$uri]['action'];
             }
             //默认转发请求的路由

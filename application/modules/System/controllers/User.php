@@ -115,7 +115,7 @@ class User extends Controller_Abstract
         $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->getInfoByName($data['name']);
         if (!empty($info)) {
-            if ($info[0]['status'] == 0) {
+            if ($info[0]['status'] === 0) {
                 $resp_content = http_response(400, '该用户处于禁用状态');
             } else if (password_verify($data['pwd'], $info[0]['pwd'])) {
                 $params['id']   = $info[0]['id'];
@@ -144,7 +144,7 @@ class User extends Controller_Abstract
      */
     public function logoutAction(): void
     {
-        $token = get_token_params(strval($this->request->header['authorization']));
+        $token = get_token_params((string)$this->request->header['authorization']);
         $this->user->setLogoutLog($token);
         $this->response->end(http_response());
     }
@@ -157,8 +157,8 @@ class User extends Controller_Abstract
     {
         $data = $this->validator(SystemUserForms::$pull);
         //执行钩子方法，让程序自动更新git项目
-        if ($data['pwd'] == 'wlsh_base_frame') {
-            $shell = "cd /home/baseFrame/ && git pull";
+        if ($data['pwd'] === 'wlsh_base_frame') {
+            $shell = 'cd /home/baseFrame/ && git pull';
             exec($shell, $result, $status);
             if ($status) {
                 $this->response->end(http_response(400, 'git自动更新数据失败'));
@@ -183,7 +183,7 @@ class User extends Controller_Abstract
 
         $res = $this->user->editPwd($data);
 
-        if (-1 == $res) {
+        if (-1 === $res) {
             $this->response->end(http_response(400, '旧密码错误'));
         } else if (!empty($res)) {
             $this->response->end(http_response(200, '密码修改成功'));

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * 注意此类中的每一行代码请勿随意上下移动
  *
@@ -27,11 +28,11 @@ class Server
      * @var Yaf\Application
      */
     private $yaf_obj;
-    protected static $instance = null;
+    protected static $instance;
 
-    public static function getInstance()
+    public static function getInstance(): ?Server
     {
-        if (empty(self::$instance) || !(self::$instance instanceof Server)) {
+        if (empty(self::$instance) || !(self::$instance instanceof self)) {
             self::$instance = new self();
         }
         return self::$instance;
@@ -44,7 +45,7 @@ class Server
     public function start(): void
     {
         $this->server = new Swoole\WebSocket\Server(
-            "0.0.0.0",
+            '0.0.0.0',
             9770,
             SWOOLE_PROCESS,
             SWOOLE_SOCK_TCP | SWOOLE_SSL
@@ -116,8 +117,8 @@ class Server
      */
     public function onStart(Swoole\WebSocket\Server $server): void
     {
-        echo "Swoole tcp server is started at tcp://127.0.0.1:9771" . PHP_EOL;
-        echo "Swoole http|ws server is started at http|s://127.0.0.1:9770" . PHP_EOL;
+        echo 'Swoole tcp server is started at tcp://127.0.0.1:9771' . PHP_EOL;
+        echo 'Swoole http|ws server is started at http|s://127.0.0.1:9770' . PHP_EOL;
     }
 
     public function onManagerStart(Swoole\WebSocket\Server $server): void
@@ -145,7 +146,7 @@ class Server
          var_dump(get_included_files());*/
 
         //用inotify监听mvc目录,一有变动就自动重启脚本
-        if (0 == $worker_id) {
+        if (0 === $worker_id) {
             $kit = new AutoReload($server->master_pid);
             $kit->watch(CONF_PATH);
             $kit->watch(APPLICATION_PATH);
@@ -198,11 +199,12 @@ class Server
          * 如发现该fd在600秒之内没有发送一条消息，则关闭该连接; 此处设置表示http长连接最多保活10分钟。
          *
          */
-        if ($worker_id == 0) {
+        if (0 === $worker_id) {
             $server->tick(30000, function () use ($server) {
                 foreach ($server->connections as $fd) {
-                    if ($this->server->isEstablished($fd))
+                    if ($this->server->isEstablished($fd)) {
                         $this->server->push($fd, true, 9);
+                    }
                 }
             });
         }
@@ -295,7 +297,7 @@ class Server
          if ($server->isEstablished($request->fd))
              $server->push($request->fd, ws_response(200, "wsConnect", '连接成功'));
         */
-        echo '===============' . date("Y-m-d H:i:s", time()) . '欢迎' . $request->fd . '进入==============' . PHP_EOL;
+        echo '===============' . date('Y-m-d H:i:s', time()) . '欢迎' . $request->fd . '进入==============' . PHP_EOL;
     }
 
     /**
@@ -306,13 +308,14 @@ class Server
      */
     public function onMessage(Swoole\WebSocket\Server $server, Swoole\WebSocket\Frame $frame): void
     {
-        if ($frame->opcode == 0x08) {
+        if ($frame->opcode === 0x08) {
             //echo "Close frame received: Code {$frame->code} Reason {$frame->reason}\n";
         } else {
             $res = json_decode($frame->data, true);
             if (!isset($res['uri']) and empty($res['uri'])) {
-                if ($server->isEstablished($frame->fd))
-                    $server->push($frame->fd, ws_response(400, null, '非法访问'));
+                if ($server->isEstablished($frame->fd)) {
+                    $server->push($frame->fd, ws_response(400, '', '非法访问'));
+                }
                 $server->close($frame->fd, true);
                 return;
             }
@@ -324,19 +327,22 @@ class Server
             try {
                 $this->yaf_obj->getDispatcher()->dispatch($req_obj);
             } catch (ValidateException $e) { //参数验证手动触发的信息
-                if ($server->isEstablished($frame->fd))
+                if ($server->isEstablished($frame->fd)) {
                     $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage(), [], true));
+                }
             } catch (ProgramException $e) { //程序手动抛出的异常
-                if ($server->isEstablished($frame->fd))
+                if ($server->isEstablished($frame->fd)) {
                     $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage()));
+                }
             } catch (Throwable $e) {
                 $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
-                if ($server->isEstablished($frame->fd))
+                if ($server->isEstablished($frame->fd)) {
                     $server->push($frame->fd, ws_response(500, '', $msg));
+                }
 
                 co_log(
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                    "onRequest Throwable message:",
+                    'onRequest Throwable message:',
                     'websocket'
                 );
             }
@@ -354,7 +360,7 @@ class Server
     {
         //TODO 绑定固定域名才能访问
         //请求过滤,会请求2次
-        if ('/favicon.ico' == $request->server['path_info'] || '/favicon.ico' == $request->server['request_uri']) {
+        if ('/favicon.ico' === $request->server['path_info'] || '/favicon.ico' === $request->server['request_uri']) {
             $response->end();
             return;
         }
@@ -380,7 +386,7 @@ class Server
             }
 
             //预检
-            if ($request->server['request_method'] == "OPTIONS") {
+            if ($request->server['request_method'] === 'OPTIONS') {
                 $response->end();
                 return;
             }
@@ -415,14 +421,13 @@ class Server
 
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                "onRequest Throwable message:",
+                'onRequest Throwable message:',
                 'http'
             );
         }
 
         Registry::del('request_' . $cid);
         Registry::del('response_' . $cid);
-
     }
 
     /**
@@ -447,7 +452,7 @@ class Server
         } catch (Throwable $e) {
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                "onReceive Throwable message:",
+                'onReceive Throwable message:',
                 'receive'
             );
         }
@@ -476,7 +481,7 @@ class Server
         } catch (Throwable $e) {
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                "onTask Throwable message:",
+                'onTask Throwable message:',
                 'task'
             );
             //todo task中抛的异常后怎么处理
@@ -516,7 +521,7 @@ class Server
                     if (APP_DEBUG) {
                         co_log(
                             ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                            "onFinish Throwable message:",
+                            'onFinish Throwable message:',
                             'finish'
                         );
                     }
@@ -548,7 +553,7 @@ class Server
             if (APP_DEBUG) {
                 co_log(
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                    "onClose Throwable message:",
+                    'onClose Throwable message:',
                     'close'
                 );
             }
@@ -590,7 +595,7 @@ class Server
     public function onWorkerError(Swoole\WebSocket\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
     {
         $content = "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}";
-        $fp      = fopen(ROOT_PATH . '/log/swoole.log', "a+");
+        $fp      = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
         fwrite($fp, $content);
         fclose($fp);
     }

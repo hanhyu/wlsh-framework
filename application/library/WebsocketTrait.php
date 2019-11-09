@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace App\Library;
 
 use App\Models\Forms\FormsVali;
+use Exception;
+use ProgramException;
 use Swoole\WebSocket\Server;
+use Throwable;
 use Yaf\Registry;
 
 /**
@@ -33,7 +36,9 @@ trait WebsocketTrait
         $this->data   = $this->getRequest()->getParam('data');
 
         Registry::get('atomic')->add(1);
-        if ($log) co_log(json_decode($this->data, true), "websocket send data:", 'ws');
+        if ($log) {
+            co_log(json_decode($this->data, true), 'websocket send data:', 'ws');
+        }
     }
 
     /**
@@ -42,24 +47,24 @@ trait WebsocketTrait
      * @param array $validations
      *
      * @return array 返回验证过滤后的数据
-     * @throws \Exception
+     * @throws Exception
      */
     public function validator(array $validations): array
     {
         try {
             $data = json_decode($this->data, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $data = [];
         }
 
         if (empty($data) or !isset($data['data'])) {
-            throw new \ProgramException('参数错误', 400);
+            throw new ProgramException('参数错误', 400);
         }
 
         //todo 优化到路由参数中sign的值控制是否需要进行解密操作,数据加密与数据验证操作
         if (isset($data['sign'])) {
             if (!is_string($data['sign'])) {
-                throw new \ProgramException('参数错误', 400);
+                throw new ProgramException('参数错误', 400);
             }
             $decrypt = private_decrypt($data['sign'], Registry::get('config')->sign->prv_key);
             $data    = json_decode($decrypt, true);
@@ -74,7 +79,7 @@ trait WebsocketTrait
         try {
             $vali_data = FormsVali::validate($data['data'], $validations);
             $vali_data = array_intersect_key($vali_data, $validations);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new \ValidateException($e->getMessage(), 400);
         }
         //url参数在入口判断过

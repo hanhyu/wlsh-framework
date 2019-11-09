@@ -1,18 +1,19 @@
 <?php
 declare(strict_types=1);
 
+use MongoDB\Client;
 use Yaf\Registry;
 
 class MongoPool
 {
     /**
-     * @var \MongoDB\Client
+     * @var Client
      */
     protected $ch;
 
     public function __construct()
     {
-        $this->ch = new \MongoDB\Client(
+        $this->ch = new Client(
             Registry::get('config')->log->mongo,
             [
                 'username'   => Registry::get('config')->log->username,

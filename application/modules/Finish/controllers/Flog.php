@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Finish\controllers;
 
+use Yaf\Controller_Abstract;
+
 /**
  * Created by PhpStorm.
  * User: hanhyu
  * Date: 19-1-14
  * Time: 下午8:33
  */
-class Flog extends \Yaf\Controller_Abstract
+class Flog extends Controller_Abstract
 {
     /**
      * @param        $content

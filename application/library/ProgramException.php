@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 程序手动抛出的异常
+ * wlsh程序手动抛出的异常
  * Class ProgramException
  */
 class ProgramException extends Exception

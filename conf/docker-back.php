@@ -47,11 +47,11 @@ return [
     ],
 
     'page' => [
-        'title' => "本地开发-运维平台",
+        'title' => '本地开发-运维平台',
     ],
 
     'backup' => [
-        'path'    => ROOT_PATH . "/backup",
+        'path'    => ROOT_PATH . '/backup',
         'downUrl' => 'http://127.0.0.1:9773/',
     ],
 

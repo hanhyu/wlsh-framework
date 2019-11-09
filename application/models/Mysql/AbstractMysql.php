@@ -5,6 +5,7 @@ namespace App\Models\Mysql;
 
 use Exception;
 use Medoo\Medoo;
+use PDOException;
 use Yaf\Registry;
 
 /**
@@ -41,19 +42,19 @@ abstract class AbstractMysql
 
             $data = call_user_func_array([$this, $method], $args);
 
-        } catch (\PDOException $e) {
-            co_log($e->getMessage(), "mysql数据连接异常", 'alert');
+        } catch (PDOException $e) {
+            co_log($e->getMessage(), 'mysql服务端断开连接', 'alert');
 
             /**
              * 判断此空闲连接是否已被断开，已断开就重新请求连接，
              * 当检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
              * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
              */
-            if (!empty($e->errorInfo) AND ($e->errorInfo[1] == 2006 OR $e->errorInfo[1] == 2013)) {
+            if (!empty($e->errorInfo) and ($e->errorInfo[1] === 2006 or $e->errorInfo[1] === 2013)) {
                 $this->db = $mysql_pool_obj->connect();
                 $data     = call_user_func_array([$this, $method], $args);
             } else {
-                throw new Exception('mysql数据连接异常', 500);
+                throw new Exception($e->getMessage(), 500);
             }
         }
 

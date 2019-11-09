@@ -40,7 +40,9 @@ class SystemMenu extends AbstractMysql
 
         $datas = $this->db->select($this->table, '*', $wheres);
 
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
 
         return $datas;
     }
@@ -55,7 +57,9 @@ class SystemMenu extends AbstractMysql
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 

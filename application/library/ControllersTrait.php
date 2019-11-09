@@ -35,7 +35,7 @@ trait ControllersTrait
      */
     protected $atomic;
     /**
-     * @var \Redis
+     * @var Redis
      */
     protected $redis;
     protected $cid;
@@ -114,8 +114,11 @@ trait ControllersTrait
         $data       = [];
         $req_method = $this->request->server['request_method'];
         switch ($req_method) {
+            case 'DELETE':
             case 'GET':
-                if (!empty($this->request->get)) $data = $this->request->get;
+                if (!empty($this->request->get)) {
+                    $data = $this->request->get;
+                }
                 break;
             case 'POST':
                 $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
@@ -124,12 +127,12 @@ trait ControllersTrait
                     if (!empty($this->request->rawContent())) {
                         try {
                             $data = json_decode($this->request->rawContent(), true, 512, JSON_THROW_ON_ERROR);
-                        } catch (\Throwable $e) {
+                        } catch (Throwable $e) {
                             $data = [];
                         }
                     }
-                } else {
-                    if (!empty($this->request->post)) $data = $this->request->post;
+                } else if (!empty($this->request->post)) {
+                    $data = $this->request->post;
                 }
                 break;
             case 'PUT':
@@ -142,16 +145,13 @@ trait ControllersTrait
                     if (!empty($this->request->rawContent())) {
                         try {
                             $data += json_decode($this->request->rawContent(), true, 512, JSON_THROW_ON_ERROR);
-                        } catch (\Throwable $e) {
+                        } catch (Throwable $e) {
                             $data = [];
                         }
                     }
-                } else {
-                    if (!empty($this->request->post)) $data += $this->request->post;
+                } else if (!empty($this->request->post)) {
+                    $data += $this->request->post;
                 }
-                break;
-            case 'DELETE':
-                if (!empty($this->request->get)) $data = $this->request->get;
                 break;
             default:
                 break;
@@ -165,21 +165,21 @@ trait ControllersTrait
      * @param array $validations
      *
      * @return array 返回验证过滤后的数据
-     * @throws \Exception
+     * @throws Exception
      */
     public function validator(array $validations): array
     {
         $data = $this->getParams();
 
         if (empty($data)) {
-            throw new \ProgramException('参数错误', 400);
+            throw new ProgramException('参数错误', 400);
         }
 
         //如果是登录接口，则需解密接口数据
         //todo 优化到路由参数中sign的值控制是否需要进行解密操作
-        if ($this->request->server['request_uri'] == '/system/user/login') {
+        if ($this->request->server['request_uri'] === '/system/user/login') {
             if (!isset($data['login_data']) or !is_string($data['login_data'])) {
-                throw new \Exception('参数错误', 400);
+                throw new ProgramException('参数错误', 400);
             }
             $decrypt = private_decrypt($data['login_data'], Registry::get('config')->sign->prv_key);
             $data    = json_decode($decrypt, true);
@@ -195,11 +195,10 @@ trait ControllersTrait
         try {
             $data = FormsVali::validate($data, $validations);
             $data = array_intersect_key($data, $validations);
-        } catch (\Exception $e) {
-            throw new \ValidateException($e->getMessage(), 400);
+        } catch (Exception $e) {
+            throw new ValidateException($e->getMessage(), 400);
         }
         return $data;
     }
-
 
 }

@@ -35,7 +35,7 @@ class PdoPool
             for ($i = 0; $i < 5; $i++) {
                 $this->ch->push($this->connect());
             }
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             throw new PDOException($e->getMessage());
         }
     }
@@ -53,7 +53,9 @@ class PdoPool
          * 当ping检查连接不可用时，就丢弃此连接（pop消息时连接池就没了此连接对象）并重新建立一个新的连接对象，
          * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
          */
-        if ($db === false) $db = $this->connect();
+        if ($db === false) {
+            $db = $this->connect();
+        }
 
         /*
          * 这种合并写法，池子性能降低10%
@@ -140,8 +142,8 @@ class PdoPool
         try {
             $dbconn->getAttribute(PDO::ATTR_SERVER_INFO);
         } catch (PDOException $e) {
-            co_log($e->getMessage(), "pdo pool error getMessage：");
-            if (!empty($e->errorInfo) AND ($e->errorInfo[1] == 2006 OR $e->errorInfo[1] == 2013)) {
+            co_log($e->getMessage(), 'pdo pool error getMessage：');
+            if (!empty($e->errorInfo) and ($e->errorInfo[1] === 2006 or $e->errorInfo[1] === 2013)) {
                 return true;
             }
         }

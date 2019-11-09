@@ -26,7 +26,7 @@ class FormsVali extends Validation
     // “错误提示信息模版”翻译对照表
     protected static $langCode2ErrorTemplates = [
         //繁体中文
-        "zh-tw" => [
+        'zh-tw' => [
             'Int'            => '“{{param}}”必須是整數',
             'IntEq'          => '“{{param}}”必須等於 {{value}}',
             'IntGt'          => '“{{param}}”必須大於 {{min}}',
@@ -72,7 +72,7 @@ class FormsVali extends Validation
             'Numbers'        => '“{{param}}”只能是純數字',
             'Digits'         => '“{{param}}”只能是純數字',
             'LettersNumbers' => '“{{param}}”只能包含字母和數字',
-            'Numeric'        => "“{{param}}”必須是數值",
+            'Numeric'        => '“{{param}}”必須是數值',
             'VarName'        => '“{{param}}”只能包含字母、數字和下劃線，並且以字母或下劃線開頭',
             'Email'          => '“{{param}}”必須是合法的email',
             'Url'            => '“{{param}}”必須是合法的Url地址',
@@ -404,8 +404,8 @@ class FormsVali extends Validation
             'Numbers'        => '“{{param}}” Pode ser apenas números puros',
             'Digits'         => '“{{param}}” Pode ser apenas números puros',
             'LettersNumbers' => '“{{param}}” Só pode conter letras e números',
-            'Numeric'        => "“{{param}}” Deve ser um número.",
-            'VarName'        => "“{{param}}” Só pode conter letras, números e sublinhados e começar com uma letra ou um sublinhado",
+            'Numeric'        => '“{{param}}” Deve ser um número.',
+            'VarName'        => '“{{param}}” Só pode conter letras, números e sublinhados e começar com uma letra ou um sublinhado',
             'Email'          => '“{{param}}” Deve ser um email legítimo',
             'Url'            => '“{{param}}” Deve ser um endereço URL válido',
             'Ip'             => '“{{param}}” Deve ser um endereço IP válido',
@@ -755,14 +755,14 @@ class FormsVali extends Validation
 
     // 文本翻译对照表
     protected static $langCodeToTranslations = [
-        "zh-tw" => [
-            "变量"      => "變量", // 🌙
-            "变量必须是整数" => "變量必須是整數", // ⭐
+        'zh-tw' => [
+            '变量'      => '變量', // 🌙
+            '变量必须是整数' => '變量必須是整數', // ⭐
         ],
-        "en-us" => [
-            "变量"      => "variable",
-            "变量必须是整数" => "variable must be an integer",
-            "手机号"     => "mobile phone no",
+        'en-us' => [
+            '变量'      => 'variable',
+            '变量必须是整数' => 'variable must be an integer',
+            '手机号'     => 'mobile phone no',
         ],
     ];
 

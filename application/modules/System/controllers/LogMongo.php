@@ -6,6 +6,7 @@ namespace App\Modules\System\controllers;
 use App\Domain\System\Log;
 use App\Models\Forms\SystemLogForms;
 use Exception;
+use Yaf\Controller_Abstract;
 
 /**
  * Created by PhpStorm.
@@ -13,7 +14,7 @@ use Exception;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class LogMongo extends \Yaf\Controller_Abstract
+class LogMongo extends Controller_Abstract
 {
     use \ControllersTrait;
 

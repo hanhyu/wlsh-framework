@@ -5,6 +5,8 @@ namespace App\Modules\System\controllers;
 
 use App\Models\Forms\SystemLogForms;
 use Exception;
+use Swoole\Coroutine;
+use Yaf\Controller_Abstract;
 
 /**
  * 获取日志类
@@ -12,7 +14,7 @@ use Exception;
  * Date: 18-9-29
  * Time: 下午3:02
  */
-class LogSwoole extends \Yaf\Controller_Abstract
+class LogSwoole extends Controller_Abstract
 {
     use \ControllersTrait;
 
@@ -28,8 +30,8 @@ class LogSwoole extends \Yaf\Controller_Abstract
     public function getInfoAction(): void
     {
         $data    = $this->validator(SystemLogForms::$info);
-        $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], "r");
-        $content = \Swoole\Coroutine::fread($fp);
+        $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], 'rb');
+        $content = Coroutine::fread($fp);
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -41,12 +43,12 @@ class LogSwoole extends \Yaf\Controller_Abstract
     public function cleanLogAction(): void
     {
         $data = $this->validator(SystemLogForms::$info);
-        if ($data['name'] == 'swoole.log' || $data['name'] == 'swoolePid.log') {
-            $fp = fopen(ROOT_PATH . '/log/' . $data['name'], "w+");
+        if ($data['name'] === 'swoole.log' || $data['name'] === 'swoolePid.log') {
+            $fp = fopen(ROOT_PATH . '/log/' . $data['name'], 'wb+');
         } else { //monolog日志
-            $fp = fopen(ROOT_PATH . '/log/monolog/' . $data['name'], "w+");
+            $fp = fopen(ROOT_PATH . '/log/monolog/' . $data['name'], 'wb+');
         }
-        $content = \Swoole\Coroutine::fwrite($fp, '日志已清空。。。');
+        $content = Coroutine::fwrite($fp, '日志已清空。。。');
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -60,8 +62,8 @@ class LogSwoole extends \Yaf\Controller_Abstract
         $data = $this->validator(SystemLogForms::$info);
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
-            $fp      = fopen($file, "r");
-            $content = \Swoole\Coroutine::fread($fp);
+            $fp      = fopen($file, 'rb');
+            $content = Coroutine::fread($fp);
             fclose($fp);
             $this->response->end(http_response(200, '', ['content' => $content]));
         } else {

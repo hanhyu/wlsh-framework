@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models\Mongo;
 
+use MongoDB\Client;
 use Yaf\Registry;
 /**
  * Created by PhpStorm.
@@ -13,7 +14,7 @@ use Yaf\Registry;
 abstract class AbstractMongo
 {
     /**
-     * @var \MongoDB\Client
+     * @var Client
      */
     protected $col;
 
@@ -26,7 +27,7 @@ abstract class AbstractMongo
      */
     public function __construct(string $database, string $col)
     {
-        $db        = new \MongoDB\Client(
+        $db        = new Client(
             Registry::get('config')->log->mongo,
             [
                 'username'   => Registry::get('config')->log->username,
