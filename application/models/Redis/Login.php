@@ -29,7 +29,9 @@ class Login extends AbstractRedis
     protected function getKey(string $key): ?string
     {
         $datas = $this->db->get($key);
-        if (false === $datas) $datas = null;
+        if (false === $datas) {
+            $datas = null;
+        }
         return $datas;
     }
 

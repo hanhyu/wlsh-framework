@@ -47,7 +47,9 @@ class UserLogView extends AbstractMysql
             'login_ip',
         ],
             $wheres);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -64,7 +66,9 @@ class UserLogView extends AbstractMysql
     protected function getListCount(array $where): int
     {
         $datas = $this->db->count($this->table, $where);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 

@@ -174,6 +174,12 @@ class User extends Controller_Abstract
         }
     }
 
+    /**
+     * User: hanhyu
+     * Date: 2019/11/10
+     * Time: 下午10:15
+     * @throws Exception
+     */
     public function editPwdAction(): void
     {
         $data = $this->validator(SystemUserForms::$editPwd);

@@ -31,7 +31,9 @@ class SystemMsg extends AbstractMysql
             'crt_dt'  => $data['crt_dt'],
             'upt_id'  => $data['id'],
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return (int)$this->db->id();
     }
 
@@ -51,7 +53,9 @@ class SystemMsg extends AbstractMysql
             'user_id'  => (int)$data['id'],
             'login_dt' => date('Y-m-d H:i:s', $data['time']),
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $data->rowCount();
     }
 
@@ -84,7 +88,9 @@ class SystemMsg extends AbstractMysql
             'upt_id',
         ],
             $wheres);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -101,7 +107,9 @@ class SystemMsg extends AbstractMysql
     protected function getListCount(array $where): int
     {
         $datas = $this->db->count($this->table, $where);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 

@@ -32,7 +32,7 @@ class SystemRouter extends AbstractMysql
             ];
         }
 
-        $datas = $this->db->select($this->table, ["[>]frame_system_menu" => ["menu_id" => "id"]],
+        $datas = $this->db->select($this->table, ['[>]frame_system_menu' => ['menu_id' => "id"]],
             [
                 'frame_system_router.id(id)',
                 'frame_system_router.name(name)',
@@ -45,7 +45,9 @@ class SystemRouter extends AbstractMysql
                 'frame_system_router.comment(comment)',
                 'frame_system_menu.name(menu_name)',
             ], $wheres);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -59,7 +61,9 @@ class SystemRouter extends AbstractMysql
     protected function getListCount(): int
     {
         $datas = $this->db->count($this->table);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -87,7 +91,9 @@ class SystemRouter extends AbstractMysql
             'menu_id' => (int)$post['menu_id'],
             'comment' => $post['comment'],
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return (int)$this->db->id();
     }
 
@@ -113,7 +119,9 @@ class SystemRouter extends AbstractMysql
         ], [
             'id' => (int)$post['id'],
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas->rowCount();
     }
 
@@ -130,7 +138,9 @@ class SystemRouter extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas->rowCount();
     }
 
@@ -143,14 +153,16 @@ class SystemRouter extends AbstractMysql
      */
     protected function getInfo(): array
     {
-        $datas = $this->db->select($this->table, ["[>]frame_system_menu" => ["menu_id" => "id"]],
+        $datas = $this->db->select($this->table, ['[>]frame_system_menu' => ['menu_id' => 'id']],
             [
                 'frame_system_router.id(id)',
                 'frame_system_router.name(name)',
                 'frame_system_router.comment(comment)',
                 'frame_system_menu.name(menu_name)',
             ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 

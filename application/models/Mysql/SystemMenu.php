@@ -81,7 +81,9 @@ class SystemMenu extends AbstractMysql
             'up_id',
             'level',
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -102,7 +104,9 @@ class SystemMenu extends AbstractMysql
             'up_id' => $post['up_id'],
             'level' => $post['level'],
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return (int)$this->db->id();
     }
 
@@ -125,7 +129,9 @@ class SystemMenu extends AbstractMysql
             'url',
             'up_id',
         ], ['id' => $id]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas;
     }
 
@@ -150,7 +156,9 @@ class SystemMenu extends AbstractMysql
         ], [
             'id' => (int)$post['id'],
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas->rowCount();
     }
 
@@ -169,7 +177,9 @@ class SystemMenu extends AbstractMysql
         $datas = $this->db->delete($this->table, [
             'id' => $id,
         ]);
-        if (false === $datas) throw new Exception($this->db->last());
+        if (false === $datas) {
+            throw new Exception($this->db->last());
+        }
         return $datas->rowCount();
     }
 
