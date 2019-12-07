@@ -98,10 +98,11 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         ),
         'A' => 
         array (
-            'App\\Plugins\\' => 12,
             'App\\Modules\\' => 12,
             'App\\Models\\' => 11,
+            'App\\Library\\' => 12,
             'App\\Domain\\' => 11,
+            'App\\Controllers\\' => 16,
         ),
     );
 
@@ -264,10 +265,6 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
         ),
-        'App\\Plugins\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/application/plugins',
-        ),
         'App\\Modules\\' => 
         array (
             0 => __DIR__ . '/../..' . '/application/modules',
@@ -276,9 +273,17 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         array (
             0 => __DIR__ . '/../..' . '/application/models',
         ),
+        'App\\Library\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/application/library',
+        ),
         'App\\Domain\\' => 
         array (
             0 => __DIR__ . '/../..' . '/application/domain',
+        ),
+        'App\\Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/application/controllers',
         ),
     );
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -32,12 +32,12 @@ class LogstashFormatter extends NormalizerFormatter
     protected $applicationName;
 
     /**
-     * @var string the key for 'extra' fields from the Monolog record
+     * @var string the key for 'extra' fields from the MonologModel record
      */
     protected $extraKey;
 
     /**
-     * @var string the key for 'context' fields from the Monolog record
+     * @var string the key for 'context' fields from the MonologModel record
      */
     protected $contextKey;
 

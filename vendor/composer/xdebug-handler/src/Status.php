@@ -134,7 +134,7 @@ class Status
 
     private function reportRestarting($command)
     {
-        $text = sprintf('Process restarting (%s)', $this->getEnvAllow());
+        $text = sprintf('ProcessDomain restarting (%s)', $this->getEnvAllow());
         $this->output($text);
         $text = 'Running '.$command;
         $this->output($text);

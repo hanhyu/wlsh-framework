@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -177,7 +177,7 @@ class TestHandler extends AbstractProcessingHandler
     {
         if (preg_match('/(.*)(Debug|Info|Notice|Warning|Error|Critical|Alert|Emergency)(.*)/', $method, $matches) > 0) {
             $genericMethod = $matches[1] . ('Records' !== $matches[3] ? 'Record' : '') . $matches[3];
-            $level = constant('Monolog\Logger::' . strtoupper($matches[2]));
+            $level = constant('MonologModel\Logger::' . strtoupper($matches[2]));
             if (method_exists($this, $genericMethod)) {
                 $args[] = $level;
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -37,7 +37,7 @@ class NormalizerFormatter implements FormatterInterface
     {
         $this->dateFormat = null === $dateFormat ? static::SIMPLE_DATE : $dateFormat;
         if (!function_exists('json_encode')) {
-            throw new \RuntimeException('PHP\'s json extension is required to use Monolog\'s NormalizerFormatter');
+            throw new \RuntimeException('PHP\'s json extension is required to use MonologModel\'s NormalizerFormatter');
         }
     }
 

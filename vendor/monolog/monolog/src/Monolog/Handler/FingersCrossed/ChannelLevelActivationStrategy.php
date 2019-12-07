@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -52,7 +52,7 @@ class ChannelLevelActivationStrategy implements ActivationStrategyInterface
     public function __construct($defaultActionLevel, array $channelToActionLevel = [])
     {
         $this->defaultActionLevel = Logger::toMonologLevel($defaultActionLevel);
-        $this->channelToActionLevel = array_map('Monolog\Logger::toMonologLevel', $channelToActionLevel);
+        $this->channelToActionLevel = array_map('MonologModel\Logger::toMonologLevel', $channelToActionLevel);
     }
 
     public function isHandlerActivated(array $record): bool

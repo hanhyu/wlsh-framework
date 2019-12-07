@@ -2,7 +2,7 @@
 /**
  * 使用php数组实现left join功能
  * 需求：优化两个foreach循环，使用多种算法实现。
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 19-1-15
  * Time: 下午5:20
  */

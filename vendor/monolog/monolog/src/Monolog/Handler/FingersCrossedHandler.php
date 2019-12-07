@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -28,7 +28,7 @@ use Monolog\ResettableInterface;
  * warning level.
  *
  * You can find the various activation strategies in the
- * Monolog\Handler\FingersCrossed\ namespace.
+ * MonologModel\Handler\FingersCrossed\ namespace.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -75,7 +75,7 @@ class FingersCrossedHandler extends Handler implements ProcessableHandlerInterfa
         }
 
         if (!$this->handler instanceof HandlerInterface && !is_callable($this->handler)) {
-            throw new \RuntimeException("The given handler (".json_encode($this->handler).") is not a callable nor a Monolog\Handler\HandlerInterface object");
+            throw new \RuntimeException("The given handler (".json_encode($this->handler).") is not a callable nor a MonologModel\Handler\HandlerInterface object");
         }
     }
 

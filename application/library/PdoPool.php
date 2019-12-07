@@ -1,13 +1,16 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Library;
+
+use PDO;
+use PDOException;
 use Swoole\Coroutine\Channel;
-use Yaf\Registry;
 use Medoo\Medoo;
 
 /**
  * Created by PhpStorm.
- * User: hanhui
+ * UserDomain: hanhui
  * Date: 18-2-13
  * Time: 下午9:11
  */
@@ -16,8 +19,8 @@ class PdoPool
     /**
      * @var Channel
      */
-    protected $ch;
-    private $config;
+    protected Channel $ch;
+    private array $config;
 
     /**
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
@@ -30,7 +33,7 @@ class PdoPool
     public function __construct(string $db_type)
     {
         $this->ch     = new Channel(300);
-        $this->config = Registry::get('config')->$db_type;
+        $this->config = DI::get('config_arr')[$db_type];
         try {
             for ($i = 0; $i < 5; $i++) {
                 $this->ch->push($this->connect());
@@ -78,7 +81,7 @@ class PdoPool
     }
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-5
      * Time: 上午10:52
      * @return Medoo
@@ -120,7 +123,7 @@ class PdoPool
 
     /**
      * 获取连接池使用状态
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-17
      * Time: 上午11:09
      * @return array

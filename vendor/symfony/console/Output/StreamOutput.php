@@ -90,7 +90,7 @@ class StreamOutput extends Output
      * This is tricky on Windows, because Cygwin, Msys2 etc emulate pseudo
      * terminals via named pipes, so we can only check the environment.
      *
-     * Reference: Composer\XdebugHandler\Process::supportsColor
+     * Reference: Composer\XdebugHandler\ProcessDomain::supportsColor
      * https://github.com/composer/xdebug-handler
      *
      * @return bool true if the stream supports colorization, false otherwise

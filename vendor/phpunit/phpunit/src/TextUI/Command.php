@@ -1108,8 +1108,8 @@ Code Coverage Options:
 
 Logging Options:
 
-  --log-junit <file>          Log test execution in JUnit XML format to file
-  --log-teamcity <file>       Log test execution in TeamCity format to file
+  --log-junit <file>          LogDomain test execution in JUnit XML format to file
+  --log-teamcity <file>       LogDomain test execution in TeamCity format to file
   --testdox-html <file>       Write agile documentation in HTML format to file
   --testdox-text <file>       Write agile documentation in Text format to file
   --testdox-xml <file>        Write agile documentation in XML format to file
@@ -1140,8 +1140,8 @@ Test Execution Options:
   --disallow-todo-tests       Disallow @todo-annotated tests
 
   --process-isolation         Run each test in a separate PHP process
-  --globals-backup            Backup and restore \$GLOBALS for each test
-  --static-backup             Backup and restore static attributes for each test
+  --globals-backup            BackupDomain and restore \$GLOBALS for each test
+  --static-backup             BackupDomain and restore static attributes for each test
 
   --colors=<flag>             Use colors in output ("never", "auto" or "always")
   --columns <n>               Number of columns to use for progress output

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -27,7 +27,7 @@ class InsightOpsHandler extends SocketHandler
     protected $logToken;
 
     /**
-     * @param string     $token  Log token supplied by InsightOps
+     * @param string     $token  LogDomain token supplied by InsightOps
      * @param string     $region Region where InsightOps account is hosted. Could be 'us' or 'eu'.
      * @param bool       $useSSL Whether or not SSL encryption should be used
      * @param string|int $level  The minimum logging level to trigger this handler

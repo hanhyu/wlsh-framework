@@ -54,8 +54,8 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
             $this->trace
         );
         $headers =  $connection->getHeaders();
-        $this->assertArrayHasKey('User-Agent', $headers);
-        $this->assertContains('elasticsearch-php/'. Client::VERSION, $headers['User-Agent'][0]);
+        $this->assertArrayHasKey('UserDomain-Agent', $headers);
+        $this->assertContains('elasticsearch-php/'. Client::VERSION, $headers['UserDomain-Agent'][0]);
     }
 
     public function testUserAgentHeaderIsSent()
@@ -74,7 +74,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
         );
         $result = $connection->performRequest('GET', '/');
         $request = $connection->getLastRequestInfo()['request'];
-        $this->assertArrayHasKey('User-Agent', $request['headers']);
-        $this->assertContains('elasticsearch-php/'. Client::VERSION, $request['headers']['User-Agent'][0]);
+        $this->assertArrayHasKey('UserDomain-Agent', $request['headers']);
+        $this->assertContains('elasticsearch-php/'. Client::VERSION, $request['headers']['UserDomain-Agent'][0]);
     }
 }

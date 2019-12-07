@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Test\phpunit\domain;
 
 use Tests\BootstrapTest;
-use App\Domain\System\User;
+use App\Domain\System\UserDomain;
 
 /**
- * @covers User
+ * @covers UserDomain
  */
 final class UserTest extends BootstrapTest
 {
@@ -20,7 +20,7 @@ final class UserTest extends BootstrapTest
         ];
 
         go(function () use ($data) {
-            $user = new User();
+            $user = new UserDomain();
             $res  = $user->getInfoList($data);
 
             print_r($res);

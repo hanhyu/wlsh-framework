@@ -127,8 +127,8 @@ class Connection implements ConnectionInterface
             unset($connectionParams['client']['headers']);
         }
 
-        // Add the User-Agent using the format: <client-repo-name>/<client-version> (metadata-values)
-        $this->headers['User-Agent'] = [sprintf(
+        // Add the UserDomain-Agent using the format: <client-repo-name>/<client-version> (metadata-values)
+        $this->headers['UserDomain-Agent'] = [sprintf(
             "elasticsearch-php/%s (%s %s, PHP %s)",
             Client::VERSION,
             php_uname("s"),
@@ -346,7 +346,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Log a successful request
+     * LogDomain a successful request
      *
      * @param string $method
      * @param string $fullURI
@@ -389,7 +389,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Log a a failed request
+     * LogDomain a a failed request
      *
      * @param string $method
      * @param string $fullURI

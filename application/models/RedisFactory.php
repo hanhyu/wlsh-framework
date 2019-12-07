@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 
-use App\Models\Redis\Login;
+use App\Models\Redis\LoginModel;
 use Swoole\Coroutine;
+use Exception;
 
 /**
  * Class RedisFactory
@@ -15,26 +16,26 @@ use Swoole\Coroutine;
 class RedisFactory
 {
     /**
-     * @var Login
+     * @var LoginModel
      */
     private static $login = [];
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-8
      * Time: 下午8:27
-     * @return Login
-     * @throws \Exception
+     * @return LoginModel
+     * @throws Exception
      */
-    public static function login(): Login
+    public static function login(): LoginModel
     {
         $cid = Coroutine::getCid();
         //单例对象协程隔离
         if (!isset(self::$login[$cid])) {
-            self::$login[$cid] = new Login();
+            self::$login[$cid] = new LoginModel();
         }
 
-        defer(function () use ($cid) {
+        defer(static function () use ($cid) {
             unset(self::$login[$cid]);
         });
 

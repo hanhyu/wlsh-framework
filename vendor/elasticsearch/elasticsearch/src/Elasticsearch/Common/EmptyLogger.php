@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 /**
  * Class EmptyLogger
  *
- * Logger that doesn't do anything.  Similar to Monolog's NullHandler,
- * but avoids the overhead of partially loading Monolog
+ * Logger that doesn't do anything.  Similar to MonologModel's NullHandler,
+ * but avoids the overhead of partially loading MonologModel
  *
  * @category Elasticsearch
  * @package  Elasticsearch\Common

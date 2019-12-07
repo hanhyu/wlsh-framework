@@ -12,7 +12,7 @@
 namespace Symfony\Component\Process\Exception;
 
 /**
- * InvalidArgumentException for the Process Component.
+ * InvalidArgumentException for the ProcessDomain Component.
  *
  * @author Romain Neutron <imprec@gmail.com>
  */

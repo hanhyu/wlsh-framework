@@ -5,10 +5,8 @@ namespace App\Library;
 
 use App\Models\Forms\FormsVali;
 use Exception;
-use ProgramException;
+use Swoole\Coroutine;
 use Swoole\WebSocket\Server;
-use Throwable;
-use Yaf\Registry;
 
 /**
  * Trait WebsocketTrait
@@ -16,28 +14,35 @@ use Yaf\Registry;
  */
 trait WebsocketTrait
 {
+    protected int $cid;
     /**
      * @var Server
      */
-    protected $server;
-    protected $fd;
-    protected $uri;
-    protected $data;
+    protected Server $server;
+    protected int $fd;
+    protected string $uri;
+    protected array $data;
 
     /**
      * 实现aop编程前置方法，供yaf控制器初始化中使用。
      *
      * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
      */
-    public function beforeInit($log = true): void
+    public function beforeInit(bool $log = true): void
     {
-        $this->server = Registry::get('server');
-        $this->fd     = (int)$this->getRequest()->getParam('fd');
-        $this->data   = $this->getRequest()->getParam('data');
+        $this->cid    = Coroutine::getCid();
+        $this->server = DI::get('server_obj');
+        $this->fd     = DI::get('fd_int' . $this->cid);
+        $this->data   = DI::get('ws_data_arr' . $this->cid);
 
-        Registry::get('atomic')->add(1);
+        DI::get('atomic_obj')->add(1);
+
         if ($log) {
-            co_log(json_decode($this->data, true), 'websocket send data:', 'ws');
+            co_log(
+                $this->data,
+                'websocket send data:',
+                'ws'
+            );
         }
     }
 
@@ -51,39 +56,33 @@ trait WebsocketTrait
      */
     public function validator(array $validations): array
     {
-        try {
-            $data = json_decode($this->data, true, 512, JSON_THROW_ON_ERROR);
-        } catch (Throwable $e) {
-            $data = [];
-        }
-
-        if (empty($data) or !isset($data['data'])) {
+        if (empty($this->data['data']) or !isset($this->data['data'])) {
             throw new ProgramException('参数错误', 400);
         }
 
         //todo 优化到路由参数中sign的值控制是否需要进行解密操作,数据加密与数据验证操作
-        if (isset($data['sign'])) {
-            if (!is_string($data['sign'])) {
+        if (isset($this->data['sign'])) {
+            if (!is_string($this->data['sign'])) {
                 throw new ProgramException('参数错误', 400);
             }
-            $decrypt = private_decrypt($data['sign'], Registry::get('config')->sign->prv_key);
-            $data    = json_decode($decrypt, true);
+            $decrypt    = private_decrypt($this->data['sign'], DI::get('config_arr')['sign']['prv_key']);
+            $this->data = json_decode($decrypt, true, 512, JSON_THROW_ON_ERROR);
         }
 
         //如果参数lang_code设置了，则输出对应的信息模板
-        if (isset($data['language']) and !empty($data['language'])) {
-            Registry::set('ws_language', $data['language']);
-            FormsVali::setLangCode($data['language']);
+        if (isset($this->data['language']) and !empty($this->data['language'])) {
+            DI::set('ws_language_str', $this->data['language']);
+            FormsVali::setLangCode($this->data['language']);
         }
 
         try {
-            $vali_data = FormsVali::validate($data['data'], $validations);
+            $vali_data = FormsVali::validate($this->data['data'], $validations);
             $vali_data = array_intersect_key($vali_data, $validations);
         } catch (Exception $e) {
-            throw new \ValidateException($e->getMessage(), 400);
+            throw new ValidateException($e->getMessage(), 400);
         }
         //url参数在入口判断过
-        $this->uri = $data['uri'];
+        $this->uri = $this->data['uri'];
 
         return $vali_data;
     }

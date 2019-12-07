@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -18,7 +18,7 @@ use Psr\Log\InvalidArgumentException;
 use Throwable;
 
 /**
- * Monolog log channel
+ * MonologModel log channel
  *
  * It contains a stack of Handlers and a stack of Processors,
  * and uses them to store records that are added to it.
@@ -35,7 +35,7 @@ class Logger implements LoggerInterface, ResettableInterface
     /**
      * Interesting events
      *
-     * Examples: User logs in, SQL logs.
+     * Examples: UserDomain logs in, SQL logs.
      */
     public const INFO = 200;
 
@@ -78,7 +78,7 @@ class Logger implements LoggerInterface, ResettableInterface
     public const EMERGENCY = 600;
 
     /**
-     * Monolog API version
+     * MonologModel API version
      *
      * This is only bumped when API breaks are done and should
      * follow the major version of the library
@@ -400,7 +400,7 @@ class Logger implements LoggerInterface, ResettableInterface
     }
 
     /**
-     * Converts PSR-3 levels to Monolog ones if necessary
+     * Converts PSR-3 levels to MonologModel ones if necessary
      *
      * @param  string|int                        $level Level number (monolog) or name (PSR-3)
      * @throws \Psr\Log\InvalidArgumentException If level is not defined

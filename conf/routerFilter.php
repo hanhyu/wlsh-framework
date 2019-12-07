@@ -37,6 +37,8 @@ return [
     '/login/sw_mysql' => ['auth' => false, 'method' => 'GET', 'action' => '/Login/swMysql'],
     '/login/sw_pgsql' => ['auth' => false, 'method' => 'GET', 'action' => '/Login/swPgsql'],
 
+    '/im/get_info' => ['auth' => false, 'method' => 'Cli', 'action' => '/Im/getInfo'],
+
     /***************************************** 用户设置相关路由 *****************************************/
 
     '/system/user/login'         => ['auth' => false, 'method' => 'POST', 'action' => '/System/User/login'],

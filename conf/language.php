@@ -3,10 +3,10 @@ define('LANGUAGE', [
     'en-us' => [
         '参数错误'             => 'Parameter error',
         '手机号已注册'           => 'Mobile phone number has been registered',
-        '用户名或密码错误'         => 'User name or password error',
+        '用户名或密码错误'         => 'UserDomain name or password error',
         '验证码暂未收到或过期，请重新注册' => 'Verification code not received or expired, please re-register',
         '该用户处于禁用状态'        => 'The user is disabled',
-        '用户名或验证码错误'        => 'User name or verification code error',
+        '用户名或验证码错误'        => 'UserDomain name or verification code error',
         '注册失败'             => 'Registration failed',
         '验证码发送成功'          => 'Verification code sent successfully',
         '验证码发送失败'          => 'Verification code failed to send',

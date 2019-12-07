@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use App\Library\DI;
 use Exception;
 use Medoo\Medoo;
 use PDOException;
-use Yaf\Registry;
+use RuntimeException;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-10-28
  * Time: 下午3:34
  */
@@ -19,22 +20,22 @@ abstract class AbstractMysql
     /**
      * @var Medoo
      */
-    protected $db;
+    protected Medoo $db;
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-9
      * Time: 上午10:40
      *
-     * @param $method
-     * @param $args
+     * @param string $method
+     * @param array  $args
      *
      * @return mixed
      * @throws Exception
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
-        $mysql_pool_obj = Registry::get('mysql_pool');
+        $mysql_pool_obj = DI::get('mysql_pool_obj');
 
         try {
 
@@ -54,7 +55,7 @@ abstract class AbstractMysql
                 $this->db = $mysql_pool_obj->connect();
                 $data     = call_user_func_array([$this, $method], $args);
             } else {
-                throw new Exception($e->getMessage(), 500);
+                throw new RuntimeException($e->getMessage(), 500);
             }
         }
 

@@ -29,7 +29,7 @@ class ProcessHelper extends Helper
      * Runs an external process.
      *
      * @param OutputInterface $output    An OutputInterface instance
-     * @param array|Process   $cmd       An instance of Process or an array of the command and arguments
+     * @param array|Process   $cmd       An instance of ProcessDomain or an array of the command and arguments
      * @param string|null     $error     An error message that must be displayed if something went wrong
      * @param callable|null   $callback  A PHP callback to run whenever there is some
      *                                   output available on STDOUT or STDERR
@@ -61,7 +61,7 @@ class ProcessHelper extends Helper
             $process = $cmd[0];
             unset($cmd[0]);
         } else {
-            throw new \InvalidArgumentException(sprintf('Invalid command provided to "%s()": the command should be an array whose first element is either the path to the binary to run or a "Process" object.', __METHOD__));
+            throw new \InvalidArgumentException(sprintf('Invalid command provided to "%s()": the command should be an array whose first element is either the path to the binary to run or a "ProcessDomain" object.', __METHOD__));
         }
 
         if ($verbosity <= $output->getVerbosity()) {
@@ -93,7 +93,7 @@ class ProcessHelper extends Helper
      * exits with a non-zero exit code.
      *
      * @param OutputInterface $output   An OutputInterface instance
-     * @param string|Process  $cmd      An instance of Process or a command to run
+     * @param string|Process  $cmd      An instance of ProcessDomain or a command to run
      * @param string|null     $error    An error message that must be displayed if something went wrong
      * @param callable|null   $callback A PHP callback to run whenever there is some
      *                                  output available on STDOUT or STDERR
@@ -116,10 +116,10 @@ class ProcessHelper extends Helper
     }
 
     /**
-     * Wraps a Process callback to add debugging output.
+     * Wraps a ProcessDomain callback to add debugging output.
      *
      * @param OutputInterface $output   An OutputInterface interface
-     * @param Process         $process  The Process
+     * @param Process         $process  The ProcessDomain
      * @param callable|null   $callback A PHP callable
      *
      * @return callable

@@ -1,12 +1,15 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Library;
+
+use RedisException;
 use Swoole\Coroutine\Channel;
-use Yaf\Registry;
+use Redis;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-11-6
  * Time: 上午10:37
  */
@@ -15,7 +18,7 @@ class RedisPool
     /**
      * @var Channel
      */
-    protected $ch;
+    protected Channel $ch;
 
     /**
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
@@ -82,7 +85,7 @@ class RedisPool
 
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-5
      * Time: 上午11:29
      * @return Redis
@@ -90,14 +93,13 @@ class RedisPool
      */
     public function connect(): Redis
     {
-        $redis_conf = Registry::get('config')->redis;
+        $redis_conf = DI::get('config_arr')['redis'];
         $db         = new Redis();
-
-        $res = $db->connect($redis_conf->host, $redis_conf->port);
+        $res        = $db->connect($redis_conf['host'], $redis_conf['port']);
         if (!$res) {
             throw new RedisException('redis数据连接异常');
         }
-        $db->auth($redis_conf->auth);
+        $db->auth($redis_conf['auth']);
 
         return $db;
     }

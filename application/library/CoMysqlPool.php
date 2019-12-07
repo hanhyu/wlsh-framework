@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Library;
 //todo 还需完善ping与流程安全测试
 use Swoole\Coroutine\{Channel, MySQL};
-use Yaf\Registry;
+use Exception;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 19-1-27
  * Time: 下午9:31
  */
@@ -42,17 +43,18 @@ class CoMysqlPool
             //todo 可以自定义一个定时器来检测空闲连接或连接时间超时操作
             //if ($db === false OR $this->ping($db->pdo)) goto EOF;
         } else {
-            EOF:
             $db  = new MySQL();
             $let = $db->connect([
-                'host'     => Registry::get('config')->mysql->host,
-                'port'     => Registry::get('config')->mysql->port,
-                'user'     => Registry::get('config')->mysql->username,
-                'password' => Registry::get('config')->mysql->password,
-                'database' => Registry::get('config')->mysql->database,
+                'host'     => DI::get('config_arr')['mysql']['host'],
+                'port'     => DI::get('config_arr')['mysql']['port'],
+                'user'     => DI::get('config_arr')['mysql']['username'],
+                'password' => DI::get('config_arr')['mysql']['password'],
+                'database' => DI::get('config_arr')['mysql']['database'],
             ]);
 
-            if (!$let) throw new Exception('Coroutine MySQL connect fail', 500);
+            if (!$let) {
+                throw new Exception('Coroutine MySQL connect fail', 500);
+            }
         }
 
         defer(function () use ($db) {

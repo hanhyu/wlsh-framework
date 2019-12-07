@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 /**
  * Helps outputting debug information when running an external program from a command.
  *
- * An external program can be a Process, an HTTP request, or anything else.
+ * An external program can be a ProcessDomain, an HTTP request, or anything else.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

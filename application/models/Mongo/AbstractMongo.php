@@ -3,21 +3,22 @@ declare(strict_types=1);
 
 namespace App\Models\Mongo;
 
+use App\Library\DI;
 use MongoDB\Client;
-use Yaf\Registry;
+use MongoDB\Collection;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-10-28
  * Time: 下午3:34
  */
 abstract class AbstractMongo
 {
     /**
-     * @var Client
+     * @var Collection
      */
-    protected $col;
+    protected Collection $col;
 
     /**
      * php7中mongodb扩展会自动释放连接
@@ -28,11 +29,12 @@ abstract class AbstractMongo
      */
     public function __construct(string $database, string $col)
     {
-        $db        = new Client(Registry::get('config')->log->mongo,
+        $log_arr   = DI::get('config_arr')['log'];
+        $db        = new Client($log_arr['mongo'],
             [
-                'username'   => Registry::get('config')->log->username,
-                'password'   => Registry::get('config')->log->pwd,
-                'authSource' => Registry::get('config')->log->database,
+                'username'   => $log_arr['username'],
+                'password'   => $log_arr['pwd'],
+                'authSource' => $log_arr['database'],
             ]);
         $this->col = $db->selectCollection($database, $col);
     }

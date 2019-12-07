@@ -22,7 +22,7 @@ use Symfony\Component\Process\Pipes\UnixPipes;
 use Symfony\Component\Process\Pipes\WindowsPipes;
 
 /**
- * Process is a thin wrapper around proc_* functions to easily
+ * ProcessDomain is a thin wrapper around proc_* functions to easily
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -83,7 +83,7 @@ class Process implements \IteratorAggregate
     /**
      * Exit codes translation table.
      *
-     * User-defined errors must use exit codes in the 64-113 range.
+     * UserDomain-defined errors must use exit codes in the 64-113 range.
      */
     public static $exitCodes = [
         0 => 'OK',
@@ -100,13 +100,13 @@ class Process implements \IteratorAggregate
         131 => 'Quit and dump core',
         132 => 'Illegal instruction',
         133 => 'Trace/breakpoint trap',
-        134 => 'Process aborted',
+        134 => 'ProcessDomain aborted',
         135 => 'Bus error: "access to undefined portion of memory object"',
         136 => 'Floating point exception: "erroneous arithmetic operation"',
         137 => 'Kill (terminate immediately)',
-        138 => 'User-defined 1',
+        138 => 'UserDomain-defined 1',
         139 => 'Segmentation violation',
-        140 => 'User-defined 2',
+        140 => 'UserDomain-defined 2',
         141 => 'Write to pipe with no one reading',
         142 => 'Signal raised by alarm',
         143 => 'Termination (request to terminate)',
@@ -140,11 +140,11 @@ class Process implements \IteratorAggregate
     public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!\function_exists('proc_open')) {
-            throw new LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            throw new LogicException('The ProcessDomain class relies on proc_open, which is not available on your PHP installation.');
         }
 
         if (!\is_array($command)) {
-            @trigger_error(sprintf('Passing a command as string when creating a "%s" instance is deprecated since Symfony 4.2, pass it as an array of its arguments instead, or use the "Process::fromShellCommandline()" constructor if you need features provided by the shell.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a command as string when creating a "%s" instance is deprecated since Symfony 4.2, pass it as an array of its arguments instead, or use the "ProcessDomain::fromShellCommandline()" constructor if you need features provided by the shell.', __CLASS__), E_USER_DEPRECATED);
         }
 
         $this->commandline = $command;
@@ -168,7 +168,7 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Creates a Process instance as a command-line to be run in a shell wrapper.
+     * Creates a ProcessDomain instance as a command-line to be run in a shell wrapper.
      *
      * Command-lines are parsed by the shell of your OS (/bin/sh on Unix-like, cmd.exe on Windows.)
      * This allows using e.g. pipes or conditional execution. In this mode, signals are sent to the
@@ -177,7 +177,7 @@ class Process implements \IteratorAggregate
      * In order to inject dynamic values into command-lines, we strongly recommend using placeholders.
      * This will save escaping values, which is not portable nor secure anyway:
      *
-     *   $process = Process::fromShellCommandline('my_command "$MY_VAR"');
+     *   $process = ProcessDomain::fromShellCommandline('my_command "$MY_VAR"');
      *   $process->run(null, ['MY_VAR' => $theValue]);
      *
      * @param string         $command The command line to pass to the shell of the OS
@@ -279,7 +279,7 @@ class Process implements \IteratorAggregate
     public function start(callable $callback = null, array $env = [])
     {
         if ($this->isRunning()) {
-            throw new RuntimeException('Process is already running');
+            throw new RuntimeException('ProcessDomain is already running');
         }
 
         $this->resetProcessData();
@@ -370,7 +370,7 @@ class Process implements \IteratorAggregate
     public function restart(callable $callback = null, array $env = [])
     {
         if ($this->isRunning()) {
-            throw new RuntimeException('Process is already running');
+            throw new RuntimeException('ProcessDomain is already running');
         }
 
         $process = clone $this;
@@ -403,7 +403,7 @@ class Process implements \IteratorAggregate
         if (null !== $callback) {
             if (!$this->processPipes->haveReadSupport()) {
                 $this->stop(0);
-                throw new \LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::wait"');
+                throw new \LogicException('Pass the callback to the "ProcessDomain::start" method or call enableOutput to use a callback with "ProcessDomain::wait"');
             }
             $this->callback = $this->buildCallback($callback);
         }
@@ -443,7 +443,7 @@ class Process implements \IteratorAggregate
 
         if (!$this->processPipes->haveReadSupport()) {
             $this->stop(0);
-            throw new \LogicException('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::waitUntil".');
+            throw new \LogicException('Pass the callback to the "ProcessDomain::start" method or call enableOutput to use a callback with "ProcessDomain::waitUntil".');
         }
         $callback = $this->buildCallback($callback);
 
@@ -594,9 +594,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
+     * Returns an iterator to the output of the process, with the output type as keys (ProcessDomain::OUT/ERR).
      *
-     * @param int $flags A bit field of Process::ITER_* flags
+     * @param int $flags A bit field of ProcessDomain::ITER_* flags
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -726,7 +726,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns the exit code returned by the process.
      *
-     * @return int|null The exit status code, null if the Process is not terminated
+     * @return int|null The exit status code, null if the ProcessDomain is not terminated
      */
     public function getExitCode()
     {
@@ -741,7 +741,7 @@ class Process implements \IteratorAggregate
      * This method relies on the Unix exit code status standardization
      * and might not be relevant for other operating systems.
      *
-     * @return string|null A string representation for the exit status code, null if the Process is not terminated
+     * @return string|null A string representation for the exit status code, null if the ProcessDomain is not terminated
      *
      * @see http://tldp.org/LDP/abs/html/exitcodes.html
      * @see http://en.wikipedia.org/wiki/Unix_signal
@@ -1155,7 +1155,7 @@ class Process implements \IteratorAggregate
      */
     public function setEnv(array $env)
     {
-        // Process can not handle env values that are arrays
+        // ProcessDomain can not handle env values that are arrays
         $env = array_filter($env, function ($value) {
             return !\is_array($value);
         });
@@ -1166,9 +1166,9 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the Process input.
+     * Gets the ProcessDomain input.
      *
-     * @return resource|string|\Iterator|null The Process input
+     * @return resource|string|\Iterator|null The ProcessDomain input
      */
     public function getInput()
     {
@@ -1586,7 +1586,7 @@ class Process implements \IteratorAggregate
     private function requireProcessIsStarted(string $functionName)
     {
         if (!$this->isStarted()) {
-            throw new LogicException(sprintf('Process must be started before calling %s.', $functionName));
+            throw new LogicException(sprintf('ProcessDomain must be started before calling %s.', $functionName));
         }
     }
 
@@ -1598,7 +1598,7 @@ class Process implements \IteratorAggregate
     private function requireProcessIsTerminated(string $functionName)
     {
         if (!$this->isTerminated()) {
-            throw new LogicException(sprintf('Process must be terminated before calling %s.', $functionName));
+            throw new LogicException(sprintf('ProcessDomain must be terminated before calling %s.', $functionName));
         }
     }
 

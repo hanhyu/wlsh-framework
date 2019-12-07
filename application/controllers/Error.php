@@ -1,29 +1,29 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
+use App\Library\DI;
 use Swoole\Coroutine;
 use Swoole\Http\Response;
-use Yaf\Registry;
-use Yaf\Controller_Abstract;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-7-25
  * Time: 上午10:38
  */
-class Error extends Controller_Abstract
+class Error
 {
     /**
      * @var Response
      */
-    private $response;
+    private Response $response;
+    protected $cid;
 
-    public function init()
+    public function __construct()
     {
-        $cid            = Coroutine::getCid();
-        $this->response = Registry::get('response_' . $cid);
+        $this->cid      = Coroutine::getCid();
+        $this->response = DI::get('response_obj' . $this->cid);
     }
 
     /**
@@ -37,14 +37,16 @@ class Error extends Controller_Abstract
 
     /**
      * 触发此路由条件：请求的接口路由不正确
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-5-24
      * Time: 下午4:09
      */
     public function routerAction(): void
     {
-        $fd     = $this->getRequest()->getParam('fd');
-        $server = Registry::get('server');
+        $server = DI::get('server_obj');
+
+        //todo 不同协议获取的fd参数是不同的
+        $fd = DI::get('fd_int' . $this->cid);
 
         if ($server->isEstablished($fd)) {
             $server->push($fd, ws_response(400, '', '请求的接口不存在'));
@@ -55,14 +57,14 @@ class Error extends Controller_Abstract
 
     /**
      * 接口请求的method
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-5-24
      * Time: 下午4:09
      */
     public function methodAction(): void
     {
-        $fd     = $this->getRequest()->getParam('fd');
-        $server = Registry::get('server');
+        $fd     = DI::get('fd_int' . $this->cid);
+        $server = DI::get('server_obj');
 
         if ($server->isEstablished($fd)) {
             $server->push($fd, ws_response(400, '', '请求的方法不正确'));
@@ -70,6 +72,5 @@ class Error extends Controller_Abstract
             $this->response->end(http_response(400, '请求的方法不正确'));
         }
     }
-
 
 }

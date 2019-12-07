@@ -434,7 +434,7 @@ class Handler
                 break;
 
             case CURLOPT_USERAGENT:
-                $this->headers['User-Agent'] = $value;
+                $this->headers['UserDomain-Agent'] = $value;
                 break;
 
             case CURLOPT_CUSTOMREQUEST:

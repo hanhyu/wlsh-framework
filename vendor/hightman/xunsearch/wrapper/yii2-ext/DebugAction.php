@@ -48,7 +48,7 @@ class DebugAction extends Action
 		$timings = $this->panel->calculateTimings();
 		ArrayHelper::multisort($timings, 3, SORT_DESC);
 		if (!isset($timings[$logId])) {
-			throw new HttpException(404, 'Log message not found.');
+			throw new HttpException(404, 'LogDomain message not found.');
 		}
 		$message = $timings[$logId][1];
 		if (($pos = mb_strpos($message, "#")) !== false) {

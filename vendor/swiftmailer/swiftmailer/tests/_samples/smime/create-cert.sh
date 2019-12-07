@@ -5,7 +5,7 @@ openssl req -x509 -new -nodes -key CA.key -days 1460 -subj '/CN=Swiftmailer CA/O
 openssl x509 -in CA.crt -clrtrust -out CA.crt
 
 openssl genrsa -out sign.key 2048
-openssl req -new -key sign.key -subj '/CN=Swiftmailer-User/O=Swiftmailer/L=Paris/C=FR' -out sign.csr
+openssl req -new -key sign.key -subj '/CN=Swiftmailer-UserDomain/O=Swiftmailer/L=Paris/C=FR' -out sign.csr
 openssl x509 -req -in sign.csr -CA CA.crt -CAkey CA.key -out sign.crt -days 1460 -addtrust emailProtection
 openssl x509 -in sign.crt -clrtrust -out sign.crt
 
@@ -26,7 +26,7 @@ openssl x509 -in sign2.crt -clrtrust -out sign2.crt
 rm sign2.csr
 
 openssl genrsa -out encrypt.key 2048
-openssl req -new -key encrypt.key -subj '/CN=Swiftmailer-User/O=Swiftmailer/L=Paris/C=FR' -out encrypt.csr
+openssl req -new -key encrypt.key -subj '/CN=Swiftmailer-UserDomain/O=Swiftmailer/L=Paris/C=FR' -out encrypt.csr
 openssl x509 -req -in encrypt.csr -CA CA.crt -CAkey CA.key -CAcreateserial -out encrypt.crt -days 1460 -addtrust emailProtection
 openssl x509 -in encrypt.crt -clrtrust -out encrypt.crt
 

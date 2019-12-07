@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -68,7 +68,7 @@ class ChromePHPHandler extends AbstractProcessingHandler
     {
         parent::__construct($level, $bubble);
         if (!function_exists('json_encode')) {
-            throw new \RuntimeException('PHP\'s json extension is required to use Monolog\'s ChromePHPHandler');
+            throw new \RuntimeException('PHP\'s json extension is required to use MonologModel\'s ChromePHPHandler');
         }
     }
 

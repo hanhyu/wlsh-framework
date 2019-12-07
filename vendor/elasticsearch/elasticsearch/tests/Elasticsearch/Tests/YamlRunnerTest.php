@@ -220,7 +220,7 @@ class YamlRunnerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Process a procedure
+     * ProcessDomain a procedure
      *
      * @param array  $procedure
      * @param string $name
@@ -242,7 +242,7 @@ class YamlRunnerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Process an operation
+     * ProcessDomain an operation
      *
      * @param object            $operation
      * @param array|string|null $lastOperationResult

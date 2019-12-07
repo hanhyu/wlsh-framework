@@ -30,7 +30,7 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalizes a Process input.
+     * Validates and normalizes a ProcessDomain input.
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate

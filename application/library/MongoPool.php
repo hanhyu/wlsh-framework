@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Library;
+
 use MongoDB\Client;
-use Yaf\Registry;
 
 class MongoPool
 {
@@ -14,11 +15,11 @@ class MongoPool
     public function __construct()
     {
         $this->ch = new Client(
-            Registry::get('config')->log->mongo,
+            DI::get('config_arr')['log']['mongo'],
             [
-                'username'   => Registry::get('config')->log->username,
-                'password'   => Registry::get('config')->log->pwd,
-                'authSource' => Registry::get('config')->log->database,
+                'username'   => DI::get('config_arr')['log']['username'],
+                'password'   => DI::get('config_arr')['log']['pwd'],
+                'authSource' => DI::get('config_arr')['log']['database'],
             ]);
         $this->ch->listDatabases();
         unset($this->ch);

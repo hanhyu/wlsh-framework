@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,9 +23,9 @@ use Monolog\Formatter\MongoDBFormatter;
  *
  * Usage example:
  *
- *   $log = new \Monolog\Logger('application');
+ *   $log = new \MonologModel\Logger('application');
  *   $client = new \MongoDB\Client('mongodb://localhost:27017');
- *   $mongodb = new \Monolog\Handler\MongoDBHandler($client, 'logs', 'prod');
+ *   $mongodb = new \MonologModel\Handler\MongoDBHandler($client, 'logs', 'prod');
  *   $log->pushHandler($mongodb);
  *
  * The above examples uses the MongoDB PHP library's client class; however, the

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-12-11
  * Time: 下午5:45
  */
@@ -18,12 +18,12 @@ class SystemMenuForms
      * up_id 菜单上级ID
      * level 菜单等级
      *
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-5-4
      * Time: 下午10:35
      * @return array
      */
-    public static $setMenu = [
+    public static array $setMenu = [
         'id'    => 'IntGe:0',
         'name'  => 'Required|StrLenGeLe:3,50',
         'icon'  => 'Required|StrLenGeLe:1,50',
@@ -32,11 +32,11 @@ class SystemMenuForms
         'level' => 'Required|IntGeLe:1,5',
     ];
 
-    public static $getMenu = [
+    public static array $getMenu = [
         'id' => 'Required|IntGe:1',
     ];
 
-    public static $getMenuList = [
+    public static array $getMenuList = [
         'curr_page' => 'Required|IntGe:1',
         'page_size' => 'Required|IntGe:1',
     ];

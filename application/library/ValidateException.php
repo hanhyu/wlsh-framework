@@ -1,4 +1,7 @@
 <?php
+namespace App\Library;
+
+use Exception;
 
 /**
  * 参数验证手动触发的信息

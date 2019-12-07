@@ -1,15 +1,14 @@
 <?php
 declare(strict_types=1);
-
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-8-1
  * Time: 下午9:03
  */
 
+use App\Library\DI;
 use Swoole\Coroutine;
-use Yaf\Registry;
 
 /**
  * http协议以固定json格式返回信息
@@ -28,10 +27,12 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
 
     //由于只是获取header中的language值，为静态值，所以这里无需考虑协程数据混乱问题。
     $cid       = Coroutine::getCid();
-    $lang_code = Registry::get('request_' . $cid)->header['language'] ?? '';
+    $lang_code = DI::get('request_obj' . $cid)->header['language'] ?? '';
 
     //屏蔽中文简体
-    if ('zh-cn' == $lang_code) $vail = true;
+    if ('zh-cn' === $lang_code) {
+        $vail = true;
+    }
 
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
@@ -46,7 +47,7 @@ function http_response(int $code = 200, string $msg = '', array $data = [], bool
         $result['code'] = 400;
         $result['msg']  = $e->getMessage();
         $result['data'] = [];
-        $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
+        $res            = json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         return $res;
     }
     //debug_print_backtrace();
@@ -70,8 +71,8 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
     $result['code'] = $code;
     $result['uri']  = $uri;
 
-    $lang_code = Registry::get('ws_language') ?? '';
-    if ('zh-cn' == $lang_code) $vail = true;
+    $lang_code = DI::get('ws_language_str');
+    if ('zh-cn' === $lang_code) $vail = true;
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
     } else {
@@ -113,7 +114,7 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
  */
 function co_log($content, string $info, string $channel = 'system', string $level = 'info'): void
 {
-    if ($level == 'critica' or $level == 'alert' or $level == 'emergency') {
+    if ($level === 'critica' or $level === 'alert' or $level === 'emergency') {
         go(function () use ($content, $info) {
             send_email($content, $info);
         });
@@ -142,16 +143,16 @@ function co_log($content, string $info, string $channel = 'system', string $leve
 function monolog_by_mongodb($content, string $info, string $channel, string $level): bool
 {
     $log    = new \Monolog\Logger($channel);
-    $config = Registry::get('config')->log;
+    $config = DI::get('config_arr')['log'];
 
     $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
-        new \MongoDB\Driver\Manager($config->mongo, [
-            'username'   => $config->username,
-            'password'   => $config->pwd,
-            'authSource' => $config->database,
+        new \MongoDB\Driver\Manager($config['mongo'], [
+            'username'   => $config['username'],
+            'password'   => $config['pwd'],
+            'authSource' => $config['database'],
         ]),
-        $config->database,
-        $config->collection,
+        $config['database'],
+        $config['collection'],
         $level
     ));
 
@@ -185,7 +186,7 @@ function monolog_by_mongodb($content, string $info, string $channel, string $lev
 function monolog_by_file($content, string $info, string $level): void
 {
     $dir = date("Y-m-d", time());
-    $log = new \Monolog\Logger(ini_get('yaf.environ'));
+    $log = new \Monolog\Logger(ini_get('wlsh.environ'));
     $log->pushHandler(new \Monolog\Handler\StreamHandler(ROOT_PATH . "/log/monolog/{$dir}.log", Monolog\Logger::DEBUG));
     $log->pushProcessor(new \Monolog\Processor\ProcessIdProcessor());
     $log->pushProcessor(new \Monolog\Processor\UidProcessor());
@@ -206,7 +207,7 @@ function monolog_by_file($content, string $info, string $level): void
  */
 function send_email($content, string $info): void
 {
-    $email     = Registry::get('email_config')->toArray()[ini_get('yaf.environ')];
+    $email     = DI::get('email_config_arr')[ini_get('wlsh.environ')];
     $transport = (new Swift_SmtpTransport($email['host'], $email['port']))
         ->setUsername($email['uname'])
         ->setPassword($email['pwd']);
@@ -243,7 +244,7 @@ function send_email($content, string $info): void
  */
 function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string $level): void
 {
-    $tasks['uri']     = '/Task/Log/index';
+    $tasks['uri']     = '/Task/LogDomain/index';
     $tasks['content'] = $data;
     $tasks['info']    = $info;
     $tasks['level']   = $level;
@@ -260,17 +261,17 @@ function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string 
  */
 function get_ip(array $server): string
 {
-    if (!empty($server["http_client_ip"])) {
-        $cip = $server["http_client_ip"];
-    } else if (!empty($server["http_x_forwarded_for"])) {
-        $cip = $server["http_x_forwarded_for"];
-    } else if (!empty($server["remote_addr"])) {
-        $cip = $server["remote_addr"];
+    if (!empty($server['http_client_ip'])) {
+        $cip = $server['http_client_ip'];
+    } else if (!empty($server['http_x_forwarded_for'])) {
+        $cip = $server['http_x_forwarded_for'];
+    } else if (!empty($server['remote_addr'])) {
+        $cip = $server['remote_addr'];
     } else {
         $cip = '';
     }
     preg_match("/[\d\.]{7,15}/", $cip, $cips);
-    $cip = isset($cips[0]) ? $cips[0] : 'unknown';
+    $cip = $cips[0] ?? 'unknown';
     unset($cips);
 
     return $cip;
@@ -282,14 +283,13 @@ function get_ip(array $server): string
  */
 function msectime(): float
 {
-    list($msec, $sec) = explode(' ', microtime());
-    $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
-    return $msectime;
+    [$msec, $sec] = explode(' ', microtime());
+    return (float)sprintf('%.0f', ((float)$msec + (float)$sec) * 1000);
 }
 
 /**
  * 验证token的合法性、是否存在与过期
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 19-5-21
  * Time: 下午4:24
  *
@@ -306,14 +306,14 @@ function validate_token(string $token): array
         return $res;
     }
 
-    $data = get_token_params((string)$token);
+    $data = get_token_params($token);
 
     if (empty($data)) {
         co_log($token, 'validate_token data fail:');
         $res['msg'] = '非法操作';
     } else {
         //设置登录时长过期时间
-        $time_flag = (time() - (int)$data['time']) > (int)Registry::get('config')->token->expTime;
+        $time_flag = (time() - (int)$data['time']) > (int)DI::get('config_arr')['token']['expTime'];
         if ($time_flag) {
             $res['msg'] = '登录超时';
         } else {
@@ -336,9 +336,9 @@ function get_token(array $params): string
     $encrypted = openssl_encrypt(
         json_encode($params, JSON_UNESCAPED_UNICODE),
         'aes-256-cbc',
-        base64_decode(Registry::get('config')->token->encryptKey),
+        base64_decode(DI::get('config_arr')['token']['encryptKey']),
         OPENSSL_RAW_DATA,
-        base64_decode(Registry::get('config')->token->encryptIv)
+        base64_decode(DI::get('config_arr')['token']['encryptIv'])
     );
     $encode    = base64_encode($encrypted);
 
@@ -359,12 +359,12 @@ function get_token_params(string $auth): array
     $decrypted = openssl_decrypt(
         $token,
         'aes-256-cbc',
-        base64_decode(Registry::get('config')->token->encryptKey),
-        OPENSSL_RAW_DATA, base64_decode(Registry::get('config')->token->encryptIv)
+        base64_decode(DI::get('config_arr')['token']['encryptKey']),
+        OPENSSL_RAW_DATA, base64_decode(DI::get('config_arr')['token']['encryptIv'])
     );
     if ($decrypted) {
         $res = json_decode($decrypted, true);
-        if (json_last_error() == 0) {
+        if (json_last_error() === 0) {
             $data = $res;
         }
     }
@@ -382,17 +382,17 @@ function sign(int $cid, string $data): void
 {
     $data = stripslashes($data);
     //简单的sign签名，如需用app_id、app_key颁发认证签名时请放进redis中和noncestr随机数
-    if (Registry::get('config')->sign->flag) {
+    if (DI::get('config_arr')['sign']['flag']) {
         $time = time();
         /*
         $sign = private_encrypt(
                     md5($data . $time),
-                    Registry::get('config')->sign->prv_key
+                    DI::get('config_arr')['sign']['prv_key']
                 );
         */
         $sign = md5($data . $time);
 
-        $resp = Registry::get('response_' . $cid);
+        $resp = DI::get('response_obj' . $cid);
         $resp->header('timestamp', (string)$time);
         $resp->header('sign', $sign);
     }
@@ -475,9 +475,9 @@ function is_mobile(string $text): bool
     $search = '/^0?1[3|4|5|6|7|8|9][0-9]\d{8}$/';
     if (preg_match($search, $text)) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
 
 /**
@@ -487,7 +487,7 @@ function is_mobile(string $text): bool
  */
 function is_md5($password)
 {
-    return preg_match("/^[a-f0-9]{32}$/", $password);
+    return preg_match('/^[a-f0-9]{32}$/', $password);
 }
 
 /**

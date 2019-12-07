@@ -533,7 +533,7 @@ class Bucket
      *  * disableMD5 (boolean): When true, no MD5 sum will be generated for
      *    the stored file. Defaults to "false".
      *
-     *  * metadata (document): User data for the "metadata" field of the files
+     *  * metadata (document): UserDomain data for the "metadata" field of the files
      *    collection document.
      *
      * @param string $filename Filename
@@ -599,7 +599,7 @@ class Bucket
      *  * disableMD5 (boolean): When true, no MD5 sum will be generated for
      *    the stored file. Defaults to "false".
      *
-     *  * metadata (document): User data for the "metadata" field of the files
+     *  * metadata (document): UserDomain data for the "metadata" field of the files
      *    collection document.
      *
      * @param string   $filename Filename

@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: hanhyu
- * Date: 18-6-20
- * Time: 上午10:08
- */
-class NotFound extends Exception
-{
+namespace App\Library;
 
-}
+use RuntimeException;
+use Swoole\Event;
 
 class AutoReload
 {
@@ -17,8 +11,8 @@ class AutoReload
      */
     protected $inotify;
     protected $pid;
-    protected $reloadFileTypes = array('.php' => true);
-    protected $watchFiles = array();
+    protected $reloadFileTypes = ['.php' => true];
+    protected $watchFiles = [];
     /**
      * 正在reload
      */
@@ -30,25 +24,25 @@ class AutoReload
      */
     protected $rootDirs = array();
 
-    function putLog($log)
+    public function putLog($log)
     {
-        $_log = "[" . date('Y-m-d H:i:s') . "]\t" . $log . "\n";
+        $_log = '[' . date('Y-m-d H:i:s') . "]\t" . $log . "\n";
         echo $_log;
     }
 
     /**
      * @param $serverPid
-     * @throws NotFound
+     * @throws RuntimeException
      */
-    function __construct($serverPid)
+    public function __construct($serverPid)
     {
         $this->pid = $serverPid;
         if (posix_kill($serverPid, 0) === false) {
-            throw new NotFound("Process#$serverPid not found.");
+            throw new RuntimeException("ProcessDomain#$serverPid not found.");
         }
         $this->inotify = inotify_init();
-        $this->events = IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE;
-        Swoole\Event::add($this->inotify, function ($ifd) {
+        $this->events  = IN_MODIFY | IN_DELETE | IN_CREATE | IN_MOVE;
+        Event::add($this->inotify, function ($ifd) {
             $events = inotify_read($this->inotify);
             if (!$events) {
                 return;
@@ -75,7 +69,7 @@ class AutoReload
         });
     }
 
-    function reload()
+    public function reload()
     {
         $this->putLog("reloading");
         //向主进程发送信号
@@ -94,9 +88,9 @@ class AutoReload
      * 添加需要监听文件类型
      * @param $type
      */
-    function addFileType($type)
+    public function addFileType($type)
     {
-        $type = trim($type, '.');
+        $type                               = trim($type, '.');
         $this->reloadFileTypes['.' . $type] = true;
     }
 
@@ -104,7 +98,7 @@ class AutoReload
      * 添加事件
      * @param $inotifyEvent
      */
-    function addEvent($inotifyEvent)
+    public function addEvent($inotifyEvent)
     {
         $this->events |= $inotifyEvent;
     }
@@ -112,26 +106,26 @@ class AutoReload
     /**
      * 清理所有inotify监听
      */
-    function clearWatch()
+    public function clearWatch()
     {
         foreach ($this->watchFiles as $wd) {
             inotify_rm_watch($this->inotify, $wd);
         }
-        $this->watchFiles = array();
+        $this->watchFiles = [];
     }
 
     /**
      * 设置要监听的源码目录
-     * @param $dir
+     * @param      $dir
      * @param bool $root
      * @return bool
-     * @throws NotFound
+     * @throws RuntimeException
      */
-    function watch($dir, $root = true)
+    public function watch($dir, $root = true)
     {
         //目录不存在
         if (!is_dir($dir)) {
-            throw new NotFound("[$dir] is not a directory.");
+            throw new RuntimeException("[$dir] is not a directory.");
         }
         //避免重复监听
         if (isset($this->watchFiles[$dir])) {
@@ -163,7 +157,7 @@ class AutoReload
         return true;
     }
 
-    function run()
+    public function run()
     {
         //swoole_event_wait();
     }

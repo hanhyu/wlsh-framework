@@ -14,7 +14,7 @@ namespace Symfony\Component\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Provides a way to continuously write to the input of a Process until the InputStream is closed.
+ * Provides a way to continuously write to the input of a ProcessDomain until the InputStream is closed.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

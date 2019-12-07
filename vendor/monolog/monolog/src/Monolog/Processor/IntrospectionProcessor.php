@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -43,7 +43,7 @@ class IntrospectionProcessor implements ProcessorInterface
     public function __construct($level = Logger::DEBUG, array $skipClassesPartials = [], int $skipStackFramesCount = 0)
     {
         $this->level = Logger::toMonologLevel($level);
-        $this->skipClassesPartials = array_merge(['Monolog\\'], $skipClassesPartials);
+        $this->skipClassesPartials = array_merge(['MonologModel\\'], $skipClassesPartials);
         $this->skipStackFramesCount = $skipStackFramesCount;
     }
 

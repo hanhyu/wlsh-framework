@@ -2,6 +2,7 @@
 //本地开发环境配置
 return [
 
+    //指定Access-Control-Allow-Origin的值
     'origin' => [
         'domain' => 'https://127.0.0.1:9772',
     ],
@@ -33,7 +34,7 @@ return [
     ],
 
     'redis' => [
-        'host' => '127.0.0.1',
+        'host' => '172.17.0.1',
         'port' => 6379,
         'auth' => 'root',
     ],

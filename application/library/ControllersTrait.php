@@ -1,18 +1,22 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Library;
+
 use App\Models\Forms\FormsVali;
 
+use Exception;
+use Redis;
 use Swoole\Atomic;
 use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Server;
-use Yaf\Registry;
+use Throwable;
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-12-12
  * Time: 下午6:38
  */
@@ -21,37 +25,37 @@ trait ControllersTrait
     /**
      * @var Server
      */
-    protected $server;
+    protected Server $server;
     /**
      * @var Request
      */
-    protected $request;
+    protected Request $request;
     /**
      * @var Response
      */
-    protected $response;
+    protected Response $response;
     /**
      * @var Atomic
      */
-    protected $atomic;
+    protected Atomic $atomic;
     /**
      * @var Redis
      */
-    protected $redis;
-    protected $cid;
+    protected Redis $redis;
+    protected int $cid;
 
     /**
      * 实现aop编程前置方法，供yaf控制器初始化中使用。
      *
      * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
      */
-    public function beforeInit($log = true): void
+    public function beforeInit(bool $log = true): void
     {
         $this->cid      = Coroutine::getCid();
-        $this->server   = Registry::get('server');
-        $this->request  = Registry::get('request_' . $this->cid);
-        $this->response = Registry::get('response_' . $this->cid);
-        $this->atomic   = Registry::get('atomic');
+        $this->server   = DI::get('server_obj');
+        $this->request  = DI::get('request_obj' . $this->cid);
+        $this->response = DI::get('response_obj' . $this->cid);
+        $this->atomic   = DI::get('atomic_obj');
 
         if ($log) {
             $req_method  = $this->request->server['request_method'];
@@ -66,7 +70,7 @@ trait ControllersTrait
                     $let          = stristr($content_type, 'json');
 
                     if ($let) {
-                        $data = json_decode($this->request->rawContent(), true);
+                        $data = json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                     } else {
                         $data = $this->request->post;
                     }
@@ -87,7 +91,7 @@ trait ControllersTrait
                     $let          = stristr($content_type, 'json');
 
                     if ($let) {
-                        $data += json_decode($this->request->rawContent(), true);
+                        $data += json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                     } else {
                         $data += $this->request->post;
                     }
@@ -126,7 +130,7 @@ trait ControllersTrait
                 if ($let) {
                     if (!empty($this->request->rawContent())) {
                         try {
-                            $data = json_decode($this->request->rawContent(), true, 512, JSON_THROW_ON_ERROR);
+                            $data = json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                         } catch (Throwable $e) {
                             $data = [];
                         }
@@ -144,7 +148,7 @@ trait ControllersTrait
                 if ($let) {
                     if (!empty($this->request->rawContent())) {
                         try {
-                            $data += json_decode($this->request->rawContent(), true, 512, JSON_THROW_ON_ERROR);
+                            $data += json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                         } catch (Throwable $e) {
                             $data = [];
                         }
@@ -165,7 +169,8 @@ trait ControllersTrait
      * @param array $validations
      *
      * @return array 返回验证过滤后的数据
-     * @throws Exception
+     * @throws ProgramException
+     * @throws ValidateException
      */
     public function validator(array $validations): array
     {
@@ -181,8 +186,8 @@ trait ControllersTrait
             if (!isset($data['login_data']) or !is_string($data['login_data'])) {
                 throw new ProgramException('参数错误', 400);
             }
-            $decrypt = private_decrypt($data['login_data'], Registry::get('config')->sign->prv_key);
-            $data    = json_decode($decrypt, true);
+            $decrypt = private_decrypt($data['login_data'], DI::get('config_arr')['sign']['prv_key']);
+            $data    = json_decode($decrypt, true, 512, JSON_THROW_ON_ERROR);
         }
 
         $lang_code = $this->request->header['language'] ?? 'zh-cn';

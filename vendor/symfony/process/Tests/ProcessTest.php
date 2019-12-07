@@ -116,7 +116,7 @@ class ProcessTest extends TestCase
         }
 
         if (!$p->isRunning()) {
-            throw new \LogicException('Process is not running: '.$p->getErrorOutput());
+            throw new \LogicException('ProcessDomain is not running: '.$p->getErrorOutput());
         }
 
         $start = microtime(true);
@@ -171,7 +171,7 @@ class ProcessTest extends TestCase
 
         $p->start();
 
-        // Don't call Process::run nor Process::wait to avoid any read of pipes
+        // Don't call ProcessDomain::run nor ProcessDomain::wait to avoid any read of pipes
         $h = new \ReflectionProperty($p, 'process');
         $h->setAccessible(true);
         $h = $h->getValue($p);
@@ -940,7 +940,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess('foo');
 
         $this->expectException('Symfony\Component\Process\Exception\LogicException');
-        $this->expectExceptionMessage(sprintf('Process must be started before calling %s.', $method));
+        $this->expectExceptionMessage(sprintf('ProcessDomain must be started before calling %s.', $method));
 
         $process->{$method}();
     }
@@ -962,7 +962,7 @@ class ProcessTest extends TestCase
     public function testMethodsThatNeedATerminatedProcess($method)
     {
         $this->expectException('Symfony\Component\Process\Exception\LogicException');
-        $this->expectExceptionMessage('Process must be terminated before calling');
+        $this->expectExceptionMessage('ProcessDomain must be terminated before calling');
         $process = $this->getProcessForCode('sleep(37);');
         $process->start();
         try {

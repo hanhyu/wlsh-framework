@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,7 +23,7 @@ use Monolog\Logger;
 class HtmlFormatter extends NormalizerFormatter
 {
     /**
-     * Translates Monolog log levels to html color priorities.
+     * Translates MonologModel log levels to html color priorities.
      */
     protected $logLevels = [
         Logger::DEBUG     => '#cccccc',

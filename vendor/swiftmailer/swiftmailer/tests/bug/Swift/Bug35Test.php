@@ -19,7 +19,7 @@ class Swift_Bug35Test extends \PHPUnit\Framework\TestCase
 
         $message->setBody('HTML part', 'text/html');
 
-        $message->setTo(['user@domain.tld' => 'User']);
+        $message->setTo(['user@domain.tld' => 'UserDomain']);
 
         $message->setFrom(['other@domain.tld' => 'Other']);
         $message->setSender(['other@domain.tld' => 'Other']);
@@ -35,7 +35,7 @@ class Swift_Bug35Test extends \PHPUnit\Framework\TestCase
         'Date: '.$date."\r\n".
         'Subject: test subject'."\r\n".
         'From: Other <other@domain.tld>'."\r\n".
-        'To: User <user@domain.tld>'."\r\n".
+        'To: UserDomain <user@domain.tld>'."\r\n".
         'MIME-Version: 1.0'."\r\n".
         'Content-Type: multipart/mixed;'."\r\n".
         ' boundary="'.$boundary.'"'."\r\n".

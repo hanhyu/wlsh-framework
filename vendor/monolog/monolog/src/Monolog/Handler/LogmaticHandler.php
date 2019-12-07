@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -36,7 +36,7 @@ class LogmaticHandler extends SocketHandler
     private $appname;
 
     /**
-     * @param string     $token    Log token supplied by Logmatic.
+     * @param string     $token    LogDomain token supplied by Logmatic.
      * @param string     $hostname Host name supplied by Logmatic.
      * @param string     $appname  Application name supplied by Logmatic.
      * @param bool       $useSSL   Whether or not SSL encryption should be used.

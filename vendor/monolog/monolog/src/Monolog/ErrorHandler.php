@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * Monolog error handler
+ * MonologModel error handler
  *
  * A facility to enable logging of runtime errors, exceptions and fatal errors.
  *
@@ -103,7 +103,7 @@ class ErrorHandler
 
     /**
      * @param string|null $level              a LogLevel::* constant, null to use the default LogLevel::ALERT or false to disable fatal error handling
-     * @param int         $reservedMemorySize Amount of KBs to reserve in memory so that it can be freed when handling fatal errors giving Monolog some room in memory to get its job done
+     * @param int         $reservedMemorySize Amount of KBs to reserve in memory so that it can be freed when handling fatal errors giving MonologModel some room in memory to get its job done
      */
     public function registerFatalHandler($level = null, int $reservedMemorySize = 20): self
     {

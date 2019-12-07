@@ -519,7 +519,7 @@ class XdebugHandler
         }
 
         self::$skipped = $settings['skipped'];
-        $this->notify(Status::INFO, 'Process called with existing restart settings');
+        $this->notify(Status::INFO, 'ProcessDomain called with existing restart settings');
     }
 
     /**

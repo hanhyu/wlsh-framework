@@ -297,7 +297,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
         stream_set_blocking($pipes[2], 0);
         if ($err = stream_get_contents($pipes[2])) {
             throw new Swift_TransportException(
-                'Process could not be started ['.$err.']'
+                'ProcessDomain could not be started ['.$err.']'
                 );
         }
         $this->in = &$pipes[0];
@@ -308,7 +308,7 @@ class Swift_Transport_StreamBuffer extends Swift_ByteStream_AbstractFilterableIn
     {
         switch ($this->params['type']) {
             case self::TYPE_PROCESS:
-                return 'Process '.$this->params['command'];
+                return 'ProcessDomain '.$this->params['command'];
                 break;
 
             case self::TYPE_SOCKET:

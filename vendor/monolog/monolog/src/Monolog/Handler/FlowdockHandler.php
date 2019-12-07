@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -55,7 +55,7 @@ class FlowdockHandler extends SocketHandler
     public function setFormatter(FormatterInterface $formatter): HandlerInterface
     {
         if (!$formatter instanceof FlowdockFormatter) {
-            throw new \InvalidArgumentException('The FlowdockHandler requires an instance of Monolog\Formatter\FlowdockFormatter to function correctly');
+            throw new \InvalidArgumentException('The FlowdockHandler requires an instance of MonologModel\Formatter\FlowdockFormatter to function correctly');
         }
 
         return parent::setFormatter($formatter);
@@ -66,7 +66,7 @@ class FlowdockHandler extends SocketHandler
      */
     protected function getDefaultFormatter(): FormatterInterface
     {
-        throw new \InvalidArgumentException('The FlowdockHandler must be configured (via setFormatter) with an instance of Monolog\Formatter\FlowdockFormatter to function correctly');
+        throw new \InvalidArgumentException('The FlowdockHandler must be configured (via setFormatter) with an instance of MonologModel\Formatter\FlowdockFormatter to function correctly');
     }
 
     /**

@@ -535,7 +535,7 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
             // Count bytes ready
             var nBytesReady = Math.min(nWordsReady * 4, dataSigBytes);
 
-            // Process blocks
+            // ProcessDomain blocks
             if (nWordsReady) {
                 for (var offset = 0; offset < nWordsReady; offset += blockSize) {
                     // Perform concrete-algorithm logic

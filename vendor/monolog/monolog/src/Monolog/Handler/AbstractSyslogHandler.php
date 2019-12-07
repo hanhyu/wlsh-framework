@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,7 +23,7 @@ abstract class AbstractSyslogHandler extends AbstractProcessingHandler
     protected $facility;
 
     /**
-     * Translates Monolog log levels to syslog log priorities.
+     * Translates MonologModel log levels to syslog log priorities.
      */
     protected $logLevels = [
         Logger::DEBUG     => LOG_DEBUG,

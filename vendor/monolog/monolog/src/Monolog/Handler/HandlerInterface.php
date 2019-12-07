@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -12,7 +12,7 @@
 namespace Monolog\Handler;
 
 /**
- * Interface that all Monolog Handlers must implement
+ * Interface that all MonologModel Handlers must implement
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -67,7 +67,7 @@ interface HandlerInterface
      * and ideally handlers should be able to reopen themselves on handle() after they have been closed.
      *
      * This is useful at the end of a request and will be called automatically when the object
-     * is destroyed if you extend Monolog\Handler\Handler.
+     * is destroyed if you extend MonologModel\Handler\Handler.
      *
      * If you are thinking of calling this method yourself, most likely you should be
      * calling ResettableInterface::reset instead. Have a look.

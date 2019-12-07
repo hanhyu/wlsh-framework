@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -14,14 +14,14 @@ namespace Monolog\Handler;
 use Monolog\Logger;
 
 /**
- * SendGridrHandler uses the SendGrid API v2 function to send Log emails, more information in https://sendgrid.com/docs/API_Reference/Web_API/mail.html
+ * SendGridrHandler uses the SendGrid API v2 function to send LogDomain emails, more information in https://sendgrid.com/docs/API_Reference/Web_API/mail.html
  *
  * @author Ricardo Fontanelli <ricardo.fontanelli@hotmail.com>
  */
 class SendGridHandler extends MailHandler
 {
     /**
-     * The SendGrid API User
+     * The SendGrid API UserDomain
      * @var string
      */
     protected $apiUser;
@@ -51,7 +51,7 @@ class SendGridHandler extends MailHandler
     protected $subject;
 
     /**
-     * @param string       $apiUser The SendGrid API User
+     * @param string       $apiUser The SendGrid API UserDomain
      * @param string       $apiKey  The SendGrid API Key
      * @param string       $from    The sender of the email
      * @param string|array $to      The recipients of the email

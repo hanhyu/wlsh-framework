@@ -199,7 +199,7 @@ final class StrictUnifiedDiffOutputBuilderIntegrationTest extends TestCase
 
         $p = new Process(\sprintf('diff -u %s %s', \escapeshellarg($this->fileFrom), \escapeshellarg($this->fileTo)));
         $p->run();
-        $this->assertSame(1, $p->getExitCode()); // note: Process assumes exit code 0 for `isSuccessful`, however `diff` uses the exit code `1` for success with diff
+        $this->assertSame(1, $p->getExitCode()); // note: ProcessDomain assumes exit code 0 for `isSuccessful`, however `diff` uses the exit code `1` for success with diff
 
         $output = $p->getOutput();
 

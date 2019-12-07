@@ -1,15 +1,15 @@
 <?php
 /**
  * 开发程序时入口打开debug
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-10-11
  * Time: 上午10:15
  */
 
 function stop(): void
 {
-    if (is_file(dirname(__FILE__) . '/log/swoolePid.log')) {
-        $fp        = fopen(dirname(__FILE__) . '/log/swoolePid.log', "r");
+    if (is_file(__DIR__ . '/log/swoolePid.log')) {
+        $fp        = fopen(__DIR__ . '/log/swoolePid.log', 'rb');
         $masterPid = fgets($fp);
         fclose($fp);
         //使用swoole_process::kill代替posix_kill
@@ -17,49 +17,49 @@ function stop(): void
             \Swoole\Process::kill($masterPid);
             $timeout   = 60;
             $startTime = time();
-            echo "=================== stop  ===================" . PHP_EOL;
+            echo '=================== stop  ===================' . PHP_EOL;
             while (true) {
                 // Check the process status
                 if (\Swoole\Process::kill($masterPid, 0)) {
                     // 判断是否超时
                     if (time() - $startTime >= $timeout) {
-                        echo PHP_EOL . "================= fail  =================" . PHP_EOL;
+                        echo PHP_EOL . '================= fail  =================' . PHP_EOL;
                         return;
                     }
                     sleep(1);
                     echo '.';
                     continue;
                 }
-                echo PHP_EOL . "================== success  =================" . PHP_EOL;
+                echo PHP_EOL . '================== success  =================' . PHP_EOL;
                 return;
             }
         }
     }
-    echo "================= please start the first  =================" . PHP_EOL;
+    echo '================= please start the first  =================' . PHP_EOL;
     return;
 }
 
 function reload(): void
 {
-    if (is_file(dirname(__FILE__) . '/log/swoolePid.log')) {
-        $fp        = fopen(dirname(__FILE__) . '/log/swoolePid.log', "r");
+    if (is_file(__DIR__ . '/log/swoolePid.log')) {
+        $fp        = fopen(__DIR__ . '/log/swoolePid.log', 'rb');
         $masterPid = fgets($fp);
         fclose($fp);
         if (\Swoole\Process::kill($masterPid, 0)) {
             \Swoole\Process::kill($masterPid, SIGUSR1);
-            echo "=================== reload  ===================" . PHP_EOL;
+            echo '=================== reload  ===================' . PHP_EOL;
             sleep(1);
-            echo PHP_EOL . "================== success  =================" . PHP_EOL;
+            echo PHP_EOL . '================== success  =================' . PHP_EOL;
             return;
         }
     }
-    echo "================= please start the first  =================" . PHP_EOL;
+    echo '================= please start the first  =================' . PHP_EOL;
     return;
 }
 
 function run(string $param = 'produce'): void
 {
-    if ($param == 'dev') {
+    if ($param === 'dev') {
         define('APP_DEBUG', TRUE);
     } else {
         define('APP_DEBUG', FALSE);
@@ -87,14 +87,14 @@ function run(string $param = 'produce'): void
     date_default_timezone_set('Asia/Shanghai');
 
     define('DS', DIRECTORY_SEPARATOR);
-    define('ROOT_PATH', dirname(__FILE__));
+    define('ROOT_PATH', __DIR__);
     define('CONF_PATH', ROOT_PATH . DS . 'conf');
-    define('APPLICATION_PATH', ROOT_PATH . DS . 'application');
-    define('LIBRARY_PATH', APPLICATION_PATH . DS . 'library');
+    define('APP_PATH', ROOT_PATH . DS . 'application');
+    define('LIBRARY_PATH', APP_PATH . DS . 'library');
 
-    require LIBRARY_PATH . DS . 'Server.php';
+    require APP_PATH . DS . 'Bootstrap.php';
 
-    $serverObj = Server::getInstance();
+    $serverObj = Bootstrap::getInstance();
     $serverObj->start();
 }
 
@@ -107,14 +107,13 @@ function explain(): void
         Commands:
           start     Start Swoole Server
           stop      Stop Swoole Server
-          reload    Reload Swoole Worker Process
+          reload    Reload Swoole Worker ProcessDomain
         
         Start Options:
           dev   Start Debug
           -d    Start Daemonize HTTP Server
     EOT;
     echo PHP_EOL;
-    return;
 }
 
 function start(array &$argv): void

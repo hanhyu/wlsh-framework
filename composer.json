@@ -1,6 +1,6 @@
 {
   "name": "wlsh/frame",
-  "description": "运行环境：php 7.2.5 / nginx 1.14.0 / swoole 4.2.5 / yaf 3.0.7 / Mysql 8.0.11/ Redis 4.0.10 / inotify",
+  "description": "运行环境：php 7.4.0 / nginx 1.14.0 / swoole 4.2.5 / yaf 3.0.7 / Mysql 8.0.11/ Redis 4.0.10 / inotify",
   "keywords": [
     "swoole",
     "redis",
@@ -16,7 +16,7 @@
     }
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.4",
     "catfan/medoo": "1.7.6",
     "monolog/monolog": "2.0.0",
     "swiftmailer/swiftmailer": "6.2.1",
@@ -33,12 +33,14 @@
     "psr-4": {
       "App\\Models\\": "application/models",
       "App\\Domain\\": "application/domain",
-      "App\\Plugins\\": "application/plugins",
       "App\\Modules\\": "application/modules",
+      "App\\Library\\": "application/library",
+      "App\\Controllers\\": "application/controllers",
       "Tests\\": "tests/"
     }
   },
   "require-dev": {
+    "roave/security-advisories": "dev-master",
     "friendsofphp/php-cs-fixer": "^2.14@dev",
     "phpunit/phpunit": "^7.4",
     "elasticsearch/elasticsearch": "~6.0",

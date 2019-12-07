@@ -1,55 +1,34 @@
 <?php
 declare(strict_types=1);
 
-//由于使用yaf，需注意controllers命名空间必须与目录一样小写开头。
-namespace App\controllers;
+namespace App\Controllers;
 
-use App\Domain\System\User;
+use App\Domain\System\UserDomain;
+use App\Library\ControllersTrait;
 use App\Models\RedisFactory;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use Yaf\{
-    Controller_Abstract,
-    Registry,
-};
 use Swoole\Coroutine;
-use Swoole\WebSocket\Server;
-use Swoole\Http\Response;
 use Exception;
-use App\Domain\Index\Login as LoginDomain;
 
 /**
  * 测试用例
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-7-25
  * Time: 上午10:24
  */
-class Login extends Controller_Abstract
+class Login
 {
-    /**
-     * @var Server
-     */
-    private $server;
-    /**
-     * @var Response
-     */
-    private $response;
-    /**
-     * @var \Redis
-     */
-    private $redis;
-    private $cid;
+    use ControllersTrait;
 
-    public function init()
+    public function __construct()
     {
-        $this->cid      = Coroutine::getCid();
-        $this->server   = Registry::get('server');
-        $this->response = Registry::get('response_' . $this->cid);
+        $this->beforeInit();
     }
 
     /**
      * 此方法不能删除
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-12
      * Time: 上午10:09
      */
@@ -59,7 +38,7 @@ class Login extends Controller_Abstract
     }
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 18-7-21
      * Time: 下午3:27
      * ab -c 1000 -n 1000000 -k http://127.0.0.1:9770/login/test
@@ -655,10 +634,10 @@ class Login extends Controller_Abstract
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
         //print_r('123');
-        $res = (new User())->getInfoList($data);
+        $res = (new UserDomain())->getInfoList($data);
 
         //压测使用两个协程并行执行，结果与不使用并行一样。
-        //$res = (new User())->getInfoList_back($data);
+        //$res = (new UserDomain())->getInfoList_back($data);
 
         //print_r('456' . PHP_EOL);
         if (!empty($res)) {
@@ -670,7 +649,7 @@ class Login extends Controller_Abstract
 
     public function getUserInfoAction(): void
     {
-        $user = new \App\Domain\System\User();
+        $user = new \App\Domain\System\UserDomain();
         $res  = $user->getInfoByName('ceshi123');
         if ($res) {
             $this->response->end(http_response(200, '', $res));
@@ -813,7 +792,7 @@ class Login extends Controller_Abstract
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Domain\System\User();
+        $user               = new \App\Domain\System\UserDomain();
         $res                = $user->getLogList($data);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
@@ -897,7 +876,7 @@ class Login extends Controller_Abstract
 
 
     /**
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-1-21
      * Time: 下午5:31
      *
@@ -1121,7 +1100,7 @@ class Login extends Controller_Abstract
           $this->response->end(http_response(200, '', $get));*/
 
         //压测协程数据结果是否错乱，连接池大小
-        (new User())->testName();
+        (new UserDomain())->testName();
         $this->response->end();
 
     }
@@ -1160,7 +1139,7 @@ class Login extends Controller_Abstract
 
     /**
      * 在SWOOLE_BASE模式下用ab压测以下两种代码方式输出的效果，会发现协程模式提速很快
-     * User: hanhyu
+     * UserDomain: hanhyu
      * Date: 19-7-25
      * Time: 下午4:18
      */

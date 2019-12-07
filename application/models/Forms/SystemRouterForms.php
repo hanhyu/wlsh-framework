@@ -4,7 +4,7 @@ namespace App\Models\Forms;
 
 class SystemRouterForms
 {
-    public static $setRouter = [
+    public static array $setRouter = [
         'name'    => 'Required|StrLenGeLe:2,20|Alias:路由名称',
         'url'     => 'Required|StrLenGeLe:3,200|Alias:请求链接',
         'auth'    => 'Required|IntIn:0,1|Alias:认证',
@@ -15,7 +15,7 @@ class SystemRouterForms
         'comment' => 'Required|StrLenGeLe:1,20|Alias:路由说明',
     ];
 
-    public static $editRouter = [
+    public static array $editRouter = [
         'id'      => 'Required|IntGe:1',
         'name'    => 'Required|StrLenGeLe:2,20',
         'url'     => 'Required|StrLenGeLe:3,200',
@@ -27,12 +27,12 @@ class SystemRouterForms
         'comment' => 'Required|StrLenGeLe:1,20',
     ];
 
-    public static $getList = [
+    public static array $getList = [
         'curr_page' => 'IntGe:1|Alias:列表页数',
         'page_size' => 'Required|IntGe:1|Alias:每页显示记录数',
     ];
 
-    public static $delRouter = [
+    public static array $delRouter = [
         'id' => 'Required|IntGe:1|Alias:路由id',
     ];
 

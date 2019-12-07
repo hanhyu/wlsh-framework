@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-12-11
  * Time: 下午10:51
  */
@@ -15,12 +15,12 @@ class SystemLogForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public static $info = [
+    public static array $info = [
         'name' => 'Required|StrLenGeLe:1,50',
     ];
 
 
-    public static $getMongoList = [
+    public static array $getMongoList = [
         'curr_page'  => 'Required|IntGe:1',
         'page_size'  => 'Required|IntGe:1',
         'start_time' => ['DateTime|Alias:开始时间', 'StrIn:'],
@@ -29,7 +29,7 @@ class SystemLogForms
     ];
 
 
-    public static $getMongoInfo = [
+    public static array $getMongoInfo = [
         'id' => 'Required|Str',
     ];
 
@@ -38,7 +38,7 @@ class SystemLogForms
      * 用户登录日志
      * @return array
      */
-    public static $getUserList = [
+    public static array $getUserList = [
         'curr_page'  => 'Required|IntGe:1',
         'page_size'  => 'Required|IntGe:1',
         'login_time' => ['Date', 'StrIn:'],

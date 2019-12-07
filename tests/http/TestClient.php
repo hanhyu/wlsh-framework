@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: hanhui
+ * UserDomain: hanhui
  * Date: 17-12-16
  * Time: 下午1:38
  */
@@ -16,10 +16,10 @@ class TestClient{
         $this->cli = new Swoole\Http\Client('127.0.0.1', 9501);
 
         $this->cli->setHeaders([
-            'Host' => "localhost",
-            "User-Agent" => 'Chrome/49.0.2587.3',
-            'Accept' => 'text/html,application/xhtml+xml,application/xml',
-            'Accept-Encoding' => 'gzip',
+            'Host'             => "localhost",
+            "UserDomain-Agent" => 'Chrome/49.0.2587.3',
+            'Accept'           => 'text/html,application/xhtml+xml,application/xml',
+            'Accept-Encoding'  => 'gzip',
         ]);
     }
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * 非正常提示码
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-12-11
  * Time: 下午10:50
  */
@@ -15,7 +15,7 @@ class SystemProcessForms
      * 格式为：array(方法名=>array(字段名=>验证规则))
      *
      */
-    public static $setMsg = [
+    public static array $setMsg = [
         'content' => 'Required|StrLenGeLe:1,1000',
     ];
 
@@ -23,7 +23,7 @@ class SystemProcessForms
      * 获取内容列表
      * @return array
      */
-    public static $getMsgList = [
+    public static array $getMsgList = [
         'curr_page' => 'Required|IntGe:1',
         'page_size' => 'Required|IntGe:1',
         'id'        => ['IntGe:1', 'StrIn:'],

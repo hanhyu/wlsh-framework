@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,11 +23,11 @@ namespace Monolog\Formatter;
  *  path /var/run/td-agent/td-agent.sock
  * </source>
  *
- * Monolog setup:
+ * MonologModel setup:
  *
- * $logger = new Monolog\Logger('fluent.tag');
- * $fluentHandler = new Monolog\Handler\SocketHandler('unix:///var/run/td-agent/td-agent.sock');
- * $fluentHandler->setFormatter(new Monolog\Formatter\FluentdFormatter());
+ * $logger = new MonologModel\Logger('fluent.tag');
+ * $fluentHandler = new MonologModel\Handler\SocketHandler('unix:///var/run/td-agent/td-agent.sock');
+ * $fluentHandler->setFormatter(new MonologModel\Formatter\FluentdFormatter());
  * $logger->pushHandler($fluentHandler);
  *
  * @author Andrius Putna <fordnox@gmail.com>
@@ -42,7 +42,7 @@ class FluentdFormatter implements FormatterInterface
     public function __construct(bool $levelTag = false)
     {
         if (!function_exists('json_encode')) {
-            throw new \RuntimeException('PHP\'s json extension is required to use Monolog\'s FluentdUnixFormatter');
+            throw new \RuntimeException('PHP\'s json extension is required to use MonologModel\'s FluentdUnixFormatter');
         }
 
         $this->levelTag = $levelTag;

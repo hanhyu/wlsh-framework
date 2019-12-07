@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the Monolog package.
+ * This file is part of the MonologModel package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -12,7 +12,7 @@
 namespace Monolog\Processor;
 
 /**
- * An optional interface to allow labelling Monolog processors.
+ * An optional interface to allow labelling MonologModel processors.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

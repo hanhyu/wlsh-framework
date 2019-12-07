@@ -94,7 +94,7 @@ class WritableStream
      *  * contentType (string): DEPRECATED content type to be stored with the
      *    file. This information should now be added to the metadata.
      *
-     *  * metadata (document): User data for the "metadata" field of the files
+     *  * metadata (document): UserDomain data for the "metadata" field of the files
      *    collection document.
      *
      * @param CollectionWrapper $collectionWrapper GridFS collection wrapper

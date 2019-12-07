@@ -126,7 +126,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
             // Append
             this._append(dataUpdate);
 
-            // Process available blocks
+            // ProcessDomain available blocks
             return this._process();
         },
 
@@ -207,7 +207,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
      */
     var StreamCipher = C_lib.StreamCipher = Cipher.extend({
         _doFinalize: function () {
-            // Process partial blocks
+            // ProcessDomain partial blocks
             var finalProcessedBlocks = this._process(!!'flush');
 
             return finalProcessedBlocks;
@@ -477,10 +477,10 @@ CryptoJS.lib.Cipher || (function (undefined) {
                 // Pad data
                 padding.pad(this._data, this.blockSize);
 
-                // Process final blocks
+                // ProcessDomain final blocks
                 var finalProcessedBlocks = this._process(!!'flush');
             } else /* if (this._xformMode == this._DEC_XFORM_MODE) */ {
-                // Process final blocks
+                // ProcessDomain final blocks
                 var finalProcessedBlocks = this._process(!!'flush');
 
                 // Unpad data

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Process\Exception;
 
 /**
- * Marker Interface for the Process Component.
+ * Marker Interface for the ProcessDomain Component.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

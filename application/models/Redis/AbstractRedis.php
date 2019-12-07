@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 /**
  * Created by PhpStorm.
- * User: hanhyu
+ * UserDomain: hanhyu
  * Date: 18-10-28
  * Time: 下午3:47
  */
 
 namespace App\Models\Redis;
 
+use App\Library\DI;
+use App\Library\RedisPool;
 use Redis;
-use Yaf\Registry;
 use Exception;
 
 abstract class AbstractRedis
@@ -19,26 +20,29 @@ abstract class AbstractRedis
     /**
      * @var Redis
      */
-    protected $db;
+    protected Redis $db;
     /**
      * 此处使用静态延迟绑定，实现选择不同的数据库
      * @var int
      */
-    protected static $dbindex = 0;
+    protected static int $dbindex = 0;
 
     /**
      * 在协程中单例模式下使用
      *
-     * @param $method
-     * @param $args
+     * @param string $method
+     * @param array  $args
      *
      * @return mixed
      * @throws Exception
      *
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
-        $redis_pool_obj = Registry::get('redis_pool');
+        /**
+         * @var RedisPool
+         */
+        $redis_pool_obj = DI::get('redis_pool_obj');
 
         try {
 

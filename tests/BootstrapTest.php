@@ -39,8 +39,8 @@ class BootstrapTest extends TestCase
         define('DS', DIRECTORY_SEPARATOR);
         define('ROOT_PATH', dirname(getcwd() . '../'));
         define('CONF_PATH', ROOT_PATH . DS . 'conf');
-        define('APPLICATION_PATH', ROOT_PATH . DS . 'application');
-        define('LIBRARY_PATH', APPLICATION_PATH . DS . 'library');
+        define('APP_PATH', ROOT_PATH . DS . 'application');
+        define('LIBRARY_PATH', APP_PATH . DS . 'library');
 
         \Yaf\Loader::import(ROOT_PATH . '/vendor/autoload.php');
         \Yaf\Loader::import(LIBRARY_PATH . '/common/functions.php');

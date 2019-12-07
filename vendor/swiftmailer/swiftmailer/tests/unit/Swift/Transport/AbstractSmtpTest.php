@@ -377,7 +377,7 @@ abstract class Swift_Transport_AbstractSmtpTest extends \SwiftMailerTestCase
         -- RFC 2821, 4.2.2.
 
             250 Requested mail action okay, completed
-            251 User not local; will forward to <forward-path>
+            251 UserDomain not local; will forward to <forward-path>
          (See section 3.4)
             252 Cannot VRFY user, but will accept message and attempt
                     delivery
