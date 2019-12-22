@@ -46,7 +46,7 @@ class UserDomain
         }
         $data['where'] = [];
         $chan          = new \Swoole\Coroutine\Channel(2);
-        go(function () use ($chan) { //获取总数
+        go(static function () use ($chan) { //获取总数
             try {
                 $count = MysqlFactory::systemUser()->getListCount();
                 $chan->push(['count' => $count]);
@@ -54,7 +54,7 @@ class UserDomain
                 $chan->push(['500' => $e->getMessage()]);
             }
         });
-        go(function () use ($chan, $data) { //获取列表数据
+        go(static function () use ($chan, $data) { //获取列表数据
             try {
                 $list = MysqlFactory::systemUser()->getUserList($data);
                 $chan->push(['list' => $list]);

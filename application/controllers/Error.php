@@ -48,7 +48,7 @@ class Error
         //todo 不同协议获取的fd参数是不同的
         $fd = DI::get('fd_int' . $this->cid);
 
-        if ($server->isEstablished($fd)) {
+        if (!empty($fd) and $server->isEstablished($fd)) {
             $server->push($fd, ws_response(400, '', '请求的接口不存在'));
         } else {
             $this->response->end(http_response(400, '请求的接口不存在'));

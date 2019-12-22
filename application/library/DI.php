@@ -47,4 +47,18 @@ class DI
         unset(self::$arr[$name]);
     }
 
+    /**
+     * User: hanhyu
+     * Date: 2019/12/22
+     * Time: 下午8:44
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function exist(string $name): bool
+    {
+        return isset(self::$arr[$name]);
+    }
+
 }

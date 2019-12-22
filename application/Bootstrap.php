@@ -3,12 +3,9 @@ declare(strict_types=1);
 
 use App\Library\{
     AutoReload,
-    CoMysqlPool,
     DI,
     MongoPool,
-    PdoPool,
     ProgramException,
-    RedisPool,
     RouterInit,
     ValidateException,
 };
@@ -204,36 +201,11 @@ class Bootstrap
                     throw new RuntimeException('请设置正确的运行环境常量');
             }
 
-            //添加路由过滤配置
-            $router_filter = require CONF_PATH . '/routerFilter.php';
-            DI::set('router_filter_config_arr', $router_filter);
-
-            //发送邮件配置
-            $email = require CONF_PATH . '/sendEmail.php';
-            DI::set('email_config_arr', $email);
-
-            //添加redis连接池
-            $redis_pool = new RedisPool();
-            DI::set('redis_pool_obj', $redis_pool);
-
-            //添加mysql数据库连接池
-            $mysql_pool = new PdoPool('mysql');
-            DI::set('mysql_pool_obj', $mysql_pool);
+            require CONF_PATH . DS . 'di.php';
 
             //启动前判断mongodb是否能连接上
             $mongo_pool = new MongoPool();
             unset($mongo_pool);
-            //如需主从、读写库请在这里自行配置添加
-            //$mysql_master = new PdoPool('mysql_master');
-            //$mysql_slave = new PdoPool('mysql_slave');
-
-            //添加pgsql数据库连接池
-            //$pgsql_pool = new PdoPool('pgsql');
-            //DI::set('pgsql_pool_obj', $pgsql_pool);
-
-            //添加协程mysql数据库连接池
-            $co_mysql_pool = new CoMysqlPool();
-            DI::set('co_mysql_pool_obj', $co_mysql_pool);
         } catch (Throwable $e) {
             print_r($e . PHP_EOL);
             $this->server->shutdown();
@@ -387,9 +359,12 @@ class Bootstrap
                     $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage()));
                 }
             } catch (Throwable $e) {
-                $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
                 if ($server->isEstablished($frame->fd)) {
-                    $server->push($frame->fd, ws_response(500, '', $msg));
+                    if (APP_DEBUG) {
+                        $server->push($frame->fd, ws_response(500, '', $e->getMessage(), $e->getTrace()));
+                    } else {
+                        $server->push($frame->fd, ws_response(500, '', '服务异常'));
+                    }
                 }
 
                 co_log(
@@ -468,8 +443,11 @@ class Bootstrap
         } catch (ProgramException $e) { //程序手动抛出的异常
             $response->end(http_response($e->getCode(), $e->getMessage()));
         } catch (Throwable $e) {
-            $msg = APP_DEBUG ? $e->getMessage() : '服务异常';
-            $response->end(http_response(500, $msg));
+            if (APP_DEBUG) {
+                $response->end(http_response(500, $e->getMessage(), $e->getTrace()));
+            } else {
+                $response->end(http_response(500, '服务异常'));
+            }
 
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],

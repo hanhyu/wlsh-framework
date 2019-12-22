@@ -15,10 +15,7 @@ use Exception;
  */
 class RedisFactory
 {
-    /**
-     * @var LoginModel
-     */
-    private static $login = [];
+    private static array $model = [];
 
     /**
      * UserDomain: hanhyu
@@ -31,15 +28,15 @@ class RedisFactory
     {
         $cid = Coroutine::getCid();
         //单例对象协程隔离
-        if (!isset(self::$login[$cid])) {
-            self::$login[$cid] = new LoginModel();
+        if (!isset(self::$model['login'][$cid])) {
+            self::$model['login'][$cid] = new LoginModel();
         }
 
         defer(static function () use ($cid) {
-            unset(self::$login[$cid]);
+            unset(self::$model['login'][$cid]);
         });
 
-        return self::$login[$cid];
+        return self::$model['login'][$cid];
     }
 
 }
