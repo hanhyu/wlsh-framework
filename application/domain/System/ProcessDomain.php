@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 /**
  * Created by PhpStorm.
- * UserDomain: hanhyu
+ * User: hanhyu
  * Date: 19-2-1
  * Time: 下午5:45
  */
 
 namespace App\Domain\System;
 
-use App\Models\MysqlFactory;
+use App\Models\Mysql\SystemMsgMysql;
 
 class ProcessDomain
 {
@@ -29,15 +29,15 @@ class ProcessDomain
             $data['where']['id'] = $data['id'];
         }
 
-        $res['count'] = MysqlFactory::systemMsg()->getListCount($data['where']);
-        $res['list']  = MysqlFactory::systemMsg()->getList($data);
+        $res['count'] = SystemMsgMysql::getInstance()->getListCount($data['where']);
+        $res['list']  = SystemMsgMysql::getInstance()->getList($data);
 
         return $res;
     }
 
     public function setMsg(array $data): int
     {
-        return MysqlFactory::systemMsg()->setMsg($data);
+        return SystemMsgMysql::getInstance()->setMsg($data);
     }
 
 }

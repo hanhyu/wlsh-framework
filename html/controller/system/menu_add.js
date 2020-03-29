@@ -38,7 +38,7 @@ new Vue({
             let self = this;
             this.axios({
                 method: 'get',
-                url: 'system/menu/get_menu_info'
+                url: 'system/menu/getMenuInfo'
             })
                 .then(function (response) {
                     switch (response.data.code) {
@@ -84,7 +84,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'post',
-                url: 'system/menu/set_menu',
+                url: 'system/menu/setMenu',
                 data: {
                     name: name,
                     icon: icon,

@@ -8,23 +8,13 @@
 
 namespace App\Domain\Index;
 
-use App\Models\Redis\LoginModel;
+use App\Models\Redis\LoginRedis;
 
 class LoginDomain
 {
-    /**
-     * @var LoginModel
-     */
-    private LoginModel $login;
-
-    public function __construct()
-    {
-        $this->login = new LoginModel();
-    }
-
     public function getKey(string $key): ?string
     {
-        return $this->login->getKey($key);
+        return LoginRedis::getInstance()->getKey($key);
     }
 
 }

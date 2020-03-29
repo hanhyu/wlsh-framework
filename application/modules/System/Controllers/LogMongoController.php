@@ -16,7 +16,7 @@ use MongoDB\Driver\Exception\Exception;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class LogMongo
+class LogMongoController
 {
     use ControllersTrait;
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
+use App\Models\Mysql\SystemBackupMysql;
 use App\Models\MysqlFactory;
 
 class BackupDomain
@@ -16,7 +17,7 @@ class BackupDomain
      */
     public function getTables(): array
     {
-        return MysqlFactory::systemBackup()->getTables();
+        return SystemBackupMysql::getInstance()->getTables();
     }
 
     /**
@@ -30,7 +31,7 @@ class BackupDomain
      */
     public function setBackup(array $data): int
     {
-        return MysqlFactory::systemBackup()->setBackup($data);
+        return SystemBackupMysql::getInstance()->setBackup($data);
     }
 
     /**
@@ -52,8 +53,8 @@ class BackupDomain
         }
         $data['where'] = [];
 
-        $res['count'] = MysqlFactory::systemBackup()->getListCount();
-        $res['list']  = MysqlFactory::systemBackup()->getList($data);
+        $res['count'] = SystemBackupMysql::getInstance()->getListCount();
+        $res['list']  = SystemBackupMysql::getInstance()->getList($data);
         return $res;
     }
 
@@ -68,7 +69,7 @@ class BackupDomain
      */
     public function getFileName(int $id): array
     {
-        return MysqlFactory::systemBackup()->getFileName($id);
+        return SystemBackupMysql::getInstance()->getFileName($id);
     }
 
     /**
@@ -82,7 +83,7 @@ class BackupDomain
      */
     public function delBackup(int $id): int
     {
-        return MysqlFactory::systemBackup()->delBackup($id);
+        return SystemBackupMysql::getInstance()->delBackup($id);
     }
 
 }

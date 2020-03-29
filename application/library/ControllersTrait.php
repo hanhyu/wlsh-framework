@@ -6,7 +6,6 @@ namespace App\Library;
 use App\Models\Forms\FormsVali;
 
 use Exception;
-use Redis;
 use Swoole\Atomic;
 use Swoole\Coroutine;
 use Swoole\Http\Request;
@@ -22,26 +21,10 @@ use Throwable;
  */
 trait ControllersTrait
 {
-    /**
-     * @var Server
-     */
     protected Server $server;
-    /**
-     * @var Request
-     */
     protected Request $request;
-    /**
-     * @var Response
-     */
     protected Response $response;
-    /**
-     * @var Atomic
-     */
     protected Atomic $atomic;
-    /**
-     * @var Redis
-     */
-    protected Redis $redis;
     protected int $cid;
 
     /**

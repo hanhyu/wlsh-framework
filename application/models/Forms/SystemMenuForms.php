@@ -11,12 +11,6 @@ namespace App\Models\Forms;
 class SystemMenuForms
 {
     /**
-     * id 菜单ID
-     * name 菜单名
-     * icon 图标
-     * url 菜单链接
-     * up_id 菜单上级ID
-     * level 菜单等级
      *
      * UserDomain: hanhyu
      * Date: 19-5-4
@@ -24,12 +18,12 @@ class SystemMenuForms
      * @return array
      */
     public static array $setMenu = [
-        'id'    => 'IntGe:0',
-        'name'  => 'Required|StrLenGeLe:3,50',
-        'icon'  => 'Required|StrLenGeLe:1,50',
-        'url'   => 'Required|StrLenGeLe:1,50',
-        'up_id' => 'Required|IntGeLe:0,99',
-        'level' => 'Required|IntGeLe:1,5',
+        'id'    => 'IntGe:0|Alias:菜单ID',
+        'name'  => 'Required|StrLenGeLe:3,50|Alias:菜单名',
+        'icon'  => 'Required|StrLenGeLe:1,50|Alias:图标',
+        'url'   => 'Required|StrLenGeLe:1,50|Alias:菜单链接',
+        'up_id' => 'Required|IntGeLe:0,99|Alias：菜单上级ID',
+        'level' => 'Required|IntGeLe:1,5|Alias:菜单等级',
     ];
 
     public static array $getMenu = [
@@ -37,8 +31,8 @@ class SystemMenuForms
     ];
 
     public static array $getMenuList = [
-        'curr_page' => 'Required|IntGe:1',
-        'page_size' => 'Required|IntGe:1',
+        'curr_page' => 'Required|IntGe:1|Alias:当前页',
+        'page_size' => 'Required|IntGe:1|Alias:每页显示多少条',
     ];
 
 }

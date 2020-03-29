@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\MysqlFactory;
+use App\Models\Mysql\SystemRouterMysql;
 
 class RouterDomain
 {
     /**
      * 获取路由列表数据
-     * UserDomain: hanhyu
+     *
+     * User: hanhyu
      * Date: 19-4-28
      * Time: 上午9:51
      *
@@ -28,8 +29,8 @@ class RouterDomain
 
         $data['where'] = [];
 
-        $res['count'] = MysqlFactory::systemRouter()->getListCount();
-        $res['list']  = MysqlFactory::systemRouter()->getList($data);
+        $res['count'] = SystemRouterMysql::getInstance()->getListCount();
+        $res['list']  = SystemRouterMysql::getInstance()->getList($data);
 
         return $res;
     }
@@ -37,7 +38,7 @@ class RouterDomain
 
     /**
      * 添加路由
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-4-28
      * Time: 上午11:05
      *
@@ -47,12 +48,12 @@ class RouterDomain
      */
     public function setRouter(array $data): int
     {
-        return MysqlFactory::systemRouter()->setRouter($data);
+        return SystemRouterMysql::getInstance()->setRouter($data);
     }
 
     /**
      * 修改路由
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-4-28
      * Time: 上午11:07
      *
@@ -62,13 +63,13 @@ class RouterDomain
      */
     public function editRouter(array $data): int
     {
-        return MysqlFactory::systemRouter()->editRouter($data);
+        return SystemRouterMysql::getInstance()->editRouter($data);
     }
 
 
     /**
      * 删除路由
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-4-28
      * Time: 上午11:06
      *
@@ -78,12 +79,12 @@ class RouterDomain
      */
     public function delRouter(int $id): int
     {
-        return MysqlFactory::systemRouter()->delRouter($id);
+        return SystemRouterMysql::getInstance()->delRouter($id);
     }
 
     public function getInfo(): array
     {
-        $res  = MysqlFactory::systemRouter()->getInfo();
+        $res  = SystemRouterMysql::getInstance()->getInfo();
         $list = [];
         foreach ($res as $k => $v) {
             $list[$v['menu_name']][] = $v;

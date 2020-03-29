@@ -11,7 +11,6 @@ use App\Domain\System\UserDomain;
  */
 final class UserTest extends BootstrapTest
 {
-
     public function testGetInfoList(): void
     {
         $data = [
@@ -19,14 +18,10 @@ final class UserTest extends BootstrapTest
             'page_size' => 1,
         ];
 
-        go(function () use ($data) {
-            $user = new UserDomain();
-            $res  = $user->getInfoList($data);
-
-            print_r($res);
-
-            $this->assertNotEmpty($res);
-        });
+        $user = new UserDomain();
+        $res  = $user->getInfoList($data);
+        //print_r($res);
+        $this->assertNotEmpty($res);
     }
 
 

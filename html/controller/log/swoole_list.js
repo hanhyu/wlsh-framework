@@ -30,7 +30,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/log_swoole/get_info',
+                url: 'system/logSwoole/getInfo',
                 params: {
                     name: dirName
                 }
@@ -65,7 +65,7 @@ new Vue({
                 let loadIndex = layer.load(2, {time: 10 * 1000});
                 self.axios({
                     method: 'post',
-                    url: 'system/log_swoole/clean_log',
+                    url: 'system/logSwoole/cleanLog',
                     data: {
                         name: dirName
                     }

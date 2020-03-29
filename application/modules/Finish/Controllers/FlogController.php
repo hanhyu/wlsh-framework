@@ -12,7 +12,7 @@ use App\Library\FinishTrait;
  * Date: 19-1-14
  * Time: 下午8:33
  */
-class Flog
+class FlogController
 {
     use FinishTrait;
 

@@ -11,7 +11,7 @@ use App\Library\TaskTrait;
  * Date: 18-10-22
  * Time: 下午5:00
  */
-class Log
+class LogController
 {
     use TaskTrait;
 

@@ -57,7 +57,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/log_mongo/get_mongo_list',
+                url: 'system/logMongo/getMongoList',
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size,

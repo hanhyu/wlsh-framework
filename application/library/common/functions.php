@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * Created by PhpStorm.
  * UserDomain: hanhyu
@@ -20,7 +21,7 @@ use Swoole\Coroutine;
  *
  * @return string
  */
-function http_response(int $code = 200, string $msg = '', array $data = [], bool $vail = false): string
+function http_response(int $code = 200, string $msg = 'success', array $data = [], bool $vail = false): string
 {
     $result         = [];
     $result['code'] = $code;
@@ -503,6 +504,31 @@ function convert_string(string $str, $ucfirst = true): string
     $str = ucwords(str_replace('_', ' ', $str));
     $str = str_replace(' ', '', lcfirst($str));
     return $ucfirst ? ucfirst($str) : $str;
+}
+
+/**
+ * 数组分页
+ * 一维数组直接返回分页键值数据；
+ * 二维数组返回第二维数组键值数据
+ *
+ * User: hanhyu
+ * Date: 2020/3/15
+ * Time: 下午1:02
+ *
+ * @param array $array_data 数组
+ * @param int   $page       第几页
+ * @param int   $page_size  每页显示多少条
+ *
+ * @return array
+ */
+function array_to_page_data(array $array_data = [], int $page = 1, int $page_size = 10): array
+{
+    $array_data                                = array_values($array_data);
+    $page_data['list']                         = array_slice($array_data, ($page - 1) * $page_size, $page_size);
+    $page_data['pagination']['total']          = count($array_data);
+    $page_data['pagination']['current_page']   = count($array_data);
+    $page_data['pagination']['pre_page_count'] = $page_size;
+    return $page_data;
 }
 
 /*function update_file(string $url, string $path, int $id)

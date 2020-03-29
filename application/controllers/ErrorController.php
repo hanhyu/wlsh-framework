@@ -12,7 +12,7 @@ use Swoole\Http\Response;
  * Date: 18-7-25
  * Time: 上午10:38
  */
-class Error
+class ErrorController
 {
     /**
      * @var Response

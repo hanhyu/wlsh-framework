@@ -3,15 +3,25 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use App\Library\AbstractMysql;
 use RuntimeException;
 
 /**
+ * @property  array  $getMenuList
+ * @property  int    $getListCount
+ * @property  array  $getMenuInfo
+ * @property  int    $setMenu
+ * @property  array  $getMenu
+ * @property  int    $editMenu
+ * @property  int    $delMenu
+ * @property  string $getVersion
+ *
  * Created by PhpStorm.
- * UserDomain: hanhyu
+ * User: hanhyu
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class SystemMenuModel extends AbstractMysql
+class SystemMenuMysql extends AbstractMysql
 {
     protected string $table = 'frame_system_menu';
 
@@ -48,7 +58,7 @@ class SystemMenuModel extends AbstractMysql
     }
 
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午8:10
      * @return int
@@ -64,7 +74,8 @@ class SystemMenuModel extends AbstractMysql
 
     /**
      * 获取所有菜单指定信息
-     * UserDomain: hanhyu
+     *
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午8:11
      * @return array
@@ -108,7 +119,7 @@ class SystemMenuModel extends AbstractMysql
     }
 
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午8:19
      *
@@ -132,7 +143,7 @@ class SystemMenuModel extends AbstractMysql
     }
 
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午8:23
      *
@@ -158,7 +169,7 @@ class SystemMenuModel extends AbstractMysql
     }
 
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午8:25
      *

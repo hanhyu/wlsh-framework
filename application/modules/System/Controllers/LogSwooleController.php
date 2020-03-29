@@ -15,7 +15,7 @@ use Swoole\Coroutine;
  * Date: 18-9-29
  * Time: 下午3:02
  */
-class LogSwoole
+class LogSwooleController
 {
     use ControllersTrait;
 
@@ -67,7 +67,7 @@ class LogSwoole
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
             $fp      = fopen($file, 'rb');
-            $content = Coroutine::fread($fp);
+            $content = Coroutine\System::fread($fp);
             fclose($fp);
             $this->response->end(http_response(200, '', ['content' => $content]));
         } else {

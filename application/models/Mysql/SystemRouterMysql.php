@@ -3,9 +3,21 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use App\Library\AbstractMysql;
 use RuntimeException;
 
-class SystemRouterModel extends AbstractMysql
+/**
+ * @property array getList
+ * @property int   getListCount
+ * @property int   setRouter
+ * @property int   editRouter
+ * @property int   delRouter
+ * @property array getInfo
+ *
+ * Class SystemRouterModel
+ * @package App\Models\Mysql
+ */
+class SystemRouterMysql extends AbstractMysql
 {
     protected string $table = 'frame_system_router';
 

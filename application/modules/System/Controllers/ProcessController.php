@@ -15,7 +15,7 @@ use App\Models\Forms\SystemProcessForms;
  * Date: 19-2-1
  * Time: 下午5:38
  */
-class Process
+class ProcessController
 {
     use ControllersTrait;
 

@@ -1,18 +1,25 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Models\Mysql;
+
+use App\Library\AbstractMysql;
+use RuntimeException;
+
 /**
+ * @property array getTables
+ * @property int   setBackup
+ * @property array getList
+ * @property array getFileName
+ * @property int   delBackup
+ * @property int   getListCount
+ *
  * 数据库备份
  * UserDomain: hanhyu
  * Date: 18-12-4
  * Time: 上午10:13
  */
-
-namespace App\Models\Mysql;
-
-use RuntimeException;
-
-class SystemBackupModel extends AbstractMysql
+class SystemBackupMysql extends AbstractMysql
 {
     protected string $table = 'frame_system_backup';
 

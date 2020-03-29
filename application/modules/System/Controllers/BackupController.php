@@ -20,7 +20,7 @@ use App\Domain\System\BackupDomain;
 use Swoole\Coroutine;
 
 //todo 数据备份类未整理完
-class Backup
+class BackupController
 {
     use ControllersTrait;
 

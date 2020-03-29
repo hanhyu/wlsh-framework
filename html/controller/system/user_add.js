@@ -46,7 +46,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'post',
-                url: 'system/user/set_user',
+                url: 'system/user/setUser',
                 data: {
                     name: this.name,
                     pwd: this.pwd,

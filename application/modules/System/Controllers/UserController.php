@@ -15,7 +15,7 @@ use App\Library\ValidateException;
  * Date: 18-9-3
  * Time: 下午4:57
  */
-class User
+class UserController
 {
     use ControllersTrait;
 

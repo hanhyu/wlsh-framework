@@ -26,7 +26,7 @@ new Vue({
             let self = this;
             this.axios({
                 method: 'get',
-                url: 'system/server_status/get_status'
+                url: 'system/serverStatus/getStatus'
             })
                 .then(function (response) {
                     if (response.data.code === 201) {

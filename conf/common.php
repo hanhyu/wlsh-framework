@@ -21,9 +21,9 @@ return [
         'notHttp' => 'task,finish,ws,tcp,close',
     ],
 
-    'version' => 'v1.2',
+    'version' => 'v2.0',
 
-    'before_url' => 'https://www.wlsh.site',
+    'before_url' => 'https://www.wlsh.xyz',
 
     'sign' => [
         'flag' => true,

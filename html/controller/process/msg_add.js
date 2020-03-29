@@ -28,7 +28,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'post',
-                url: 'system/process/set_msg',
+                url: 'system/process/setMsg',
                 data: {
                     content: this.content
                 }

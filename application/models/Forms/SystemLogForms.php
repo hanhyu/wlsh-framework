@@ -16,16 +16,16 @@ class SystemLogForms
      *
      */
     public static array $info = [
-        'name' => 'Required|StrLenGeLe:1,50',
+        'name' => 'Required|StrLenGeLe:1,50|Alias:日志名称',
     ];
 
 
     public static array $getMongoList = [
-        'curr_page'  => 'Required|IntGe:1',
-        'page_size'  => 'Required|IntGe:1',
+        'curr_page'  => 'Required|IntGe:1|Alias:当前页数',
+        'page_size'  => 'Required|IntGe:1|Alias:每页显示多少条',
         'start_time' => ['DateTime|Alias:开始时间', 'StrIn:'],
         'end_time'   => ['DateTime|Alias:结束时间', 'StrIn:'],
-        'channel'    => ['StrLenGeLe:2,50', 'StrIn:'],
+        'channel'    => ['StrLenGeLe:2,50|Alias:通道类型', 'StrIn:'],
     ];
 
 
@@ -39,10 +39,10 @@ class SystemLogForms
      * @return array
      */
     public static array $getUserList = [
-        'curr_page'  => 'Required|IntGe:1',
-        'page_size'  => 'Required|IntGe:1',
-        'login_time' => ['Date', 'StrIn:'],
-        'uname'      => ['StrLenGeLe:3,50', 'StrIn:'],
+        'curr_page'  => 'Required|IntGe:1|Alias:当前页数',
+        'page_size'  => 'Required|IntGe:1|Alias:每页显示多少条',
+        'login_time' => ['Date|Alias:登录时间', 'StrIn:'],
+        'uname'      => ['StrLenGeLe:3,50|Alias:用户名', 'StrIn:'],
     ];
 
 }

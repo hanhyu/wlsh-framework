@@ -40,7 +40,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/log_user/get_user_list',
+                url: 'system/logUser/getUserList',
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size,

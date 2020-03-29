@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 /**
  * Created by PhpStorm.
- * UserDomain: hanhyu
+ * User: hanhyu
  * Date: 19-1-11
  * Time: 下午5:43
  */
 
 namespace App\Domain\System;
 
-use App\Models\MysqlFactory;
-use App\Models\Redis\LoginModel;
+use App\Models\Mysql\SystemMenuMysql;
+use App\Models\Redis\LoginRedis;
 
 class MenuDomain
 {
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午9:38
      *
@@ -35,47 +35,45 @@ class MenuDomain
 
         $data['where'] = [];
 
-        $res['count'] = MysqlFactory::systemMenu()->getListCount();
-        $res['list']  = MysqlFactory::systemMenu()->getMenuList($data);
-
+        $res['count'] = SystemMenuMysql::getInstance()->getListCount();
+        $res['list']  = SystemMenuMysql::getInstance()->getMenuList($data);
         return $res;
     }
 
     /**
-     * UserDomain: hanhyu
+     * User: hanhyu
      * Date: 19-6-16
      * Time: 下午9:39
      * @return array
      */
     public function getInfo(): array
     {
-        return MysqlFactory::systemMenu()->getMenuInfo();
+        return SystemMenuMysql::getInstance()->getMenuInfo();
     }
 
     public function setMenu(array $data): int
     {
-        return MysqlFactory::systemMenu()->setMenu($data);
+        return SystemMenuMysql::getInstance()->setMenu($data);
     }
 
     public function getMenuById(int $id): array
     {
-        return MysqlFactory::systemMenu()->getMenu($id);
+        return SystemMenuMysql::getInstance()->getMenu($id);
     }
 
     public function editMenu(array $data): int
     {
-        return MysqlFactory::systemMenu()->editMenu($data);
+        return SystemMenuMysql::getInstance()->editMenu($data);
     }
 
     public function delMenu(int $id): int
     {
-        return MysqlFactory::systemMenu()->delMenu($id);
+        return SystemMenuMysql::getInstance()->delMenu($id);
     }
 
     public function getRedis(string $key): ?string
     {
-        $redis = new LoginModel();
-        return $redis->getKey($key);
+        return LoginRedis::getInstance()->getKey($key);
     }
 
 }

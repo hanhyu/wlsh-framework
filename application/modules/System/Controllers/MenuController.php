@@ -16,7 +16,7 @@ use App\Models\Forms\SystemMenuForms;
  * Date: 18-8-31
  * Time: 下午4:09
  */
-class Menu
+class MenuController
 {
     use ControllersTrait;
     /**

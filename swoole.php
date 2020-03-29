@@ -105,13 +105,23 @@ function explain(): void
           php swoole.php {command} [arguments ...] [options ...]
         
         Commands:
-          start     Start Swoole Server
-          stop      Stop Swoole Server
-          reload    Reload Swoole Worker ProcessDomain
+          start     Start swoole server
+          stop      Stop swoole server
+          reload    Reload swoole (task)worker process
         
+        Start arguments:
+          dev   Start debug
+          
         Start Options:
-          dev   Start Debug
-          -d    Start Daemonize HTTP Server
+          -d    Start daemonize server
+          
+        Eg: 
+          [start]: docker-compose exec wlsh php swoole.php start
+          [start]: docker-compose exec wlsh php swoole.php start dev
+          [start]: docker-compose exec wlsh php swoole.php start dev -d
+          [stop|restart]: docker-compose exec wlsh php swoole.php stop
+          [reload]: docker-compose exec wlsh php swoole.php reload
+          
     EOT;
     echo PHP_EOL;
 }

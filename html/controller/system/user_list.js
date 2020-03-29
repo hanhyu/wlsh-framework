@@ -31,7 +31,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/user/get_user_list',
+                url: 'system/user/getUserList',
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size
@@ -70,7 +70,7 @@ new Vue({
                 let loadIndex = layer.load(2, {time: 30 * 1000});
                 self.axios({
                     method: 'delete',
-                    url: 'system/user/del_user',
+                    url: 'system/user/delUser',
                     params: {
                         id: id
                     }
@@ -100,7 +100,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/user/get_user',
+                url: 'system/user/getUser',
                 params: {
                     id: id
                 }

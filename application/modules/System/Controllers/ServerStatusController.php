@@ -5,6 +5,7 @@ namespace App\Modules\System\Controllers;
 
 use App\Library\ControllersTrait;
 use App\Library\DI;
+use App\Models\Mysql\SystemMenuMysql;
 use App\Models\MysqlFactory;
 use Swoole\Coroutine;
 
@@ -14,7 +15,7 @@ use Swoole\Coroutine;
  * Date: 18-12-10
  * Time: 上午9:44
  */
-class ServerStatus
+class ServerStatusController
 {
     use ControllersTrait;
 
@@ -39,7 +40,7 @@ class ServerStatus
         //$content['nginxV'] = fgets(STDIN);
         $content['php_v'] = PHP_VERSION;
         //$content['mysql_v']   = Coroutine::exec('mysql -V')['output'];
-        $content['mysql_v']   = MysqlFactory::systemMenu()->getVersion();
+        $content['mysql_v']   = SystemMenuMysql::getInstance()->getVersion();
         $content['filesize']  = ini_get('upload_max_filesize');
         $content['exec_time'] = ini_get('max_execution_time');
         $content['memory']    = round(memory_get_usage() / 1024 / 1024, 2);
@@ -48,7 +49,6 @@ class ServerStatus
         $data['swoole']  = $swoole;
         $data['content'] = $content;
         $this->response->end(http_response(200, '', $data));
-        //echo http_response(200, $data);
     }
 
     //todo 在运维平台中增加监听指定端口，可以手动发送指令启动服务，停止服务功能

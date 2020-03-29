@@ -32,7 +32,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/backup/get_list',
+                url: 'system/backup/getList',
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size

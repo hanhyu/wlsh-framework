@@ -8,18 +8,15 @@ declare(strict_types=1);
  * Time: 下午3:47
  */
 
-namespace App\Models\Redis;
+namespace App\Library;
 
-use App\Library\DI;
-use App\Library\RedisPool;
 use Redis;
 use Exception;
+use Swoole\Coroutine;
 
 abstract class AbstractRedis
 {
-    /**
-     * @var Redis
-     */
+    private static array $instance = [];
     protected Redis $db;
     /**
      * 此处使用静态延迟绑定，实现选择不同的数据库
@@ -39,9 +36,6 @@ abstract class AbstractRedis
      */
     public function __call(string $method, array $args)
     {
-        /**
-         * @var RedisPool
-         */
         $redis_pool_obj = DI::get('redis_pool_obj');
 
         try {
@@ -66,6 +60,29 @@ abstract class AbstractRedis
         $redis_pool_obj->put($this->db);
 
         return $data;
+    }
+
+    public static function getInstance()
+    {
+        $class_name = static::class;
+        $cid        = Coroutine::getCid();
+        if (!isset(static::$instance[$class_name][$cid])) {
+            //new static()与new static::class一样，但为了IDE友好提示类中的方法，需要用new static()
+            $_instance = static::$instance[$class_name][$cid] = new static();
+        } else {
+            $_instance = static::$instance[$class_name][$cid];
+        }
+
+        defer(static function () use ($class_name, $cid) {
+            unset(static::$instance[$class_name][$cid]);
+        });
+
+        //为了IDE代码提示功能
+        return $_instance;
+    }
+
+    private function __construct()
+    {
     }
 
 }

@@ -26,16 +26,18 @@ class PdoPool
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
      * PdoPool constructor.
      *
-     * @param string $db_type
+     * @param string $db_type  数据库类型：mysql、pgsql等
+     * @param int    $pool_min 启动的单进程中初始化默认最小连接池为5
+     * @param int    $pool_max 启动的单进程中初始化默认最大连接池为100
      *
      * @throws PDOException
      */
-    public function __construct(string $db_type)
+    public function __construct(string $db_type, int $pool_min = 5, int $pool_max = 100)
     {
-        $this->ch     = new Channel(300);
+        $this->ch     = new Channel($pool_max);
         $this->config = DI::get('config_arr')[$db_type];
         try {
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i < $pool_min; $i++) {
                 $this->ch->push($this->connect());
             }
         } catch (PDOException $e) {
@@ -108,7 +110,7 @@ class PdoPool
                     PDO::ATTR_ORACLE_NULLS             => PDO::NULL_TO_STRING,
                     PDO::ATTR_TIMEOUT                  => 3,
                     PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
-                    //PDO::ATTR_PERSISTENT => true
+                    PDO::ATTR_PERSISTENT               => true,
                 ],
                 'command'       => [
                     'SET SQL_MODE=ANSI_QUOTES',
@@ -156,7 +158,7 @@ class PdoPool
     /**
      * 连接池销毁, 置不可用状态, 防止新的客户端进入常驻连接池, 导致服务器无法平滑退出
      *
-     * public function destruct()
+     * public function __destruct()
      * {
      * echo 'destruct1';
      * $this->available = false;

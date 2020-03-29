@@ -1,19 +1,22 @@
 <?php
 declare(strict_types=1);
+
+namespace App\Models\Mysql;
+
+use App\Library\AbstractMysql;
+use RuntimeException;
+
 /**
+ * @property array getList
+ * @property int   getListCount
+ *
  * Created by PhpStorm.
  * UserDomain: hanhyu
  * Date: 19-1-16
  * Time: 上午10:09
  *
  */
-
-namespace App\Models\Mysql;
-
-
-use RuntimeException;
-
-class UserLogViewModel extends AbstractMysql
+class UserLogViewMysql extends AbstractMysql
 {
     protected string $table = 'user_log_view';
 

@@ -69,7 +69,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'post',
-                url: 'system/router/set_router',
+                url: 'system/router/setRouter',
                 data: {
                     name: name,
                     url: url,
@@ -113,7 +113,7 @@ new Vue({
             let self = this;
             this.axios({
                 method: 'get',
-                url: 'system/menu/get_menu_info'
+                url: 'system/menu/getMenuInfo'
             })
                 .then(function (response) {
                     switch (response.data.code) {

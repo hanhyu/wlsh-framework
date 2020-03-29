@@ -7,6 +7,14 @@
  */
 
 //php phpunit.php -c phpunit.xml phpunit/domain/UserTest.php
+//php phpunit.php phpunit/domain/UserTest.php
+//php phpunit.php
 
-require_once getcwd() . '/../vendor/bin/phpunit';
+Swoole\Coroutine\run(static function () {
+    try {
+        require_once getcwd() . '/../vendor/bin/phpunit';
+    } catch (Swoole\Exception $e) {
+        print_r($e->getMessage());
+    }
+});
 

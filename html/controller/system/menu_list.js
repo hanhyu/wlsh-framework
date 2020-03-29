@@ -31,7 +31,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/menu/get_menu_list',
+                url: 'system/menu/getMenuList',
                 params: {
                     curr_page: self.curr_page,
                     page_size: self.page_size
@@ -70,7 +70,7 @@ new Vue({
                 let loadIndex = layer.load(2, {time: 30 * 1000});
                 self.axios({
                     method: 'delete',
-                    url: 'system/menu/del_menu',
+                    url: 'system/menu/delMenu',
                     params: {
                         id: id
                     }

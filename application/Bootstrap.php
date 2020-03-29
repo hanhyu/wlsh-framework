@@ -51,10 +51,10 @@ class Bootstrap
     {
         $this->server = new Swoole\WebSocket\Server(
             '0.0.0.0',
-            9780,
+            9770,
             SWOOLE_PROCESS,
-            SWOOLE_SOCK_TCP | SWOOLE_SSL
-        //SWOOLE_SOCK_TCP
+            SWOOLE_SOCK_TCP
+        //SWOOLE_SOCK_TCP | SWOOLE_SSL
         );
 
         //todo 这里的所有配置参数，可以使用外部配置文件引入。
@@ -79,12 +79,13 @@ class Bootstrap
             'heartbeat_idle_time'        => 600,
             'heartbeat_check_interval'   => 60,
             'buffer_output_size'         => 8 * 1024 * 1024,
-            'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
-            'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            //'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
+            //'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
             //'open_http2_protocol'        => true,
-            //'open_mqtt_protocol' => true,
+            //'open_mqtt_protocol'         => true,
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
+            'hook_flags'                 => SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL,
         ]);
 
         $this->table = new Table(1024);
@@ -150,8 +151,8 @@ class Bootstrap
 
          var_dump(get_included_files());*/
 
-        require ROOT_PATH . '/vendor/autoload.php';
-        require LIBRARY_PATH . '/common/functions.php';
+        require_once ROOT_PATH . '/vendor/autoload.php';
+        require_once LIBRARY_PATH . '/common/functions.php';
 
         //用inotify监听mvc目录,一有变动就自动重启脚本
         if (0 === $worker_id) {
@@ -175,8 +176,8 @@ class Bootstrap
 
         //todo 这里当进程达到max_request设置数量
         try {
-            require CONF_PATH . DS . 'environ.php';
-            require CONF_PATH . DS . 'language.php';
+            require_once CONF_PATH . DS . 'environ.php';
+            require_once CONF_PATH . DS . 'language.php';
 
             //把配置保存起来
             $common = require CONF_PATH . DS . 'common.php';
@@ -201,7 +202,7 @@ class Bootstrap
                     throw new RuntimeException('请设置正确的运行环境常量');
             }
 
-            require CONF_PATH . DS . 'di.php';
+            require_once CONF_PATH . DS . 'di.php';
 
             //启动前判断mongodb是否能连接上
             $mongo_pool = new MongoPool();
@@ -231,8 +232,6 @@ class Bootstrap
                 }
             });
         }
-
-        Swoole\Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
     }
 
     /**
@@ -388,7 +387,12 @@ class Bootstrap
     public function onRequest(Request $request, Response $response): void
     {
         //TODO 绑定固定域名才能访问
-        $request_uri_str = $request->server['request_uri'];
+        $request_uri_str = $request->server['request_uri'] ?? '';
+        if (empty($request_uri_str)) {
+            $response->status(404);
+            $response->end();
+            return;
+        }
         //请求过滤,会请求2次
         if ('/favicon.ico' === $request->server['path_info'] or '/favicon.ico' === $request_uri_str) {
             $response->end();
@@ -454,10 +458,10 @@ class Bootstrap
                 'onRequest Throwable message:',
                 'http'
             );
+        } finally {
+            DI::del('request_obj' . $cid);
+            DI::del('response_obj' . $cid);
         }
-
-        DI::del('request_obj' . $cid);
-        DI::del('response_obj' . $cid);
     }
 
     /**

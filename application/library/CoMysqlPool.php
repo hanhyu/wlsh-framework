@@ -14,10 +14,7 @@ use Exception;
  */
 class CoMysqlPool
 {
-    /**
-     * @var Channel
-     */
-    protected $ch;
+    protected Channel $ch;
 
     public function __construct()
     {

@@ -1,13 +1,12 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
-namespace App\Models\Mysql;
+namespace App\Library;
 
-use App\Library\DI;
 use Exception;
 use Medoo\Medoo;
 use PDOException;
 use RuntimeException;
+use Swoole\Coroutine;
 
 /**
  * Created by PhpStorm.
@@ -17,9 +16,7 @@ use RuntimeException;
  */
 abstract class AbstractMysql
 {
-    /**
-     * @var Medoo
-     */
+    private static array $instance = [];
     protected Medoo $db;
 
     /**
@@ -36,15 +33,11 @@ abstract class AbstractMysql
     public function __call(string $method, array $args)
     {
         $mysql_pool_obj = DI::get('mysql_pool_obj');
-
         try {
-
             $this->db = $mysql_pool_obj->get();
-
-            $data = call_user_func_array([$this, $method], $args);
-
+            $data     = call_user_func_array([$this, $method], $args);
         } catch (PDOException $e) {
-            co_log($e->getMessage(), 'mysql服务端断开连接', 'alert');
+            co_log($e->getMessage(), '连接池中mysql服务端断开连接，重新请求连接。', 'alert');
 
             /**
              * 判断此空闲连接是否已被断开，已断开就重新请求连接，
@@ -59,26 +52,33 @@ abstract class AbstractMysql
             }
         }
 
+        //只能使用__call方法实现快速回收连接池资源
         $mysql_pool_obj->put($this->db);
 
         return $data;
     }
 
-    /*
-     * 当new一个数据对象时，construct方式时qps为8863,call方式时qps8242,连接池都是占用12个
-     * 当同时new十个数据对象时，construct方式时2835（占用池子84个）,call方式时还是跟一个对象一样8170(占用池子12个)
-     *
-
-    public function __construct()
+    public static function getInstance()
     {
-        //从数据库连接池中获取连接对象
-        try {
-            $this->db = Registry::get('mysql_pool')->get();
-        } catch (\PDOException $e) {
-            co_log($e->getMessage(), "mysql数据连接异常", 'alert');
-            throw new \Exception('mysql数据连接异常', 500);
+        $class_name = static::class;
+        $cid        = Coroutine::getCid();
+        if (!isset(static::$instance[$class_name][$cid])) {
+            //new static()与new static::class一样，但为了IDE友好提示类中的方法，需要用new static()
+            $_instance = static::$instance[$class_name][$cid] = new static();
+        } else {
+            $_instance = static::$instance[$class_name][$cid];
         }
+
+        defer(static function () use ($class_name, $cid) {
+            unset(static::$instance[$class_name][$cid]);
+        });
+
+        //为了IDE代码提示功能
+        return $_instance;
     }
-    */
+
+    private function __construct()
+    {
+    }
 
 }

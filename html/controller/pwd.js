@@ -22,7 +22,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'post',
-                url: 'system/user/edit_pwd',
+                url: 'system/user/editPwd',
                 data: {
                     old_pwd: self.old_pwd,
                     new_pwd: self.new_pwd,

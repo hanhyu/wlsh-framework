@@ -11,7 +11,7 @@ use App\Library\CloseTrait;
  * Date: 18-10-22
  * Time: 下午2:00
  */
-class Index
+class IndexController
 {
     use CloseTrait;
 

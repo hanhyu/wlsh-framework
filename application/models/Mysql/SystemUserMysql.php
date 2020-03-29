@@ -3,15 +3,29 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use App\Library\AbstractMysql;
 use RuntimeException;
 
 /**
+ * @property int         setUser
+ * @property array       getUserList
+ * @property int         getListCount
+ * @property int         delUser
+ * @property array       getUser
+ * @property int         editUser
+ * @property array       getInfo
+ * @property array       getNameById
+ * @property null|string testNameById
+ * @property null|string getPwdByUid
+ * @property int         editPwd
+ * @property bool        existName
+ *
  * Created by PhpStorm.
  * UserDomain: hanhyu
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class SystemUserModel extends AbstractMysql
+class SystemUserMysql extends AbstractMysql
 {
     protected string $table = 'frame_system_user';
 

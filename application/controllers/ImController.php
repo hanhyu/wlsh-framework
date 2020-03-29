@@ -7,7 +7,7 @@ namespace App\Controllers;
 
 use App\Library\WebsocketTrait;
 
-class Im
+class ImController
 {
     use WebsocketTrait;
 

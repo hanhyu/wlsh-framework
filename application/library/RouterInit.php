@@ -44,11 +44,8 @@ class RouterInit
                 $uri = '/Error/router';
             } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
                 $uri = '/Error/method';
-            } else {
-                if ($router[$uri]['auth']) {
-                    $this->authToken();
-                }
-                $uri = $router[$uri]['action'];
+            } else if ($router[$uri]['auth']) {
+                $this->authToken();
             }
             //默认转发请求的路由
             $this->routerShutdown($uri);
@@ -58,18 +55,20 @@ class RouterInit
     public function routerShutdown($uri): void
     {
         if (!empty($uri)) {
+            //todo 使用atomic做接口限流
+
             $request_uri = explode('/', $uri);
             switch (count($request_uri)) {
                 case 5:
-                    $ctrl   = 'App\Modules\\' . $request_uri[1] . '\Controllers\\' . $request_uri[2] . '\\' . $request_uri[3];
+                    $ctrl   = 'App\Modules\\' . ucfirst($request_uri[1]) . '\Controllers\\' . ucfirst($request_uri[2]) . '\\' . ucfirst($request_uri[3]) . 'Controller';
                     $action = $request_uri[4] . 'Action';
                     break;
                 case 4:
-                    $ctrl   = 'App\Modules\\' . $request_uri[1] . '\Controllers\\' . $request_uri[2];
+                    $ctrl   = 'App\Modules\\' . ucfirst($request_uri[1]) . '\Controllers\\' . ucfirst($request_uri[2]) . 'Controller';
                     $action = $request_uri[3] . 'Action';
                     break;
                 default:
-                    $ctrl   = 'App\Controllers\\' . $request_uri[1];
+                    $ctrl   = 'App\Controllers\\' . ucfirst($request_uri[1]) . 'Controller';
                     $action = $request_uri[2] . 'Action';
             }
 

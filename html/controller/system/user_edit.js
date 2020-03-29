@@ -32,7 +32,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'put',
-                url: 'system/user/edit_user',
+                url: 'system/user/editUser',
                 params: {
                     id: this.uid
                 },

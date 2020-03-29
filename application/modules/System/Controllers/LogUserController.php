@@ -15,7 +15,7 @@ use App\Models\Forms\SystemLogForms;
  * Date: 19-1-15
  * Time: 下午2:49
  */
-class LogUser
+class LogUserController
 {
     use ControllersTrait;
 

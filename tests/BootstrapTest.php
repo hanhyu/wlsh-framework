@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
+use App\Library\DI;
 
 class BootstrapTest extends TestCase
 {
@@ -42,26 +43,14 @@ class BootstrapTest extends TestCase
         define('APP_PATH', ROOT_PATH . DS . 'application');
         define('LIBRARY_PATH', APP_PATH . DS . 'library');
 
-        \Yaf\Loader::import(ROOT_PATH . '/vendor/autoload.php');
-        \Yaf\Loader::import(LIBRARY_PATH . '/common/functions.php');
+        require ROOT_PATH . '/vendor/autoload.php';
+        require LIBRARY_PATH . '/common/functions.php';
 
-        $common  = require CONF_PATH . DS . 'common.php';
-        $develop = require CONF_PATH . DS . 'develop.php';
-        $test    = require CONF_PATH . DS . 'test.php';
-        $devtest = require CONF_PATH . DS . 'devtest.php';
-        $product = require CONF_PATH . DS . 'product.php';
+        $common      = require CONF_PATH . DS . 'common.php';
+        $current_env = require CONF_PATH . DS . 'develop.php';
+        DI::set('config_arr', array_merge($common, $current_env));
 
-        $yaf_conf = ini_get('yaf.environ');
-
-        try {
-            $obj_yaf = new \Yaf\Application(array_merge($common, $$yaf_conf));
-            go(function () use ($obj_yaf) {
-                $obj_yaf->bootstrap()->run();
-            });
-        } catch (\Yaf\Exception $e) {
-            var_dump($e->getMessage());
-        }
-
+        require CONF_PATH . DS . 'di.php';
     }
 
     /**

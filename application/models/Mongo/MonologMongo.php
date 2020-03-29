@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Models\Mongo;
 
+use App\Library\AbstractMongo;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\Exception\Exception;
 
@@ -12,15 +13,21 @@ use MongoDB\Driver\Exception\Exception;
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class MonologModel extends AbstractMongo
+class MonologMongo extends AbstractMongo
 {
+    /**
+     * 此处使用静态延迟绑定，实现选择不同的实例,如不设置默认为配置文件中的collection值
+     * @var string
+     */
+    protected static string $col = 'monolog';
+
     /**
      * @param array $data
      *
      * @return array
      * @throws Exception
      */
-    public function getMongoList(array $data): array
+    protected function getMongoList(array $data): array
     {
         /*$filter = [
               //'level'=> 200,
@@ -31,7 +38,7 @@ class MonologModel extends AbstractMongo
             'limit' => (int)$data['page_size'],
             //'projection' => ['_id'=>0],
         ];
-        $res     = $this->col->find($data['where'], $options);
+        $res     = $this->db->find($data['where'], $options);
         return $res->toArray();
     }
 
@@ -42,9 +49,9 @@ class MonologModel extends AbstractMongo
      * @return int
      * @throws Exception
      */
-    public function getMongoCount(array $where): int
+    protected function getMongoCount(array $where): int
     {
-        return $this->col->countDocuments($where);
+        return $this->db->countDocuments($where);
     }
 
     /**
@@ -53,10 +60,10 @@ class MonologModel extends AbstractMongo
      * @return array
      * @throws Exception
      */
-    public function getMongoInfo(string $id): array
+    protected function getMongoInfo(string $id): array
     {
         $id = new ObjectId($id);
-        return $this->col->findOne(['_id' => $id])->toArray();
+        return $this->db->findOne(['_id' => $id])->toArray();
     }
 
 }

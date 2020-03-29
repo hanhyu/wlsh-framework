@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace App\Domain\System;
 
 use App\Library\ProgramException;
-use App\Models\Mysql\SystemUserModel;
-use App\Models\MysqlFactory;
+use App\Models\Mysql\SystemUserLogMysql;
+use App\Models\Mysql\SystemUserMysql;
+use App\Models\Mysql\UserLogViewMysql;
+use Swoole\Coroutine\Channel;
 
 /**
- * Created by PhpStorm.
- * UserDomain: hanhyu
+ * User: hanhyu
  * Date: 19-1-3
  * Time: 下午11:36
  */
@@ -18,17 +19,18 @@ class UserDomain
 
     public function getInfoByName(string $name): array
     {
-        return MysqlFactory::systemUser()->getInfo($name);
+        return SystemUserMysql::getInstance()->getInfo($name);
     }
 
     public function setUser(array $data): int
     {
-        return MysqlFactory::systemUser()->setUser($data);
+        return SystemUserMysql::getInstance()->setUser($data);
     }
 
     /**
      * 在开启Swoole\Runtime::enableCoroutine的情况下，压测结果，协程并行与不使用并行一样。
-     * UserDomain: hanhyu
+     *
+     * User: hanhyu
      * Date: 2019/8/2
      * Time: 下午3:33
      *
@@ -45,10 +47,10 @@ class UserDomain
             $data['curr_data'] = 0;
         }
         $data['where'] = [];
-        $chan          = new \Swoole\Coroutine\Channel(2);
+        $chan          = new Channel(2);
         go(static function () use ($chan) { //获取总数
             try {
-                $count = MysqlFactory::systemUser()->getListCount();
+                $count = SystemUserMysql::getInstance()->getListCount();
                 $chan->push(['count' => $count]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -56,7 +58,7 @@ class UserDomain
         });
         go(static function () use ($chan, $data) { //获取列表数据
             try {
-                $list = MysqlFactory::systemUser()->getUserList($data);
+                $list = SystemUserMysql::getInstance()->getUserList($data);
                 $chan->push(['list' => $list]);
             } catch (\Throwable $e) {
                 $chan->push(['500' => $e->getMessage()]);
@@ -82,20 +84,19 @@ class UserDomain
         }
         $data['where'] = [];
 
-        $res['count'] = MysqlFactory::systemUser()->getListCount();
-        $res['list']  = MysqlFactory::systemUser()->getUserList($data);
-
+        $res['count'] = SystemUserMysql::getInstance()->getListCount();
+        $res['list']  = SystemUserMysql::getInstance()->getUserList($data);
         return $res;
     }
 
     public function delUser(int $id): int
     {
-        return MysqlFactory::systemUser()->delUser($id);
+        return SystemUserMysql::getInstance()->delUser($id);
     }
 
     public function getUserById(int $id): array
     {
-        return MysqlFactory::systemUser()->getUser($id);
+        return SystemUserMysql::getInstance()->getUser($id);
     }
 
     /**
@@ -106,17 +107,17 @@ class UserDomain
      */
     public function editUser(array $data): int
     {
-        return MysqlFactory::systemUser()->editUser($data);
+        return SystemUserMysql::getInstance()->editUser($data);
     }
 
     public function setLoginLog(array $data): void
     {
-        MysqlFactory::systemUserLog()->setLoginLog($data);
+        SystemUserLogMysql::getInstance()->setLoginLog($data);
     }
 
     public function setLogoutLog(array $data): void
     {
-        MysqlFactory::systemUserLog()->setLogoutLog($data);
+        SystemUserLogMysql::getInstance()->setLogoutLog($data);
     }
 
     /**
@@ -145,28 +146,32 @@ class UserDomain
         }
 
         if (!empty($data['uname'])) {
-            $arr_uid = MysqlFactory::systemUser()->getInfo($data['uname']);
+            $arr_uid = SystemUserMysql::getInstance()->getInfo($data['uname']);
             if (empty($arr_uid)) {
                 throw new ProgramException('用户名不存在', 400);
             }
             $data['where']['user_id'] = $arr_uid[0]['id'] ?? 0;
         }
 
-        $res['count'] = MysqlFactory::systemUserLog()->getListCount($data['where']);
+        $res['count'] = SystemUserLogMysql::getInstance()->getListCount($data['where']);
         if (0 === $res['count']) {
             $res['list'] = [];
         } else {
-            $list    = MysqlFactory::systemUserLog()->getList($data);
+            $list    = SystemUserLogMysql::getInstance()->getList($data);
             $arr_uid = array_column($list, 'user_id');
 
-            $arr_name = MysqlFactory::systemUser()->getNameById(array_unique($arr_uid));
+            $arr_name = SystemUserMysql::getInstance()->getNameById(array_unique($arr_uid));
             $arr_let  = array_column($arr_name, 'name', 'id');
 
-            foreach ($list as $k => &$v) {
-                $list[$k]['user_name'] = $arr_let[$v['user_id']];
-                $v['login_ip']         = long2ip((int)$v['login_ip']);
+            if (is_iterable($list)) {
+                foreach ($list as $k => &$v) {
+                    $list[$k]['user_name'] = $arr_let[$v['user_id']];
+                    $v['login_ip']         = long2ip((int)$v['login_ip']);
+                }
+                unset($v);
+            } else {
+                $list = [];
             }
-            unset($v);
 
             $res['list'] = $list;
         }
@@ -194,8 +199,8 @@ class UserDomain
         $data['where']['user_name'] = $data['uname'] ?? 0;
 
 
-        $res['count'] = MysqlFactory::userLogView()->getListCount($data['where']);
-        $res['list']  = MysqlFactory::userLogView()->getList($data);
+        $res['count'] = UserLogViewMysql::getInstance()->getListCount($data['where']);
+        $res['list']  = UserLogViewMysql::getInstance()->getList($data);
 
         return $res;
     }
@@ -209,34 +214,29 @@ class UserDomain
     public function testName(): void
     {
         go(function () {
-            $name = MysqlFactory::systemUser()->testNameById(1);
+            $name = SystemUserMysql::getInstance()->testNameById(1);
             if ('ceshi001' != $name) print_r('name:' . $name);
         });
 
         go(function () {
-            $name = MysqlFactory::systemUser()->testNameById(7);
+            $name = SystemUserMysql::getInstance()->testNameById(7);
             if ('ceshi12' != $name) print_r('name:' . $name);
         });
 
         go(function () {
-            $name2 = MysqlFactory::systemUser()->getNameById([7]);
+            $name2 = SystemUserMysql::getInstance()->getNameById([7]);
             if ('ceshi12' != $name2[0]['name']) print_r('name2:' . $name2);
         });
-
-        /*go(function (){
-            $name2 = MysqlFactory::systemMenu()->getMenu(5);
-        });*/
-
     }
 
     public function editPwd(array $data): int
     {
-        $pwd = MysqlFactory::systemUser()->getPwdByUid($data['uid']);
+        $pwd = SystemUserMysql::getInstance()->getPwdByUid($data['uid']);
 
         if (!password_verify($data['old_pwd'], $pwd)) {
             $res = -1;
         } else {
-            $res = MysqlFactory::systemUser()->editPwd($data);
+            $res = SystemUserMysql::getInstance()->editPwd($data);
         }
         return $res;
     }
@@ -253,8 +253,7 @@ class UserDomain
      */
     public function existName(string $name): bool
     {
-        return MysqlFactory::systemUser()->existName($name);
+        return SystemUserMysql::getInstance()->existName($name);
     }
-
 
 }

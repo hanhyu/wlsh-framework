@@ -30,7 +30,7 @@ new Vue({
             let self = this;
             axios({
                 method: 'get',
-                url: 'system/menu/get_menu_info'
+                url: 'system/menu/getMenuInfo'
             })
                 .then(function (response) {
                     switch (response.data.code) {

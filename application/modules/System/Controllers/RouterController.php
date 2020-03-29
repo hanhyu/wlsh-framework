@@ -9,7 +9,7 @@ use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemRouterForms;
 
-class Router
+class RouterController
 {
     use ControllersTrait;
     /**

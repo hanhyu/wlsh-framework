@@ -9,22 +9,12 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
-use App\Models\MongoFactory;
-use App\Models\Mongo\MonologModel;
+use App\Models\Mongo\MonologMongo;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\Exception\Exception;
 
 class LogDomain
 {
-    /**
-     * @var MonologModel
-     */
-    protected MonologModel $monolog;
-
-    public function __construct()
-    {
-        $this->monolog = MongoFactory::monolog('baseFrame', 'monolog');
-    }
 
     /**
      * UserDomain: hanhyu
@@ -58,12 +48,12 @@ class LogDomain
             $data['where']['channel'] = $data['channel'];
         }
 
-        $res['count'] = $this->monolog->getMongoCount($data['where']);
+        $res['count'] = MonologMongo::getInstance()->getMongoCount($data['where']);
 
         if (0 === $res['count']) {
             $res['list'] = [];
         } else {
-            $res['list'] = $this->monolog->getMongoList($data);
+            $res['list'] = MonologMongo::getInstance()->getMongoList($data);
         }
 
         return $res;
@@ -81,7 +71,7 @@ class LogDomain
      */
     public function getMongoById(string $id): array
     {
-        return $this->monolog->getMongoInfo($id);
+        return MonologMongo::getInstance()->getMongoInfo($id);
     }
 
 }

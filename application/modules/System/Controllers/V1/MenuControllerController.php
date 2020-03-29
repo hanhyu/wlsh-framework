@@ -6,10 +6,10 @@ namespace App\Modules\System\Controllers\V1;
 
 use App\Library\ProgramException;
 use App\Library\ValidateException;
-use App\Modules\System\Controllers\Menu as BaseMenu;
+use App\Modules\System\Controllers\MenuController as BaseMenu;
 use App\Models\Forms\SystemMenuForms;
 
-class Menu extends BaseMenu
+class MenuControllerController extends BaseMenu
 {
 
     /**

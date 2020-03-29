@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Domain\Index\LoginDomain;
+use App\Domain\System\LogDomain;
 use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
-use App\Models\RedisFactory;
+use App\Library\DI;
+use App\Models\Redis\LoginRedis;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swoole\Coroutine;
@@ -17,7 +20,7 @@ use Exception;
  * Date: 18-7-25
  * Time: 上午10:24
  */
-class Login
+class LoginController
 {
     use ControllersTrait;
 
@@ -376,51 +379,39 @@ class Login
      */
     public function getRedisAction(): void
     {
-        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
-        //$this->redis->select(1);
-        //$this->response->end($this->redis->get('key'));
-        //\Yaf\Registry::get('redis_pool')->put($this->redis);
-
-
-        $value = RedisFactory::login()->getKey('key');
-
-
-        //print_r('123');
-        //这里会自动触发协程切换
-        //$value = (new LoginDomain())->getKey('key');
-        //print_r('456' . PHP_EOL);
+        $value = (new LoginDomain())->getKey('key');
         $this->response->end(http_response(200, '', ['content' => $value]));
     }
 
     public function publisherRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        $let         = $this->redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
+        $redis = DI::get('redis_pool_obj')->get();
+        $let   = $redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
         $this->response->end($let);
     }
 
     public function consumerRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        var_dump($this->redis->xRange('channel1', '-', '+'));
+        $redis = DI::get('redis_pool_obj')->get();
+        var_dump($redis->xRange('channel1', '-', '+'));
     }
 
     public function ackRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        //$res = $this->redis->xRange('channel1', '-', '+');
-        $this->redis->xGroup('CREATE', 'channel1', 'chgroup4', '0');
-        $res = $this->redis->xReadGroup('chgroup4', 'comsumer1', ['channel1' => 0], 2);
+        $redis = DI::get('redis_pool')->get();
+        //$res = $redis->xRange('channel1', '-', '+');
+        $redis->xGroup('CREATE', 'channel1', 'chgroup4', '0');
+        $res = $redis->xReadGroup('chgroup4', 'comsumer1', ['channel1' => 0], 2);
         //$let = array_keys($res);
         var_dump(array_keys($res['channel1']));
-        $this->redis->xAck('channel1', 'chgroup4', array_keys($res['channel1']));
+        $redis->xAck('channel1', 'chgroup4', array_keys($res['channel1']));
     }
 
     public function delRedisAction(): void
     {
-        $this->redis = \Yaf\Registry::get('redis_pool')->get();
-        $res         = $this->redis->xRange('channel1', '-', '+');
-        $this->redis->xDel('channel1', array_keys($res));
+        $redis = DI::get('redis_pool')->get();
+        $res   = $redis->xRange('channel1', '-', '+');
+        $redis->xDel('channel1', array_keys($res));
     }
 
     /**
@@ -633,7 +624,7 @@ class Login
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        //print_r('123');
+        //print_r('4567');
         $res = (new UserDomain())->getInfoList($data);
 
         //压测使用两个协程并行执行，结果与不使用并行一样。
@@ -649,8 +640,7 @@ class Login
 
     public function getUserInfoAction(): void
     {
-        $user = new \App\Domain\System\UserDomain();
-        $res  = $user->getInfoByName('ceshi123');
+        $res = (new UserDomain())->getInfoByName('ceshi123');
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -720,10 +710,9 @@ class Login
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        $user              = new \App\Services\System\Log();
-        $res               = $user->getMongoList($data);
+        $res               = (new LogDomain())->getMongoList($data);
         if ($res) {
-            $this->response->end(http_response(200, '', $res));
+            $this->response->end(http_response(200, 'success', $res));
         } else {
             $this->response->end(http_response(500, '查询失败'));
         }
@@ -792,8 +781,8 @@ class Login
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Domain\System\UserDomain();
-        $res                = $user->getLogList($data);
+
+        $res = (new UserDomain())->getLogList($data);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -865,8 +854,8 @@ class Login
         $data['page_size']  = 10;
         $data['login_time'] = '2019-01-14';
         $data['uname']      = 'ceshi001';
-        $user               = new \App\Services\System\User();
-        $res                = $user->getLogViewList($data);
+
+        $res = (new UserDomain())->getLogViewList($data);
         if ($res) {
             $this->response->end(http_response(200, '', $res));
         } else {
@@ -939,7 +928,7 @@ class Login
      */
     public function swMysqlAction(): void
     {
-        $sql = "SELECT * FROM `users` WHERE id=1 LIMIT 1 ";
+        $sql = 'SELECT * FROM `users` WHERE id=1 LIMIT 1 ';
 
         /*        $sql = "SELECT `id`,`user_name`,`login_dt`,`logout_dt`,`login_ip`
         FROM `user_log_view`
@@ -952,18 +941,18 @@ class Login
  WHERE (`user_name` = 'ceshi001')
  ORDER BY `id` DESC
  LIMIT 10 OFFSET 0";*/
-        $mysql = Yaf\Registry::get('mysql_pool')->get();
-        $get   = $mysql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $mysql = DI::get('co_mysql_pool_obj')->get();
+        $get   = $mysql->query($sql);
 
         $this->response->end(http_response(200, '', $get));
     }
 
     public function swPgsqlAction(): void
     {
-        $sql = "SELECT * FROM users WHERE id=1 LIMIT 1 ";
+        $sql = 'SELECT * FROM users WHERE id=1 LIMIT 1 ';
         //$sql = "select * from users";
 
-        $pgsql = Yaf\Registry::get('pgsql_pool')->get();
+        $pgsql = DI::get('pgsql_pool_obj')->get();
 
         $get = $pgsql->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $this->response->end(http_response(200, '', $get));
@@ -1090,15 +1079,6 @@ class Login
      */
     public function coMysqlAction(): void
     {
-        /*  $sql = "select * from `users` where id=? limit 1 ";
-
-          $mysql = Registry::get('co_mysql_pool')->get();
-          $stmt  = $mysql->prepare($sql);
-          $get   = $stmt->execute([1]);
-          $this->response->header('sign', 'qwe123');
-
-          $this->response->end(http_response(200, '', $get));*/
-
         //压测协程数据结果是否错乱，连接池大小
         (new UserDomain())->testName();
         $this->response->end();
@@ -1112,7 +1092,7 @@ class Login
         $response = $this->response;
         //go(function () use ($ch, $response) {
         //\Co::sleep(0.1);
-        $value = RedisFactory::login()->getKey('key');
+        $value = LoginRedis::getInstance()->getKey('key');
         print_r('456' . PHP_EOL);
         //$ch->push($value);
         $response->end($value);
@@ -1128,12 +1108,7 @@ class Login
      */
     public function setRedisAction(): void
     {
-        //$this->redis = \Yaf\Registry::get('redis_pool')->get();
-        //$this->redis->select(1);
-        //$this->response->end($this->redis->get('key'));
-        //\Yaf\Registry::get('redis_pool')->put($this->redis);
-
-        $value = RedisFactory::login()->setKey('setKey', '123');
+        $value = LoginRedis::getInstance()->setKey('setKey', '123');
         $this->response->end($value);
     }
 

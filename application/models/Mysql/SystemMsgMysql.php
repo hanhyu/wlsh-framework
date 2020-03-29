@@ -3,31 +3,37 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
+use App\Library\AbstractMysql;
 use RuntimeException;
 
 /**
+ * @property int   setMsg
+ * @property int   setLogoutLog
+ * @property array getList
+ * @property int   getListCount
+ *
  * Created by PhpStorm.
  * UserDomain: hanhyu
- * Date: 18-9-26
- * Time: 下午3:09
+ * Date: 19-2-1
+ * Time: 下午5:58
  */
-class SystemUserLogModel extends AbstractMysql
+class SystemMsgMysql extends AbstractMysql
 {
-    protected string $table = 'frame_system_user_log';
+    protected string $table = 'frame_system_msg';
 
     /**
-     * 添加用户登录记录
+     * 添加内容
      *
      * @param array $data
      *
      * @return int
      */
-    protected function setLoginLog(array $data): int
+    protected function setMsg(array $data): int
     {
         $datas = $this->db->insert($this->table, [
-            'user_id'  => $data['id'],
-            'login_dt' => date('Y-m-d H:i:s', $data['time']),
-            'login_ip' => $data['ip'],
+            'content' => $data['content'],
+            'crt_dt'  => $data['crt_dt'],
+            'upt_id'  => $data['id'],
         ]);
         if (false === $datas) {
             throw new RuntimeException($this->db->last());
@@ -78,11 +84,10 @@ class SystemUserLogModel extends AbstractMysql
 
         $datas = $this->db->select($this->table, [
             'id',
-            'user_id',
-            'login_dt',
-            'logout_dt',
-            'login_ip',
-            //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
+            'content',
+            'crt_dt',
+            'upt_dt',
+            'upt_id',
         ],
             $wheres);
         if (false === $datas) {
@@ -94,7 +99,7 @@ class SystemUserLogModel extends AbstractMysql
     /**
      * UserDomain: hanhyu
      * Date: 19-6-16
-     * Time: 下午9:10
+     * Time: 下午8:52
      *
      * @param array $where
      *
