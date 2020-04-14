@@ -45,6 +45,7 @@ abstract class AbstractMysql
              * 此功能依赖于mysql的wait_timeout与interactive_timeout两个参数值。
              */
             if (!empty($e->errorInfo) and ($e->errorInfo[1] === 2006 or $e->errorInfo[1] === 2013)) {
+                sleep(3);
                 $this->db = $mysql_pool_obj->connect();
                 $data     = call_user_func_array([$this, $method], $args);
             } else {

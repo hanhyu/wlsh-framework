@@ -9,8 +9,8 @@ return [
 
     'mysql' => [
         'driver'    => 'mysql',
-        'host'      => '172.17.0.1',
-        'port'      => 13306,
+        'host'      => 'wlsh-mysql',
+        'port'      => 3306,
         'database'  => 'baseFrame',
         'username'  => 'root',
         'password'  => 'wlsh_mysql',
@@ -34,13 +34,13 @@ return [
     ],
 
     'redis' => [
-        'host' => '172.17.0.1',
-        'port' => 16379,
+        'host' => 'wlsh-redis',
+        'port' => 6379,
         'auth' => 'wlsh_redis',
     ],
 
     'log' => [
-        'mongo'      => 'mongodb://172.17.0.1:27018',
+        'mongo'      => 'mongodb://wlsh-mongo:27017',
         'username'   => 'test',
         'pwd'        => 'test',
         'database'   => 'baseFrame',
@@ -53,7 +53,7 @@ return [
 
     'backup' => [
         'path'    => ROOT_PATH . '/backup',
-        'downUrl' => 'http://127.0.0.1:9773/',
+        'downUrl' => 'http://127.0.0.1:9770/',
     ],
 
 ];

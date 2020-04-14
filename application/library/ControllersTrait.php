@@ -40,13 +40,17 @@ trait ControllersTrait
         $this->response = DI::get('response_obj' . $this->cid);
         $this->atomic   = DI::get('atomic_obj');
 
+        $client_ip = get_ip($this->request->server);
+        $server_ip = swoole_get_local_ip()['eth0'];
+        $info      = "【req_uri】{$this->request->server['request_uri']}【client_ip】{$client_ip}【server_ip】{$server_ip}";
+
         if ($log) {
             $req_method  = $this->request->server['request_method'];
             $request_uri = explode('/', $this->request->server['request_uri']);
             $channel     = $request_uri[1] ?? 'system';
             switch ($req_method) {
                 case 'GET':
-                    co_log($this->request->get, "{$this->request->server['request_uri']} client get data:", $channel);
+                    $data = $this->request->get;
                     break;
                 case 'POST':
                     $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
@@ -57,12 +61,6 @@ trait ControllersTrait
                     } else {
                         $data = $this->request->post;
                     }
-
-                    co_log(
-                        $data,
-                        "{$this->request->server['request_uri']} client post data:",
-                        $channel
-                    );
                     break;
                 case 'PUT':
                     $data = [];
@@ -79,14 +77,15 @@ trait ControllersTrait
                         $data += $this->request->post;
                     }
 
-                    co_log($data, "{$this->request->server['request_uri']} client put data:", $channel);
                     break;
                 case 'DELETE':
-                    co_log($this->request->get, "{$this->request->server['request_uri']} client delete data:", $channel);
+                    $data = $this->request->get;
                     break;
                 default:
+                    $data = $req_method;
                     break;
             }
+            co_log($data, $info, $channel);
         }
     }
 

@@ -395,6 +395,7 @@ class Bootstrap
         }
         //请求过滤,会请求2次
         if ('/favicon.ico' === $request->server['path_info'] or '/favicon.ico' === $request_uri_str) {
+            $response->status(200);
             $response->end();
             return;
         }
@@ -421,6 +422,7 @@ class Bootstrap
 
             //预检
             if ($request->server['request_method'] === 'OPTIONS') {
+                $response->status(200);
                 $response->end();
                 return;
             }
@@ -448,8 +450,10 @@ class Bootstrap
             $response->end(http_response($e->getCode(), $e->getMessage()));
         } catch (Throwable $e) {
             if (APP_DEBUG) {
+                $response->status(200);
                 $response->end(http_response(500, $e->getMessage(), $e->getTrace()));
             } else {
+                $response->status(200);
                 $response->end(http_response(500, '服务异常'));
             }
 

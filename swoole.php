@@ -83,6 +83,9 @@ function run(string $param = 'produce'): void
 
     //每个PHP进程所吃掉的最大内存
     ini_set('memory_limit', '2048M');
+    ini_set('upload_max_filesize', '50M');
+    ini_set('max_input_time', '300');
+    ini_set('max_execution_time', '300');
 
     date_default_timezone_set('Asia/Shanghai');
 

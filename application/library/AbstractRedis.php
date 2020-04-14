@@ -50,6 +50,7 @@ abstract class AbstractRedis
             co_log($e->getMessage(), 'redis服务端断开连接', 'alert');
 
             if ($redis_pool_obj->ping($this->db)) {
+                sleep(3);
                 $this->db = $redis_pool_obj->connect();
             }
             $this->db->select(static::$dbindex);

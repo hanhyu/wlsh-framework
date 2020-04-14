@@ -310,7 +310,8 @@ class LoginController
      */
     public function testAction(): void
     {
-        $this->response->end('hello world');
+        //$this->response->status(200);
+        $this->response->end('hello world' . swoole_get_local_ip()['eth0']);
     }
 
     public function leveldbAction(): void
