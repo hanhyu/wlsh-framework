@@ -8,6 +8,7 @@ use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemLogForms;
 use Swoole\Coroutine;
+use JsonException;
 
 /**
  * 获取日志类
@@ -27,13 +28,15 @@ class LogSwooleController
     /**
      * 查看swoole日志信息
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getInfoAction(): void
     {
-        $data    = $this->validator(SystemLogForms::$info);
-        $fp      = fopen(ROOT_PATH . '/log/' . $data['name'], 'rb');
-        $content = Coroutine::fread($fp);
+        $data      = $this->validator(SystemLogForms::$info);
+        $file_path = ROOT_PATH . '/log/' . $data['name'];
+        $fp        = fopen($file_path, 'rb');
+        $content   = fread($fp, filesize($file_path));
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -41,7 +44,8 @@ class LogSwooleController
     /**
      * 清空swoole日志
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function cleanLogAction(): void
     {
@@ -51,7 +55,7 @@ class LogSwooleController
         } else { //monolog日志
             $fp = fopen(ROOT_PATH . '/log/monolog/' . $data['name'], 'wb+');
         }
-        $content = Coroutine::fwrite($fp, '日志已清空。。。');
+        $content = fwrite($fp, '日志已清空。。。');
         fclose($fp);
         $this->response->end(http_response(200, '', ['content' => $content]));
     }
@@ -59,7 +63,8 @@ class LogSwooleController
     /**
      * 查询monolog日志
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getMonologAction(): void
     {
@@ -67,7 +72,7 @@ class LogSwooleController
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
             $fp      = fopen($file, 'rb');
-            $content = Coroutine\System::fread($fp);
+            $content = fread($fp, filesize($file));
             fclose($fp);
             $this->response->end(http_response(200, '', ['content' => $content]));
         } else {

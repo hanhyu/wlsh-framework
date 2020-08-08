@@ -8,6 +8,7 @@ use App\Library\ControllersTrait;
 use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemProcessForms;
+use JsonException;
 
 /**
  * Created by PhpStorm.
@@ -33,7 +34,8 @@ class ProcessController
     /**
      * 列表
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getMsgListAction(): void
     {
@@ -47,7 +49,8 @@ class ProcessController
      * Date: 19-6-5
      * Time: 下午8:42
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function setMsgAction(): void
     {

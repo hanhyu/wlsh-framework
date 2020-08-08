@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * UserDomain: hanhyu
@@ -13,77 +13,113 @@ use Swoole\Coroutine;
 
 class RouterInit
 {
-    //todo 协程模式下不支持反射路由
+    /**
+     * 格式：
+     * @router auth=false&method=get
+     *
+     * 参数说明：
+     * auth 值是需要使用authorization进行token认证的路由，false不需要，true需要
+     * method 值是请求的http方法
+     * rate-limit 值代表该接口服务限流参数 使用nginx配置代替
+     * circuit-breaker 值代表该接口服务超时熔断参数  使用nginx配置代替
+     * before 请求方法之前执行,一般是权限检查动作，用户登录日志，重要数据查询日志，数据删除日志，重要数据变更日志 （如密码变更，权限变更，数据修改等）
+     * after 请求方法之后执行
+     *
+     * 可以按不同项目、团队、需求、个人喜好等对uri增加加密key
+     */
+
     /**
      * User: hanhyu
      * Date: 2019/12/4
      * Time: 下午10:05
      *
-     * @param string $uri    请求的链接地址
-     * @param string $method 请求的方法
+     * @param array  $uri_arr 请求的链接地址
+     * @param string $method  请求的方法
      *
      * @throws Exception
      */
-    public function routerStartup(string $uri, string $method): void
+    public function routerStartup(array $uri_arr, string $method): void
     {
-        $request_uri = explode('/', $uri);
+        //todo 使用atomic做接口限流
+
+        /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，
+         若存在则停止解析，直接输出页面，缓存数据页。
+         或做防重复操作提交*/
+
         /**
          * $arr[1] module
          * $arr[2] controller
          * $arr[3] action
          */
-        if ($uri) {
-            if ('Task' === $request_uri[1] or 'Finish' === $request_uri[1] or 'Close' === $request_uri[1]) {
-                $this->routerShutdown($uri);
-                return;
-            }
-
-            $router = DI::get('router_filter_config_arr');
-
-            if (!isset($router[$uri])) { //请求的路由错误
-                $uri = '/Error/router';
-            } else if ($method !== $router[$uri]['method']) { //请求的方法不正确
-                $uri = '/Error/method';
-            } else if ($router[$uri]['auth']) {
-                $this->authToken();
-            }
-            //默认转发请求的路由
-            $this->routerShutdown($uri);
+        switch (count($uri_arr)) {
+            case 5:
+                $ctrl   = 'App\Modules\\' . ucfirst($uri_arr[1]) . '\Controllers\\' . ucfirst($uri_arr[2]) . '\\' . ucfirst($uri_arr[3]) . 'Controller';
+                $action = $uri_arr[4] . 'Action';
+                break;
+            case 4:
+                $ctrl   = 'App\Modules\\' . ucfirst($uri_arr[1]) . '\Controllers\\' . ucfirst($uri_arr[2]) . 'Controller';
+                $action = $uri_arr[3] . 'Action';
+                break;
+            default:
+                $ctrl   = 'App\Controllers\\' . ucfirst($uri_arr[1]) . 'Controller';
+                $action = $uri_arr[2] . 'Action';
         }
-    }
 
-    public function routerShutdown($uri): void
-    {
-        if (!empty($uri)) {
-            //todo 使用atomic做接口限流
+        try {
+            $ref            = new \ReflectionClass($ctrl);
+            $ref_method_doc = $ref->getMethod($action)->getDocComment();
+            $flag           = preg_match_all('/@router(.*?)\n/', $ref_method_doc, $ref_method_doc);
 
-            $request_uri = explode('/', $uri);
-            switch (count($request_uri)) {
-                case 5:
-                    $ctrl   = 'App\Modules\\' . ucfirst($request_uri[1]) . '\Controllers\\' . ucfirst($request_uri[2]) . '\\' . ucfirst($request_uri[3]) . 'Controller';
-                    $action = $request_uri[4] . 'Action';
-                    break;
-                case 4:
-                    $ctrl   = 'App\Modules\\' . ucfirst($request_uri[1]) . '\Controllers\\' . ucfirst($request_uri[2]) . 'Controller';
-                    $action = $request_uri[3] . 'Action';
-                    break;
-                default:
-                    $ctrl   = 'App\Controllers\\' . ucfirst($request_uri[1]) . 'Controller';
-                    $action = $request_uri[2] . 'Action';
+            if (empty($ref_method_doc[1][0])) {
+                throw new ProgramException('请求的接口不存在', 400);
             }
+
+            $description = trim($ref_method_doc[1][0]);
+            if (!empty($description)) {
+                parse_str($description, $output);
+                //throw new ProgramException($output['auth'],  400);
+
+                $output['method'] = strtoupper($output['method']) ?? 'GET';
+                $output['auth'] ?? 'true';
+                $output['rate-limit'] ?? 0;
+                $output['circuit-breaker'] ?? 0;
+                $output['before'] ?? '';
+                $output['after'] ?? '';
+
+                if ('CLI' === ucfirst($output['method'])) {
+                    $output['method'] = 'Cli';
+                }
+
+                if ($method !== $output['method']) {
+                    throw new ProgramException('请求方法不正确', 405);
+                } else if (true === $output['auth']) {
+                    $this->authToken();
+                }
+
+            } else {
+                throw new ProgramException('请重试', 500);
+            }
+            unset($ref_method_doc, $description);
 
             if (class_exists($ctrl)) {
                 $class = new $ctrl();
                 if (method_exists($class, $action)) {
+                    if (!empty($output['before'])) {
+                        $before_action = $output['before'];
+                        $class->$before_action();
+                    }
+
                     $class->$action();
+
+                    if (!empty($output['after'])) {
+                        $after_action = $output['after'];
+                        $class->$after_action();
+                    }
                 }
             }
+        } catch (\ReflectionException $e) {
+            throw new ProgramException('请求的接口不存在', 400);
         }
-
-        /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，
-        若存在则停止解析，直接输出页面，缓存数据页。
-        或做防重复操作提交*/
-        //todo 权限检查在这里，在此处加入路由权限组的钩子方法
     }
 
     /**

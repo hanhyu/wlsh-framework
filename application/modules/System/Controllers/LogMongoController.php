@@ -9,6 +9,7 @@ use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemLogForms;
 use MongoDB\Driver\Exception\Exception;
+use JsonException;
 
 /**
  * Created by PhpStorm.
@@ -27,7 +28,7 @@ class LogMongoController
 
     public function __construct()
     {
-        $this->beforeInit();
+        $this->beforeInit(false);
         $this->log = new LogDomain();
     }
 
@@ -35,7 +36,8 @@ class LogMongoController
      * 列表
      * @throws ProgramException
      * @throws ValidateException
-     * @throws Exception
+     * @throws Exception|JsonException
+     * @router auth=true&method=get
      */
     public function getMongoListAction(): void
     {
@@ -50,7 +52,8 @@ class LogMongoController
      * Time: 下午10:11
      * @throws ProgramException
      * @throws ValidateException
-     * @throws Exception
+     * @throws Exception|JsonException
+     * @router auth=true&method=get
      */
     public function getMongoInfoAction(): void
     {

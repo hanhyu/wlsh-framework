@@ -28,6 +28,7 @@ class ServerStatusController
      * 查看当前server的活动tcp连接信息
      * {"start_time":1544406749,"connection_num":1,"accept_count":2,"close_count":1,
      * "tasking_num":0,"request_count":34,"worker_request_count":3,"coroutine_num":1}
+     * @router auth=true&method=get
      */
     public function getStatusAction(): void
     {
@@ -50,7 +51,5 @@ class ServerStatusController
         $data['content'] = $content;
         $this->response->end(http_response(200, '', $data));
     }
-
-    //todo 在运维平台中增加监听指定端口，可以手动发送指令启动服务，停止服务功能
 
 }

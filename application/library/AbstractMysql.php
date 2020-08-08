@@ -52,7 +52,6 @@ abstract class AbstractMysql
                 throw new RuntimeException($e->getMessage(), 500);
             }
         }
-
         //只能使用__call方法实现快速回收连接池资源
         $mysql_pool_obj->put($this->db);
 

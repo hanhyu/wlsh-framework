@@ -17,9 +17,7 @@ return [
         'expTime'    => 28800,
     ],
 
-    'router' => [
-        'notHttp' => 'task,finish,ws,tcp,close',
-    ],
+    'deny_http_module' => ['task', 'finish', 'ws', 'tcp', 'close'],
 
     'version' => 'v2.0',
 

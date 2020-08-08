@@ -86,6 +86,8 @@ class Bootstrap
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
             'hook_flags'                 => SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL,
+            'user'                       => 'root',
+            'group'                      => 'root',
         ]);
 
         $this->table = new Table(1024);
@@ -144,7 +146,7 @@ class Bootstrap
                  [0]=>
            string(26) "/home/baseFrame/swoole.php"
                  [1]=>
-           string(46) "/home/baseFrame/application/library/Server.php"
+           string(46) "/home/baseFrame/application/Bootstrap.php"
                  [2]=>
            string(50) "/home/baseFrame/application/library/AutoReload.php"
          }
@@ -247,7 +249,7 @@ class Bootstrap
         $token = $request->get['token'] ?? '0';
         $res   = validate_token($token);
         if (!empty($res)) {
-            $response->status(400);
+            $response->status(401);
             $response->end($res['msg']);
             return false;
         }
@@ -327,13 +329,22 @@ class Bootstrap
      *
      * @param Server $server
      * @param Frame  $frame
+     *
+     * @throws JsonException
      */
     public function onMessage(Server $server, Frame $frame): void
     {
         if ($frame->opcode === 0x08) {
             //echo "Close frame received: Code {$frame->code} Reason {$frame->reason}\n";
         } else {
-            $res = json_decode($frame->data, true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            try {
+                $res = json_decode($frame->data, true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            } catch (JsonException $j) {
+                if ($server->isEstablished($frame->fd)) {
+                    $server->push($frame->fd, ws_response(422, '', '无法处理请求内容'));
+                }
+            }
+
             if (!isset($res['uri']) and empty($res['uri'])) {
                 if ($server->isEstablished($frame->fd)) {
                     $server->push($frame->fd, ws_response(400, '', '非法访问'));
@@ -342,13 +353,12 @@ class Bootstrap
                 return;
             }
 
-            //$req_obj = new Yaf\Request\Http($res['uri'], '/');
-            //$req_obj->setParam((array)$frame);
-
             DI::set('fd_int' . Coroutine::getCid(), $frame->fd);
             DI::set('ws_data_arr' . Coroutine::getCid(), $res);
+
             try {
-                (new RouterInit())->routerStartup($res['uri'], 'Cli');
+                $uri_arr = explode('/', $res['uri']);
+                (new RouterInit())->routerStartup($uri_arr, 'Cli');
             } catch (ValidateException $e) { //参数验证手动触发的信息
                 if ($server->isEstablished($frame->fd)) {
                     $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage(), [], true));
@@ -366,14 +376,17 @@ class Bootstrap
                     }
                 }
 
-                co_log(
+                task_log(
+                    $server,
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                     'onRequest Throwable message:',
-                    'websocket'
+                    'websocket',
+                    'error'
                 );
+            } finally {
+                DI::del('fd_int' . Coroutine::getCid());
+                DI::del('ws_data_arr' . Coroutine::getCid());
             }
-            DI::del('fd_int' . Coroutine::getCid());
-            DI::del('ws_data_arr' . Coroutine::getCid());
         }
     }
 
@@ -386,8 +399,7 @@ class Bootstrap
      */
     public function onRequest(Request $request, Response $response): void
     {
-        //TODO 绑定固定域名才能访问
-        $request_uri_str = $request->server['request_uri'] ?? '';
+        $request_uri_str = $request->server['request_uri'] ?? '/';
         if (empty($request_uri_str)) {
             $response->status(404);
             $response->end();
@@ -402,19 +414,17 @@ class Bootstrap
 
         $response->header('Content-Type', 'application/json;charset=utf-8');
 
-        $request_uri_arr   = explode('/', $request_uri_str);
-        $router_config_arr = DI::get('config_arr');
+        $request_uri_arr = explode('/', $request_uri_str);
         if (isset($request_uri_arr[1]) and !empty($request_uri_arr[1])) {
             $response->header('Access-Control-Allow-Methods', 'POST,DELETE,PUT,GET,OPTIONS');
             $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
             $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign,Language');
             $response->header('Access-Control-Allow-Credentials', 'true');
             $response->header('Access-Control-Max-Age', '8388608');
-            $response->header('Access-Control-Allow-Origin', $router_config_arr['origin']['domain']);
+            $response->header('Access-Control-Allow-Origin', DI::get('config_arr')['origin']['domain']);
 
             //过滤掉固定的几个模块不能在外部http直接访问，ws、task、tcp、close、finish模块
-            $router_arr = explode(',', $router_config_arr['router']['notHttp']);
-            if (in_array($request_uri_arr[1], $router_arr, true)) {
+            if (in_array($request_uri_arr[1], DI::get('config_arr')['deny_http_module'], true)) {
                 $response->status(404);
                 $response->end();
                 return;
@@ -443,7 +453,7 @@ class Bootstrap
          });*/
 
         try {
-            (new RouterInit())->routerStartup($request_uri_str, $request->server['request_method']);
+            (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
         } catch (ValidateException $e) { //参数验证手动触发的信息
             $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
         } catch (ProgramException $e) { //程序手动抛出的异常
@@ -457,10 +467,12 @@ class Bootstrap
                 $response->end(http_response(500, '服务异常'));
             }
 
-            co_log(
+            task_log(
+                $this->server,
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onRequest Throwable message:',
-                'http'
+                'http',
+                'error'
             );
         } finally {
             DI::del('request_obj' . $cid);
@@ -475,6 +487,8 @@ class Bootstrap
      * @param int    $fd
      * @param int    $reactor_id
      * @param string $data
+     *
+     * @throws JsonException
      */
     //todo 暂未实现路由Tcp模块
     public function onReceive(Server $server, int $fd, int $reactor_id, string $data): void
@@ -486,16 +500,20 @@ class Bootstrap
         DI::set('receive_data_arr' . Coroutine::getCid(), $res);
 
         try {
-            (new RouterInit())->routerStartup($res['uri'], 'Cli');
+            $uri_arr = explode('/', $res['uri']);
+            (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
-            co_log(
+            task_log(
+                $server,
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onReceive Throwable message:',
-                'receive'
+                'receive',
+                'error'
             );
+        } finally {
+            DI::del('fd_int' . Coroutine::getCid());
+            DI::del('receive_data_arr' . Coroutine::getCid());
         }
-        DI::del('fd_int' . Coroutine::getCid());
-        DI::del('receive_data_arr' . Coroutine::getCid());
     }
 
     /**
@@ -518,16 +536,17 @@ class Bootstrap
         DI::set('task_data_arr' . Coroutine::getCid(), $res);
         ob_start();
         try {
-            (new RouterInit())->routerStartup($res['uri'], 'Cli');
+            $uri_arr = explode('/', $res['uri']);
+            (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
             co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onTask Throwable message:',
                 'task'
             );
-            //todo task中抛的异常后怎么处理
         } finally {
             $result = ob_get_contents();
+            DI::del('task_data_arr' . Coroutine::getCid());
         }
         ob_end_clean();
 
@@ -536,8 +555,6 @@ class Bootstrap
             var_dump($result);
             $result = '';
         }
-
-        DI::del('task_data_arr' . Coroutine::getCid());
 
         $task->finish($result);
     }
@@ -551,24 +568,26 @@ class Bootstrap
      */
     public function onFinish(Server $server, int $task_id, string $data): void
     {
-        if (!empty($data)) {
-            $res = unserialize($data);
-            if (isset($res['uri'])) {
-                DI::set('finish_data_arr' . Coroutine::getCid(), $res);
-                try {
-                    (new RouterInit())->routerStartup($res['uri'], 'Cli');
-                } catch (Throwable $e) {
-                    if (APP_DEBUG) {
-                        co_log(
-                            ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                            'onFinish Throwable message:',
-                            'finish'
-                        );
-                    }
+        /*if (!empty($data)) {
+            $res        = unserialize($data);
+            DI::set('finish_data_arr' . Coroutine::getCid(), $res);
+            try {
+                $uri_arr = explode('/', '/finish/flog/index');
+                (new RouterInit())->routerStartup($uri_arr, 'Cli');
+            } catch (Throwable $e) {
+                if (APP_DEBUG) {
+                    //todo 这里需要改成levelDB记录错误，否则会造成task进程异常死循环
+                    co_log(
+                        ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                        'onFinish Throwable message:',
+                        'finish'
+                    );
                 }
+            } finally {
                 DI::del('finish_data_arr' . Coroutine::getCid());
             }
-        }
+
+        }*/
     }
 
     /**
@@ -582,19 +601,22 @@ class Bootstrap
     {
         //echo "client-{$fd} is closed" . PHP_EOL;
         //echo '==============='. date("Y-m-d H:i:s", time()). '欢送' . $fd . '离开==============' . PHP_EOL;
-        DI::set('fd_int' . Coroutine::getCid(), $fd);
-        try {
-            (new RouterInit())->routerStartup('/Close/Index/index', 'Cli');
-        } catch (Throwable $e) {
-            if (APP_DEBUG) {
-                co_log(
-                    ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                    'onClose Throwable message:',
-                    'close'
-                );
-            }
-        }
-        DI::del('fd_int' . Coroutine::getCid());
+        /* DI::set('fd_int' . Coroutine::getCid(), $fd);
+         try {
+             $uri_arr = explode('/', '/close/index/index');
+             (new RouterInit())->routerStartup($uri_arr, 'Cli');
+         } catch (Throwable $e) {
+             if (APP_DEBUG) {
+                 //todo 这里需要改成levelDB记录错误，否则会造成task进程异常死循环
+                 co_log(
+                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
+                     'onClose Throwable message:',
+                     'close'
+                 );
+             }
+         } finally {
+             DI::del('fd_int' . Coroutine::getCid());
+         }*/
     }
 
     /**

@@ -22,15 +22,17 @@ class IndexController
 
     /**
      * 这里可以做一些连接关闭或客户端退出的后续操作记录日志
-     *
+     * @router auth=false&method=cli
      */
     public function IndexAction(): void
     {
         //判断该fd是websocket客户端
-        if ($this->server->getClientInfo($this->fd)['websocket_status'] === 3) {
+        $client_info = $this->server->getClientInfo($this->fd);
+        if ($client_info and is_array($client_info) and $client_info['websocket_status'] === 3) {
             //在ws协议下非正常关闭操作后业务需要退出的逻辑
+        } else if (APP_DEBUG) {
+            //monolog_by_file($this->fd, 'onClose is fd:');
         }
-        co_log($this->fd, 'onClose is fd:');
     }
 
 }

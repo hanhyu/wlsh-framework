@@ -9,6 +9,7 @@ use App\Library\DI;
 use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemMenuForms;
+use JsonException;
 
 /**
  * Created by PhpStorm.
@@ -19,6 +20,7 @@ use App\Models\Forms\SystemMenuForms;
 class MenuController
 {
     use ControllersTrait;
+
     /**
      * @var MenuDomain
      */
@@ -33,7 +35,8 @@ class MenuController
     /**
      *
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getMenuListAction(): void
     {
@@ -42,7 +45,12 @@ class MenuController
         $this->response->end(http_response(200, '', $res));
     }
 
-    public function getMenuInfoAction():void {
+    /**
+     * @throws JsonException
+     * @router auth=true&method=get
+     */
+    public function getMenuInfoAction(): void
+    {
         $data['menu']  = $this->menu->getInfo();
         $data['title'] = DI::get('config_arr')['page']['title'];
         $this->response->end(http_response(200, '', $data));
@@ -51,7 +59,8 @@ class MenuController
     /**
      *
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function setMenuAction(): void
     {
@@ -67,7 +76,8 @@ class MenuController
     /**
      *
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getMenuAction(): void
     {
@@ -83,7 +93,8 @@ class MenuController
     /**
      *
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=put
      */
     public function editMenuAction(): void
     {
@@ -99,7 +110,8 @@ class MenuController
     /**
      *
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=delete
      */
     public function delMenuAction(): void
     {

@@ -20,6 +20,7 @@ use Swoole\Coroutine;
  * @param bool   $vail
  *
  * @return string
+ * @throws JsonException
  */
 function http_response(int $code = 200, string $msg = 'success', array $data = [], bool $vail = false): string
 {
@@ -233,6 +234,7 @@ function send_email($content, string $info): void
  * @param \Swoole\WebSocket\Server $server
  * @param                          $data
  * @param string                   $info
+ * @param string                   $channel
  * @param string                   $level <p>debug (100): 详细的debug信息</p></P>
  *                                        <p>info (200): 有意义的事件，比如用户登录、SQL日志.</P>
  *                                        <p>notice (250): 普通但是重要的事件</P>
@@ -243,11 +245,12 @@ function send_email($content, string $info): void
  *                                        <p>alert (550): 必须立即采取行动。比如整个网站都挂了，数据库不可用了等。这种情况应该发送短信警报，并把你叫醒.</P>
  *                                        <p>emergency (600): 紧急请求：系统不可用了</P>
  */
-function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string $level): void
+function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string $channel = 'system', string $level = 'info'): void
 {
-    $tasks['uri']     = '/Task/LogDomain/index';
+    $tasks['uri']     = '/task/log/index';
     $tasks['content'] = $data;
     $tasks['info']    = $info;
+    $tasks['channel'] = $channel;
     $tasks['level']   = $level;
     $send             = serialize($tasks);
     $server->task($send);
@@ -300,7 +303,7 @@ function msectime(): float
  */
 function validate_token(string $token): array
 {
-    $res['code'] = 666;
+    $res['code'] = 401;
 
     if (empty($token)) {
         $res['msg'] = '请先登录';

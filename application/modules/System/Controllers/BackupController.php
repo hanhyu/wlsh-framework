@@ -18,6 +18,7 @@ use App\Models\Forms\SystemUserForms;
 use App\Models\Forms\SystemBackupForms;
 use App\Domain\System\BackupDomain;
 use Swoole\Coroutine;
+use JsonException;
 
 //todo 数据备份类未整理完
 class BackupController
@@ -42,6 +43,7 @@ class BackupController
 
     /**
      * 获取所有数据表名
+     * @router auth=true&method=get
      */
     public function indexAction(): void
     {
@@ -53,6 +55,8 @@ class BackupController
      * 备份数据库
      * @throws ProgramException
      * @throws ValidateException
+     * @throws JsonException
+     * @router auth=true&method=post
      */
     public function addAction(): void
     {
@@ -92,7 +96,8 @@ class BackupController
     /**
      * 获取列表
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getListAction(): void
     {
@@ -104,7 +109,8 @@ class BackupController
     /**
      * 下载数据库备份的文件
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     //todo 下载链接直接在前端拼接，无需在后端操作，但是在后端操作有个好处是需要登录认证后才能下载，否则不能用url直接下载。
     public function downAction(): void
@@ -120,7 +126,8 @@ class BackupController
     /**
      * 删除备份文件
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=delete
      */
     public function delAction(): void
     {

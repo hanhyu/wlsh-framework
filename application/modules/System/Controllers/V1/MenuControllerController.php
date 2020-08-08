@@ -18,7 +18,8 @@ class MenuControllerController extends BaseMenu
      * Date: 19-6-16
      * Time: 下午3:20
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|\JsonException
+     * @router auth=true&method=get
      */
     public function getMenuListAction(): void
     {
@@ -31,12 +32,26 @@ class MenuControllerController extends BaseMenu
         }
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午4:27
+     * @throws \JsonException
+     * @router auth=true&method=get
+     */
     public function getMenuInfoAction(): void
     {
         $data['menu'] = $this->menu->getInfo();
         $this->response->end(http_response(200, '', $data));
     }
 
+    /**
+     * User: hanhyu
+     * Date: 19-6-16
+     * Time: 下午4:30
+     * @throws \JsonException
+     * @router auth=true&method=get
+     */
     public function getRedisAction(): void
     {
         $data = $this->menu->getRedis('key');

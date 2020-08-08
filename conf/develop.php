@@ -9,7 +9,7 @@ return [
 
     'mysql' => [
         'driver'    => 'mysql',
-        'host'      => 'wlsh-mysql',
+        'host'      => 'wlsh-ha',
         'port'      => 3306,
         'database'  => 'baseFrame',
         'username'  => 'root',
@@ -20,21 +20,8 @@ return [
         'strict'    => false,
     ],
 
-    'pgsql' => [
-        'driver'    => 'pgsql',
-        'host'      => '172.17.0.1',
-        'port'      => 5432,
-        'database'  => 'baseframe',
-        'username'  => 'postgres',
-        'password'  => 'root',
-        'charset'   => 'utf8',
-        'collation' => 'utf8_general_ci',
-        'prefix'    => '',
-        'strict'    => false,
-    ],
-
     'redis' => [
-        'host' => 'wlsh-redis',
+        'host' => 'wlsh-redis-master',
         'port' => 6379,
         'auth' => 'wlsh_redis',
     ],

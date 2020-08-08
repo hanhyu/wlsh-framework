@@ -8,6 +8,7 @@ use App\Library\ControllersTrait;
 use App\Library\ProgramException;
 use App\Models\Forms\SystemUserForms;
 use App\Library\ValidateException;
+use JsonException;
 
 /**
  * Created by PhpStorm.
@@ -33,7 +34,8 @@ class UserController
     /**
      * 创建用户
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function setUserAction(): void
     {
@@ -55,7 +57,8 @@ class UserController
     /**
      * 用户列表
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getUserListAction(): void
     {
@@ -67,7 +70,8 @@ class UserController
     /**
      * 删除用户
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=delete
      */
     public function delUserAction(): void
     {
@@ -83,7 +87,8 @@ class UserController
     /**
      * 根据id获取用户信息
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getUserAction(): void
     {
@@ -99,7 +104,8 @@ class UserController
     /**
      * 修改用户信息
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=put
      */
     public function editUserAction(): void
     {
@@ -115,7 +121,8 @@ class UserController
     /**
      * 用户登录
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=false&method=post
      */
     public function loginAction(): void
     {
@@ -148,6 +155,7 @@ class UserController
 
     /**
      * 用户退出
+     * @router auth=true&method=post
      */
     public function logoutAction(): void
     {
@@ -159,7 +167,8 @@ class UserController
     /**
      * 自动更新服务器代码钩子
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function pullAction(): void
     {
@@ -187,7 +196,8 @@ class UserController
      * Date: 2019/11/10
      * Time: 下午10:15
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function editPwdAction(): void
     {

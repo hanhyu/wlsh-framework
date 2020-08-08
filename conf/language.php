@@ -21,6 +21,10 @@ define('LANGUAGE', [
         'redis数据连接异常'      => 'Redis connection exception',
         '暂无数据'             => 'Temporarily no data',
         '国际化：非法请求参数'       => 'Internationalization, illegal request parameter',
+        '无法处理请求内容'         => 'Unprocessable Entity',
+        '请求方法不正确'          => 'Method Not Allowed',
+        '请重试'              => 'Please try again',
+        '请求的接口不存在'         => 'The requested interface does not exist',
     ],
 ]);
 

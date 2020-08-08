@@ -20,9 +20,22 @@ class LogController
         $this->beforeInit();
     }
 
+    /**
+     * @throws \Exception
+     * @router auth=false&method=cli
+     */
     public function IndexAction(): void
     {
-        co_log($this->data['content'], $this->data['info'], 'task', $this->data['level']);
+        if ($this->data['level'] === 'critica' or $this->data['level'] === 'alert' or $this->data['level'] === 'emergency') {
+            send_email($this->data['content'], $this->data['info']);
+        }
+
+        if (APP_DEBUG) {
+            $let = monolog_by_mongodb($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
+            if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
+                monolog_by_file($this->data['content'], $this->data['info'], $this->data['level']);
+            }
+        }
 
         /*
          * 测试投递finish路由

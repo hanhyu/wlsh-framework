@@ -8,6 +8,7 @@ use App\Library\ControllersTrait;
 use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemLogForms;
+use JsonException;
 
 /**
  * 登录日志
@@ -33,7 +34,8 @@ class LogUserController
     /**
      * 列表
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getUserListAction(): void
     {

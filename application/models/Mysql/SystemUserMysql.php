@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractMysql;
+use App\Library\DI;
+use App\Library\ProgramException;
 use RuntimeException;
 
 /**
@@ -73,6 +75,7 @@ class SystemUserMysql extends AbstractMysql
         if (false === $datas) {
             throw new RuntimeException($this->db->last());
         }
+
         return $datas;
     }
 
@@ -84,6 +87,7 @@ class SystemUserMysql extends AbstractMysql
      */
     protected function getListCount(): int
     {
+        //todo mysql count 性能下降100倍
         $datas = $this->db->count($this->table);
         if (false === $datas) {
             throw new RuntimeException($this->db->last());

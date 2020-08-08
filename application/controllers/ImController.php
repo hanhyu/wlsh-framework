@@ -16,6 +16,9 @@ class ImController
         $this->beforeInit();
     }
 
+    /**
+     * @router auth=false&method=cli
+     */
     public function getInfoAction(): void
     {
         $this->server->push($this->fd, ws_response(200, 'im/get_info', 'success'));

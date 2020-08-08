@@ -8,13 +8,16 @@ use App\Domain\System\LogDomain;
 use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
 use App\Library\DI;
+use App\Library\ProgramException;
 use App\Models\Redis\LoginRedis;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swoole\Coroutine;
 use Exception;
+use Doctrine\Common\Annotations\Annotation;
 
 /**
+ * @Annotation
  * 测试用例
  * UserDomain: hanhyu
  * Date: 18-7-25
@@ -29,15 +32,34 @@ class LoginController
         $this->beforeInit();
     }
 
+    public function rule()
+    {
+        //todo 前置操作，相关权限业务判断
+        $res = false;
+        if ($res) {
+            $this->response->end('没有权限访问');
+        }
+    }
+
+    public function responseLog()
+    {
+        //todo 后置通知第三方接口、后置ack缓存机制等操作
+        $fp = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
+        fwrite($fp, '销毁操作');
+        fclose($fp);
+    }
+
     /**
-     * 此方法不能删除
+     *
      * UserDomain: hanhyu
      * Date: 19-7-12
      * Time: 上午10:09
+     *
+     * @router auth=false&method=get&before=rule&after=responseLog
      */
-    public function indexAction(): void
+    public function indexTestAction(): void
     {
-
+        $this->response->end('hello world');
     }
 
     /**
@@ -307,13 +329,18 @@ class LoginController
      * 529140 requests in 10.08s, 239.70MB read
      * Requests/sec:  52473.98
      * Transfer/sec:     23.77MB
+     *
+     * @router auth=false&method=get
      */
     public function testAction(): void
     {
         //$this->response->status(200);
-        $this->response->end('hello world' . swoole_get_local_ip()['eth0']);
+        $this->response->end('hello world');
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function leveldbAction(): void
     {
         $db = new LevelDB(ROOT_PATH . '/log/level.db');
@@ -377,6 +404,8 @@ class LoginController
      * 98%    148
      * 99%    172
      * 100%   7788 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function getRedisAction(): void
     {
@@ -384,6 +413,9 @@ class LoginController
         $this->response->end(http_response(200, '', ['content' => $value]));
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function publisherRedisAction(): void
     {
         $redis = DI::get('redis_pool_obj')->get();
@@ -391,12 +423,18 @@ class LoginController
         $this->response->end($let);
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function consumerRedisAction(): void
     {
         $redis = DI::get('redis_pool_obj')->get();
         var_dump($redis->xRange('channel1', '-', '+'));
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function ackRedisAction(): void
     {
         $redis = DI::get('redis_pool')->get();
@@ -408,6 +446,9 @@ class LoginController
         $redis->xAck('channel1', 'chgroup4', array_keys($res['channel1']));
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function delRedisAction(): void
     {
         $redis = DI::get('redis_pool')->get();
@@ -417,6 +458,7 @@ class LoginController
 
     /**
      * elasticsearch
+     * @router auth=false&method=get
      */
     public function setEsAction(): void
     {
@@ -443,6 +485,7 @@ class LoginController
 
     /**
      * elasticsearch
+     * @router auth=false&method=get
      */
     public function getEsAction(): void
     {
@@ -467,6 +510,7 @@ class LoginController
 
     /**
      * xunsearch
+     * @router auth=false&method=get
      */
     public function setXsAction(): void
     {
@@ -487,6 +531,7 @@ class LoginController
     /**
      * xunsearch
      * @throws XSException
+     * @router auth=false&method=get
      */
     public function getXsAction(): void
     {
@@ -620,6 +665,8 @@ class LoginController
      * 98%    105
      * 99%    109
      * 100%   1113 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function getUserListAction(): void
     {
@@ -639,6 +686,9 @@ class LoginController
         }
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function getUserInfoAction(): void
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
@@ -706,6 +756,8 @@ class LoginController
      * 98%    222
      * 99%   1128
      * 100%   3263 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function getMongoLogListAction(): void
     {
@@ -775,6 +827,8 @@ class LoginController
      * 98%    211
      * 99%    226
      * 100%    439 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function getLogUserListAction(): void
     {
@@ -848,6 +902,8 @@ class LoginController
      * 98%     37
      * 99%     46
      * 100%     81 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function getLogUserViewAction(): void
     {
@@ -926,6 +982,7 @@ class LoginController
      * 99%     96
      * 100%    333 (longest request)
      *
+     * @router auth=false&method=get
      */
     public function swMysqlAction(): void
     {
@@ -948,6 +1005,9 @@ class LoginController
         $this->response->end(http_response(200, '', $get));
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function swPgsqlAction(): void
     {
         $sql = 'SELECT * FROM users WHERE id=1 LIMIT 1 ';
@@ -1077,6 +1137,8 @@ class LoginController
      * 98%     96
      * 99%   1024
      * 100%   1091 (longest request)
+     *
+     * @router auth=false&method=get
      */
     public function coMysqlAction(): void
     {
@@ -1086,6 +1148,9 @@ class LoginController
 
     }
 
+    /**
+     * @router auth=false&method=get
+     */
     public function getCoRedisAction(): void
     {
         //$ch = new Channel(1);
@@ -1106,6 +1171,8 @@ class LoginController
 
     /**
      * @throws Exception
+     *
+     * @router auth=false&method=get
      */
     public function setRedisAction(): void
     {
@@ -1118,6 +1185,8 @@ class LoginController
      * UserDomain: hanhyu
      * Date: 19-7-25
      * Time: 下午4:18
+     *
+     * @router auth=false&method=get
      */
     public function testCoAction(): void
     {

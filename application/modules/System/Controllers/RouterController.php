@@ -8,6 +8,7 @@ use App\Library\ControllersTrait;
 use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemRouterForms;
+use JsonException;
 
 class RouterController
 {
@@ -26,7 +27,8 @@ class RouterController
     /**
      * 获取路由列表数据
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=get
      */
     public function getListAction(): void
     {
@@ -39,7 +41,8 @@ class RouterController
     /**
      * 添加路由信息
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=post
      */
     public function setRouterAction(): void
     {
@@ -56,7 +59,8 @@ class RouterController
     /**
      * 修改路由
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=put
      */
     public function editRouterAction(): void
     {
@@ -72,7 +76,8 @@ class RouterController
     /**
      * 删除路由
      * @throws ProgramException
-     * @throws ValidateException
+     * @throws ValidateException|JsonException
+     * @router auth=true&method=delete
      */
     public function delRouterAction(): void
     {
@@ -85,6 +90,10 @@ class RouterController
         }
     }
 
+    /**
+     * @throws JsonException
+     * @router auth=true&method=get
+     */
     public function getInfoAction(): void
     {
         $res = $this->router->getInfo();
