@@ -1,111 +1,74 @@
 <?php
-
+/**
+ * Elasticsearch PHP client
+ *
+ * @link      https://github.com/elastic/elasticsearch-php/
+ * @copyright Copyright (c) Elasticsearch B.V (https://www.elastic.co)
+ * @license   http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+ * @license   https://www.gnu.org/licenses/lgpl-2.1.html GNU Lesser General Public License, Version 2.1 
+ * 
+ * Licensed to Elasticsearch B.V under one or more agreements.
+ * Elasticsearch B.V licenses this file to you under the Apache 2.0 License or
+ * the GNU Lesser General Public License, Version 2.1, at your option.
+ * See the LICENSE file in the project root for more information.
+ */
 declare(strict_types = 1);
 
 namespace Elasticsearch\Endpoints\Snapshot;
 
+use Elasticsearch\Common\Exceptions\RuntimeException;
 use Elasticsearch\Endpoints\AbstractEndpoint;
-use Elasticsearch\Common\Exceptions;
 
 /**
  * Class Delete
- *
- * @category Elasticsearch
- * @package  Elasticsearch\Endpoints\Snapshot
- * @author   Zachary Tong <zach@elastic.co>
- * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
- * @link     http://elastic.co
+ * Elasticsearch API name snapshot.delete
+ * Generated running $ php util/GenerateEndpoints.php 7.9
  */
 class Delete extends AbstractEndpoint
 {
-    /**
-     * A repository name
-     *
-     * @var string
-     */
-    private $repository;
+    protected $repository;
+    protected $snapshot;
 
-    /**
-     * A snapshot name
-     *
-     * @var string
-     */
-    private $snapshot;
+    public function getURI(): string
+    {
+        $repository = $this->repository ?? null;
+        $snapshot = $this->snapshot ?? null;
 
-    /**
-     * @param string $repository
-     *
-     * @return $this
-     */
-    public function setRepository($repository)
+        if (isset($repository) && isset($snapshot)) {
+            return "/_snapshot/$repository/$snapshot";
+        }
+        throw new RuntimeException('Missing parameter for the endpoint snapshot.delete');
+    }
+
+    public function getParamWhitelist(): array
+    {
+        return [
+            'master_timeout'
+        ];
+    }
+
+    public function getMethod(): string
+    {
+        return 'DELETE';
+    }
+
+    public function setRepository($repository): Delete
     {
         if (isset($repository) !== true) {
             return $this;
         }
-
         $this->repository = $repository;
 
         return $this;
     }
 
-    /**
-     * @param string $snapshot
-     *
-     * @return $this
-     */
-    public function setSnapshot($snapshot)
+    public function setSnapshot($snapshot): Delete
     {
         if (isset($snapshot) !== true) {
             return $this;
         }
-
         $this->snapshot = $snapshot;
 
         return $this;
-    }
-
-    /**
-     * @throws \Elasticsearch\Common\Exceptions\RuntimeException
-     * @return string
-     */
-    public function getURI()
-    {
-        if (isset($this->repository) !== true) {
-            throw new Exceptions\RuntimeException(
-                'repository is required for Delete'
-            );
-        }
-        if (isset($this->snapshot) !== true) {
-            throw new Exceptions\RuntimeException(
-                'snapshot is required for Delete'
-            );
-        }
-        $repository = $this->repository;
-        $snapshot = $this->snapshot;
-        $uri   = "/_snapshot/$repository/$snapshot";
-
-        if (isset($repository) === true && isset($snapshot) === true) {
-            $uri = "/_snapshot/$repository/$snapshot";
-        }
-
-        return $uri;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getParamWhitelist()
-    {
-        return array(
-            'master_timeout',
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod()
-    {
-        return 'DELETE';
     }
 }

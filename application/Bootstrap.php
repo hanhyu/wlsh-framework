@@ -54,10 +54,10 @@ class Bootstrap
             9770,
             SWOOLE_PROCESS,
             SWOOLE_SOCK_TCP
-        //SWOOLE_SOCK_TCP | SWOOLE_SSL
+            //SWOOLE_SOCK_TCP | SWOOLE_SSL
         );
 
-        //todo 这里的所有配置参数，可以使用外部配置文件引入。
+        //todo 这里的所有配置参数，不建议使用外部配置文件引入，直接使用统一的docker镜像，无需额外配置。
         $this->server->set([
             //'reactor_num' => 16,
             'worker_num'                 => 4,
@@ -81,6 +81,9 @@ class Bootstrap
             'buffer_output_size'         => 8 * 1024 * 1024,
             //'ssl_cert_file'              => ROOT_PATH . '/tests/opensslRsa/cert.crt',
             //'ssl_key_file'               => ROOT_PATH . '/tests/opensslRsa/rsa_private.key',
+            //'ssl_ciphers'                => '',
+            //'ssl_verify_peer'            => true,
+            //'ssl_allow_self_signed'      => true,
             //'open_http2_protocol'        => true,
             //'open_mqtt_protocol'         => true,
             'open_websocket_close_frame' => true,
@@ -396,6 +399,7 @@ class Bootstrap
      * @param Request  $request
      * @param Response $response
      *
+     * @throws JsonException
      */
     public function onRequest(Request $request, Response $response): void
     {

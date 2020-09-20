@@ -9,6 +9,7 @@ use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Library\ProgramException;
+use App\Models\Mysql\UserMysql;
 use App\Models\Redis\LoginRedis;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -1215,6 +1216,20 @@ class LoginController
         print_r($res);
 
         $this->response->end();
+    }
+
+    /**
+     * User: hanhyu
+     * Date: 2020/9/6
+     * Time: 上午9:02
+     *
+     * @router auth=false&method=get
+     * @throws \JsonException
+     */
+    public function getUserNameAction(): void
+    {
+        $data = (new UserMysql())->getInfo('ceshi123');
+        $this->response->end(http_response(200, '', $data));
     }
 
 

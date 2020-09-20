@@ -32,8 +32,11 @@ abstract class AbstractMysql
      */
     public function __call(string $method, array $args)
     {
+        /** @var $mysql_pool_obj PdoPool */
         $mysql_pool_obj = DI::get('mysql_pool_obj');
         try {
+            if (!$mysql_pool_obj->available) return '';
+
             $this->db = $mysql_pool_obj->get();
             $data     = call_user_func_array([$this, $method], $args);
         } catch (PDOException $e) {
@@ -52,6 +55,21 @@ abstract class AbstractMysql
                 throw new RuntimeException($e->getMessage(), 500);
             }
         }
+
+        if (APP_DEBUG) {
+            $debugInfo['sql'] = $this->db->last();
+
+            if (preg_match("/^(SELECT )/i", $debugInfo['sql'])) {
+                $explain[] = $this->db->query('EXPLAIN ' . $debugInfo['sql'])->fetch();
+
+                if (!empty($explain)) {
+                    $debugInfo['explain'] = $explain;
+                }
+            }
+
+            co_log($debugInfo, 'sql', 'mysql');
+        }
+
         //只能使用__call方法实现快速回收连接池资源
         $mysql_pool_obj->put($this->db);
 

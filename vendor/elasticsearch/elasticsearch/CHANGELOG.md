@@ -1,10 +1,205 @@
-## Release 6.7.2
+## Release 7.9.0
 
-- Fix #846 choosing `GET` and `POST` in endpoints based on body [[acbc76d0]](https://github.com/elastic/elasticsearch-php/commit/acbc76d0)
-- Fix #843 adding `wait_for_active_shards` and `pipeline` in `UpdateByQuery` [[acbc76d0]](https://github.com/elastic/elasticsearch-php/commit/acbc76d0)
-- Fixed missing `ScriptsPainlessExecute` endpoint, since ES 6.3 [[acbc76d0]](https://github.com/elastic/elasticsearch-php/commit/acbc76d0)
-- Fixed missing `RankEval` endpoint, since ES 6.2 [[acbc76d0]](https://github.com/elastic/elasticsearch-php/commit/acbc76d0)
-- Added User-Agent header equal to `elasticsearch-php/6.7.1 (metadata-values)` [[acbc76d0]](https://github.com/elastic/elasticsearch-php/commit/acbc76d0)
+- Updated endpoints and namespaces for Elasticsearch 7.9
+  [28bf0ed](https://github.com/elastic/elasticsearch-php/commit/28bf0ed6df6bc95f83f369509431d97907bfdeb0)
+- Moved `scroll_id` into `body` for search operations in the documentation
+  [#1052](https://github.com/elastic/elasticsearch-php/pull/1052)
+- Fixed PHP 7.4 preloading feature for autoload.php
+  [#1051](https://github.com/elastic/elasticsearch-php/pull/1051)
+- Improved message of JSON errors using `json_last_error_msg()`
+  [#1045](https://github.com/elastic/elasticsearch-php/pull/1045)
+
+## Release 7.8.0
+
+- Updated endpoints and namespaces for Elasticsearch 7.8
+  [f2a0828](https://github.com/elastic/elasticsearch-php/commit/f2a0828d5ee9d126ad63e2a1d43f70b4013845e2)
+- Improved documentation
+  [#1038](https://github.com/elastic/elasticsearch-php/pull/1038)
+  [#1027](https://github.com/elastic/elasticsearch-php/pull/1027)
+  [#1025](https://github.com/elastic/elasticsearch-php/pull/1025)
+
+## Release 7.7.0
+
+- Removed setId() into endpoints, fixed `util/GenerateEndpoints.php`
+  [#1026](https://github.com/elastic/elasticsearch-php/pull/1026)
+- Fixes JsonErrorException with code instead of message
+  [#1022](https://github.com/elastic/elasticsearch-php/pull/1022)
+- Better exception message for Could not parse URI
+  [#1016](https://github.com/elastic/elasticsearch-php/pull/1016)
+- Added JUnit log for PHPUnit
+  [88b7e1c](https://github.com/elastic/elasticsearch-php/commit/88b7e1ce80a5a52c1d64d00c55fef77097bbd8a9)
+- Added the XPack endpoints
+  [763d91a](https://github.com/elastic/elasticsearch-php/commit/763d91a3d506075316b84a38b2bed7a098da5028)
+
+## Release 7.6.1
+
+- Fixed issue with `guzzlehttp/ringphp` and `guzzle/streams`
+  using forks `ezimuel/ringphp` and `ezimuel/guzzlestreams`
+  [92a6a4a](https://github.com/elastic/elasticsearch-php/commit/92a6a4adda5eafd1823c7c9c386e2c7e5e75cd08)
+
+## Release 7.6.0
+
+- Generated the new endpoints for Elasticsearch 7.6.0
+  [be31f31](https://github.com/elastic/elasticsearch-php/commit/be31f317af704f333b43bbcc7c01ddc7c91ec6f8)
+
+## Release 7.5.1
+
+- Fixes port missing in log [#925](https://github.com/elastic/elasticsearch-php/issues/925)
+  [75e0888](https://github.com/elastic/elasticsearch-php/commit/125594b40d167ef1509b3ee49a3f93426390c426)
+- Added `ClientBuilder::includePortInHostHeader()` to add the
+  `port` in the `Host` header. This fixes [#993](https://github.com/elastic/elasticsearch-php/issues/993).
+  By default the `port` is not included in the `Host` header.
+  [#997](https://github.com/elastic/elasticsearch-php/pull/997)
+- Replace abandoned packages: ringphp, streams and phpstan-shim 
+  [#996](https://github.com/elastic/elasticsearch-php/pull/996)
+- Fixed gzip compression when setting Cloud Id
+  [#986](https://github.com/elastic/elasticsearch-php/pull/986)
+
+## Release 7.5.0
+
+- Fixed `Client::extractArgument` iterable casting to array;
+  this allows passing a `Traversable` body for some endpoints
+  (e.g. Bulk, Msearch, MsearchTemplate)
+  [#983](https://github.com/elastic/elasticsearch-php/pull/983)
+- Fixed the Response Exception if the `reason` field is null
+  [#980](https://github.com/elastic/elasticsearch-php/pull/980)
+- Added support for PHP 7.4
+  [#976](https://github.com/elastic/elasticsearch-php/pull/976)
+
+## Release 7.4.1
+
+- We added the suppress operator `@` for the deprecation messages `@trigger_error()`.
+  With this approach we don't break existing application that convert PHP errors in Exception
+  (e.g. using Laravel with issue https://github.com/babenkoivan/scout-elasticsearch-driver/issues/297)
+  Using the `@` operator is still possible to intercept the deprecation message using
+  a custom error handler.
+  [#973](https://github.com/elastic/elasticsearch-php/pull/973)
+- Add missing leading slash in the URL of put mapping endpoint
+  [#970](https://github.com/elastic/elasticsearch-php/pull/970)
+- Fix pre 7.2 endpoint class name with aliases + reapply fix #947.
+  This PR solved the unexpected BC break introduce in 7.4.0 with the code
+  generation tool
+  [#968](https://github.com/elastic/elasticsearch-php/pull/968)
+
+## Release 7.4.0
+
+- Added the code generation for endpoints and namespaces based on
+  the [REST API specification](https://github.com/elastic/elasticsearch/tree/v7.4.2/rest-api-spec/src/main/resources/rest-api-spec/api)
+  of Elasticsearch. This tool is available in `util/GenerateEndpoints.php`.
+  [#966](https://github.com/elastic/elasticsearch-php/pull/966)
+- Fixed the asciidoc [endpoints documentation](https://www.elastic.co/guide/en/elasticsearch/client/php-api/current/ElasticsearchPHP_Endpoints.html) based on the code generation 
+  using [Sami](https://github.com/FriendsOfPHP/Sami) project
+  [#966](https://github.com/elastic/elasticsearch-php/pull/966)
+- All the `experimental` and `beta` APIs are now signed with
+  a `@note` tag in the phpdoc section (e.g. [$client->rankEval()](https://github.com/elastic/elasticsearch-php/blob/master/src/Elasticsearch/Client.php)). For more information read the [experimental and beta APIs](docs/experimental-beta-apis.asciidoc)
+  section in the documentation.
+  [#966](https://github.com/elastic/elasticsearch-php/pull/966)
+- Removed `AlreadyExpiredException` since it has been removed
+  from Elasticsearch with https://github.com/elastic/elasticsearch/pull/24857
+  [#954](https://github.com/elastic/elasticsearch-php/pull/954)
+
+## Release 7.3.0
+
+- Added support for simplified access to the `X-Opaque-Id` header
+  [#952](https://github.com/elastic/elasticsearch-php/pull/952)
+- Added the HTTP port in the log messages
+  [#950](https://github.com/elastic/elasticsearch-php/pull/950)
+- Fixed hostname with underscore (ClientBuilder::prependMissingScheme)
+  [#949](https://github.com/elastic/elasticsearch-php/pull/949)
+- Removed unused Monolog in ClientBuilder
+  [#948](https://github.com/elastic/elasticsearch-php/pull/948)
+  
+## Release 7.2.2
+
+- Reintroduced the optional parameter in `Elasticsearch\Namespaces\IndicesNamespace::getAliases()`.
+  This fixes the BC break introduced in 7.2.0 and 7.2.1.
+  [#947](https://github.com/elastic/elasticsearch-php/pull/)
+
+## Release 7.2.1
+
+- Reintroduced `Elasticsearch\Namespaces\IndicesNamespace::getAliases()` as proxy
+  to `IndicesNamespace::getAlias()` to prevent BC breaks. The `getAliases()` is
+  marked as deprecated and it will be removed from `elasticsearch-php 8.0`
+  [#943](https://github.com/elastic/elasticsearch-php/pull/943)
+
+### Docs
+
+- Fixed missing put mapping code snippet in code examples
+  [#938](https://github.com/elastic/elasticsearch-php/pull/938)
+
+# Release 7.2.0
+
+- Updated the API endpoints for working with Elasticsearch 7.2.0:
+    - added `wait_for_active_shards` parameter to `indices.close` API;
+    - added `expand_wildcards` parameter to `cluster.health` API;
+    - added include_unloaded_segments`, `expand_wildcards`, `forbid_closed_indices`
+      parameters to `indices.stats` API.
+  [[27d721b]](https://github.com/elastic/elasticsearch-php/pull/933/commits/27d721ba44b8c199388650c5a1c8bd69757229aa)
+- Updated the phpdoc parameters for all the API endpoints
+  [[27d721b]](https://github.com/elastic/elasticsearch-php/pull/933/commits/27d721ba44b8c199388650c5a1c8bd69757229aa)  
+- Improved the Travis CI speed using cache feature with composer
+  [#929](https://github.com/elastic/elasticsearch-php/pull/929)
+- Fixed `php_uname()` usage checking if it is disabled
+  [#927](https://github.com/elastic/elasticsearch-php/pull/927)
+- Added support of Elastic Cloud ID and API key authentication
+  [#923](https://github.com/elastic/elasticsearch-php/pull/923)
+
+## Release 7.1.1
+
+- Fixed `ClientBuilder::setSSLVerification()` to accept string or boolean
+  [#917](https://github.com/elastic/elasticsearch-php/pull/917)
+- Fix type hinting for `setBody` in `Elasticsearch\Endpoints\Ingest\Pipeline\Put`
+  [#913](https://github.com/elastic/elasticsearch-php/pull/913)
+
+## Release 7.1.0
+
+- Added warning log for Elasticsearch response containing the `Warning` header
+  [#911](https://github.com/elastic/elasticsearch-php/pull/911)
+- Fixed #838 hosting company is blocking ports because of `YamlRunnerTest.php`
+  [#844](https://github.com/elastic/elasticsearch-php/pull/844)
+- Specialized inheritance of `NoNodesAvailableException` to extend `ServerErrorResponseException`
+  instead of the generic `\Exception`
+  [#607](https://github.com/elastic/elasticsearch-php/pull/607)
+- Fixed scroll TTL is extracted but not set as a body param
+  [#907](https://github.com/elastic/elasticsearch-php/pull/907)
+
+### Testing
+
+- Improved the speed of integration tests removing snapshots delete from `YamlRunnerTest::clean`
+  [#911](https://github.com/elastic/elasticsearch-php/pull/911)
+- Reduced the number of skipping YAML integration tests from 20 to 6
+  [#911](https://github.com/elastic/elasticsearch-php/pull/911)
+
+### Docs
+
+- Documentation updated for Elasticsearch 7
+  [#904](https://github.com/elastic/elasticsearch-php/pull/904)
+
+## Release 7.0.2
+
+- Fixed incorrect return type hint when using async requests/futures
+  [#905](https://github.com/elastic/elasticsearch-php/pull/905)
+
+## Release 7.0.1
+
+- Fixed SniffingConnectionPool removing the return type of Connection::sniff()
+  [#899](https://github.com/elastic/elasticsearch-php/pull/899)
+
+## Release 7.0.0
+
+- Requirement of PHP 7.1 instead of 7.0 that is not supported since 1 Jan 2019.
+  [#897](https://github.com/elastic/elasticsearch-php/pull/897)
+- Code refactoring using type hints and return type declarations where possible
+  [#897](https://github.com/elastic/elasticsearch-php/pull/897)
+- Update vendor libraries (PHPUnit 7.5, Symfony YAML 4.3, etc)
+  [#897](https://github.com/elastic/elasticsearch-php/pull/897)
+- Updated all the API endpoints using the [latest 7.0.0 specs](https://github.com/elastic/elasticsearch/tree/v7.0.0/rest-api-spec/src/main/resources/rest-api-spec/api) of Elasticsearch [#897](https://github.com/elastic/elasticsearch-php/pull/897)
+- Added the `User-Agent` in each HTTP request [#898](https://github.com/elastic/elasticsearch-php/pull/898)
+- Simplified the logging methods `logRequestFail($request, $response, $exception)`
+  and `logRequestSuccess($request, $response)` in `Elasticsearch\Connections\Connection`
+  [#876](https://github.com/elastic/elasticsearch-php/pull/876)
+- Fix `json_encode` for unicode(emoji) characters [856](https://github.com/elastic/elasticsearch-php/pull/856)
+- Fix HTTP port specification using CURLOPT_PORT, not anymore in the host [782](https://github.com/elastic/elasticsearch-php/pull/782)
 
 ## Release 6.7.1
 
@@ -41,7 +236,7 @@
 - [DOCS] Update `community.asciidoc`, added `ElasticSearchQueryDSL` project [#749](https://github.com/elastic/elasticsearch-php/pull/749)
 - [DOCS] Proper return type array for get method for `IndicesNamespace` [#651](https://github.com/elastic/elasticsearch-php/pull/651)
 - [DOCS] Fix full docs link [#862](https://github.com/elastic/elasticsearch-php/pull/862)
-- [DOCS] Update breaking-changes.asciidoc, removal of ClientBuilder::defaultLogger() [#879](https://github.com/elastic/elasticsearch-php/pull/879)
+- [DOCS] Update breaking-changes.asciidoc, removal of ClientBuilder::defaultLogger() [879](https://github.com/elastic/elasticsearch-php/pull/879)
 
 ### Testing
 

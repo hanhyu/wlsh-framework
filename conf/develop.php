@@ -9,7 +9,7 @@ return [
 
     'mysql' => [
         'driver'    => 'mysql',
-        'host'      => 'wlsh-ha',
+        'host'      => 'wlsh-mysql',
         'port'      => 3306,
         'database'  => 'baseFrame',
         'username'  => 'root',

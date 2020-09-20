@@ -5,7 +5,7 @@ use App\Library\{
     DI,
     PdoPool,
     RedisPool,
-    CoMysqlPool
+    CoMysqlPool,
 };
 
 //发送邮件配置

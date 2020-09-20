@@ -1,20 +1,20 @@
 {
-    "_readme": [
-        "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
-        "This file is @generated automatically"
-    ],
-    "content-hash": "e78bd43cf1e1a4381033c5e35e3bc6bb",
-    "packages": [
-        {
-            "name": "catfan/medoo",
-            "version": "v1.7.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/catfan/Medoo.git",
-                "reference": "4b3194a526e7e0ace7efd3a6773f0805fd47bef9"
-            },
-            "dist": {
+  "_readme": [
+    "This file locks the dependencies of your project to a known state",
+    "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+    "This file is @generated automatically"
+  ],
+  "content-hash": "b555d65f11828eda99eb1ad9e04e5e53",
+  "packages": [
+    {
+      "name": "catfan/medoo",
+      "version": "v1.7.6",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/catfan/Medoo.git",
+        "reference": "4b3194a526e7e0ace7efd3a6773f0805fd47bef9"
+      },
+      "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/catfan/Medoo/zipball/4b3194a526e7e0ace7efd3a6773f0805fd47bef9",
                 "reference": "4b3194a526e7e0ace7efd3a6773f0805fd47bef9",
@@ -195,26 +195,208 @@
             ],
             "description": "A library for validating emails against several RFCs",
             "homepage": "https://github.com/egulias/EmailValidator",
-            "keywords": [
-                "email",
-                "emailvalidation",
-                "emailvalidator",
-                "validation",
-                "validator"
-            ],
-            "time": "2019-08-13T17:33:27+00:00"
+          "keywords": [
+            "email",
+            "emailvalidation",
+            "emailvalidator",
+            "validation",
+            "validator"
+          ],
+          "time": "2019-08-13T17:33:27+00:00"
+        },
+    {
+      "name": "elasticsearch/elasticsearch",
+      "version": "v7.9.0",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/elastic/elasticsearch-php.git",
+        "reference": "1380925ccd276ab897c76596cf3705cb9714a78c"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/1380925ccd276ab897c76596cf3705cb9714a78c",
+        "reference": "1380925ccd276ab897c76596cf3705cb9714a78c",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
+      "require": {
+        "ext-json": ">=1.3.7",
+        "ezimuel/ringphp": "^1.1.2",
+        "php": "^7.1",
+        "psr/log": "~1.0"
+      },
+      "require-dev": {
+        "cpliakas/git-wrapper": "~2.0",
+        "doctrine/inflector": "^1.3",
+        "mockery/mockery": "^1.2",
+        "phpstan/phpstan": "^0.12",
+        "phpunit/phpunit": "^7.5",
+        "squizlabs/php_codesniffer": "^3.4",
+        "symfony/finder": "~4.0",
+        "symfony/yaml": "~4.0"
+      },
+      "suggest": {
+        "ext-curl": "*",
+        "monolog/monolog": "Allows for client-level logging and tracing"
+      },
+      "type": "library",
+      "autoload": {
+        "files": [
+          "src/autoload.php"
+        ],
+        "psr-4": {
+          "Elasticsearch\\": "src/Elasticsearch/"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "Apache-2.0"
+      ],
+      "authors": [
+        {
+          "name": "Zachary Tong"
         },
         {
-            "name": "mongodb/mongodb",
-            "version": "1.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mongodb/mongo-php-library.git",
-                "reference": "32cfb9bbd0bc60a5a13ca9eab7e4803226a5d4a7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/32cfb9bbd0bc60a5a13ca9eab7e4803226a5d4a7",
+          "name": "Enrico Zimuel"
+        }
+      ],
+      "description": "PHP Client for Elasticsearch",
+      "keywords": [
+        "client",
+        "elasticsearch",
+        "search"
+      ],
+      "time": "2020-08-18T13:44:18+00:00"
+    },
+    {
+      "name": "ezimuel/guzzlestreams",
+      "version": "3.0.1",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/ezimuel/guzzlestreams.git",
+        "reference": "abe3791d231167f14eb80d413420d1eab91163a8"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/ezimuel/guzzlestreams/zipball/abe3791d231167f14eb80d413420d1eab91163a8",
+        "reference": "abe3791d231167f14eb80d413420d1eab91163a8",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
+      "require": {
+        "php": ">=5.4.0"
+      },
+      "require-dev": {
+        "phpunit/phpunit": "~4.0"
+      },
+      "type": "library",
+      "extra": {
+        "branch-alias": {
+          "dev-master": "3.0-dev"
+        }
+      },
+      "autoload": {
+        "psr-4": {
+          "GuzzleHttp\\Stream\\": "src/"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "authors": [
+        {
+          "name": "Michael Dowling",
+          "email": "mtdowling@gmail.com",
+          "homepage": "https://github.com/mtdowling"
+        }
+      ],
+      "description": "Fork of guzzle/streams (abandoned) to be used with elasticsearch-php",
+      "homepage": "http://guzzlephp.org/",
+      "keywords": [
+        "Guzzle",
+        "stream"
+      ],
+      "time": "2020-02-14T23:11:50+00:00"
+    },
+    {
+      "name": "ezimuel/ringphp",
+      "version": "1.1.2",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/ezimuel/ringphp.git",
+        "reference": "0b78f89d8e0bb9e380046c31adfa40347e9f663b"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/ezimuel/ringphp/zipball/0b78f89d8e0bb9e380046c31adfa40347e9f663b",
+        "reference": "0b78f89d8e0bb9e380046c31adfa40347e9f663b",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
+      "require": {
+        "ezimuel/guzzlestreams": "^3.0.1",
+        "php": ">=5.4.0",
+        "react/promise": "~2.0"
+      },
+      "require-dev": {
+        "ext-curl": "*",
+        "phpunit/phpunit": "~4.0"
+      },
+      "suggest": {
+        "ext-curl": "Guzzle will use specific adapters if cURL is present"
+      },
+      "type": "library",
+      "extra": {
+        "branch-alias": {
+          "dev-master": "1.1-dev"
+        }
+      },
+      "autoload": {
+        "psr-4": {
+          "GuzzleHttp\\Ring\\": "src/"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "authors": [
+        {
+          "name": "Michael Dowling",
+          "email": "mtdowling@gmail.com",
+          "homepage": "https://github.com/mtdowling"
+        }
+      ],
+      "description": "Fork of guzzle/RingPHP (abandoned) to be used with elasticsearch-php",
+      "time": "2020-02-14T23:51:21+00:00"
+    },
+    {
+      "name": "mongodb/mongodb",
+      "version": "1.5.1",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/mongodb/mongo-php-library.git",
+        "reference": "32cfb9bbd0bc60a5a13ca9eab7e4803226a5d4a7"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/32cfb9bbd0bc60a5a13ca9eab7e4803226a5d4a7",
                 "reference": "32cfb9bbd0bc60a5a13ca9eab7e4803226a5d4a7",
                 "shasum": "",
                 "mirrors": [
@@ -365,26 +547,26 @@
             ],
             "time": "2019-08-30T09:56:44+00:00"
         },
-        {
-            "name": "psr/log",
-            "version": "1.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
-                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
+    {
+      "name": "psr/log",
+      "version": "1.1.3",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/php-fig/log.git",
+        "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
+        "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
             "require": {
                 "php": ">=5.3.0"
             },
@@ -406,27 +588,79 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                  "homepage": "http://www.php-fig.org/"
                 }
             ],
-            "description": "Common interface for logging libraries",
-            "homepage": "https://github.com/php-fig/log",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "time": "2019-11-01T11:05:21+00:00"
+      "description": "Common interface for logging libraries",
+      "homepage": "https://github.com/php-fig/log",
+      "keywords": [
+        "log",
+        "psr",
+        "psr-3"
+      ],
+      "time": "2020-03-23T09:12:05+00:00"
+    },
+    {
+      "name": "react/promise",
+      "version": "v2.7.1",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/reactphp/promise.git",
+        "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
+        "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
+      "require": {
+        "php": ">=5.4.0"
+      },
+      "require-dev": {
+        "phpunit/phpunit": "~4.8"
+      },
+      "type": "library",
+      "autoload": {
+        "psr-4": {
+          "React\\Promise\\": "src/"
         },
+        "files": [
+          "src/functions_include.php"
+        ]
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "authors": [
         {
-            "name": "swiftmailer/swiftmailer",
-            "version": "v6.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "5397cd05b0a0f7937c47b0adcb4c60e5ab936b6a"
-            },
-            "dist": {
+          "name": "Jan Sorgalla",
+          "email": "jsorgalla@gmail.com"
+        }
+      ],
+      "description": "A lightweight implementation of CommonJS Promises/A for PHP",
+      "keywords": [
+        "promise",
+        "promises"
+      ],
+      "time": "2019-01-07T21:25:54+00:00"
+    },
+    {
+      "name": "swiftmailer/swiftmailer",
+      "version": "v6.2.1",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/swiftmailer/swiftmailer.git",
+        "reference": "5397cd05b0a0f7937c47b0adcb4c60e5ab936b6a"
+      },
+      "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/5397cd05b0a0f7937c47b0adcb4c60e5ab936b6a",
                 "reference": "5397cd05b0a0f7937c47b0adcb4c60e5ab936b6a",
@@ -1048,72 +1282,6 @@
             "time": "2019-03-17T17:37:11+00:00"
         },
         {
-            "name": "elasticsearch/elasticsearch",
-            "version": "v6.7.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/elastic/elasticsearch-php.git",
-                "reference": "9ba89f905ebf699e72dacffa410331c7fecc8255"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/9ba89f905ebf699e72dacffa410331c7fecc8255",
-                "reference": "9ba89f905ebf699e72dacffa410331c7fecc8255",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
-            "require": {
-                "ext-json": ">=1.3.7",
-                "guzzlehttp/ringphp": "~1.0",
-                "php": "^7.0",
-                "psr/log": "~1.0"
-            },
-            "require-dev": {
-                "cpliakas/git-wrapper": "^1.7 || ^2.1",
-                "doctrine/inflector": "^1.1",
-                "mockery/mockery": "^1.2",
-                "phpstan/phpstan-shim": "^0.9 || ^0.11",
-                "phpunit/phpunit": "^5.7 || ^6.5",
-                "squizlabs/php_codesniffer": "^3.4",
-                "symfony/finder": "^2.8",
-                "symfony/yaml": "^2.8"
-            },
-            "suggest": {
-                "ext-curl": "*",
-                "monolog/monolog": "Allows for client-level logging and tracing"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Elasticsearch\\": "src/Elasticsearch/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Zachary Tong"
-                },
-                {
-                    "name": "Enrico Zimuel"
-                }
-            ],
-            "description": "PHP Client for Elasticsearch",
-            "keywords": [
-                "client",
-                "elasticsearch",
-                "search"
-            ],
-            "time": "2019-07-19T14:48:24+00:00"
-        },
-        {
             "name": "friendsofphp/php-cs-fixer",
             "version": "dev-master",
             "source": {
@@ -1258,17 +1426,18 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+              "MIT"
             ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
-            "time": "2018-07-31T13:22:33+00:00"
+          "authors": [
+            {
+              "name": "Michael Dowling",
+              "email": "mtdowling@gmail.com",
+              "homepage": "https://github.com/mtdowling"
+            }
+          ],
+          "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
+          "abandoned": true,
+          "time": "2018-07-31T13:22:33+00:00"
         },
         {
             "name": "guzzlehttp/streams",
@@ -1314,17 +1483,18 @@
             "authors": [
                 {
                     "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
+                  "email": "mtdowling@gmail.com",
+                  "homepage": "https://github.com/mtdowling"
                 }
             ],
-            "description": "Provides a simple abstraction over streams of data",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "Guzzle",
-                "stream"
-            ],
-            "time": "2014-10-12T19:18:40+00:00"
+          "description": "Provides a simple abstraction over streams of data",
+          "homepage": "http://guzzlephp.org/",
+          "keywords": [
+            "Guzzle",
+            "stream"
+          ],
+          "abandoned": true,
+          "time": "2014-10-12T19:18:40+00:00"
         },
         {
             "name": "hightman/xunsearch",
@@ -2173,17 +2343,18 @@
                 "BSD-3-Clause"
             ],
             "authors": [
-                {
-                    "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
-                }
+              {
+                "name": "Sebastian Bergmann",
+                "email": "sebastian@phpunit.de"
+              }
             ],
-            "description": "Wrapper around PHP's tokenizer extension.",
-            "homepage": "https://github.com/sebastianbergmann/php-token-stream/",
-            "keywords": [
-                "tokenizer"
-            ],
-            "time": "2019-09-17T06:23:10+00:00"
+          "description": "Wrapper around PHP's tokenizer extension.",
+          "homepage": "https://github.com/sebastianbergmann/php-token-stream/",
+          "keywords": [
+            "tokenizer"
+          ],
+          "abandoned": true,
+          "time": "2019-09-17T06:23:10+00:00"
         },
         {
             "name": "phpunit/phpunit",
@@ -2329,58 +2500,6 @@
                 "psr"
             ],
             "time": "2017-02-14T16:28:37+00:00"
-        },
-        {
-            "name": "react/promise",
-            "version": "v2.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/promise.git",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\Promise\\": "src/"
-                },
-                "files": [
-                    "src/functions_include.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com"
-                }
-            ],
-            "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "keywords": [
-                "promise",
-                "promises"
-            ],
-            "time": "2019-01-07T21:25:54+00:00"
         },
         {
             "name": "roave/security-advisories",
@@ -4149,7 +4268,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2"
+      "php": ">=7.0"
     },
     "platform-dev": []
 }

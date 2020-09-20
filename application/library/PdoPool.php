@@ -21,6 +21,7 @@ class PdoPool
      */
     protected Channel $ch;
     private array $config;
+    public bool $available;
 
     /**
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
@@ -32,10 +33,11 @@ class PdoPool
      *
      * @throws PDOException
      */
-    public function __construct(string $db_type, int $pool_min = 5, int $pool_max = 100)
+    public function __construct(string $db_type, int $pool_min = 2, int $pool_max = 10)
     {
-        $this->ch     = new Channel($pool_max);
-        $this->config = DI::get('config_arr')[$db_type];
+        $this->available = true;
+        $this->ch        = new Channel($pool_max);
+        $this->config    = DI::get('config_arr')[$db_type];
         try {
             for ($i = 0; $i < $pool_min; $i++) {
                 $this->ch->push($this->connect());
@@ -70,6 +72,7 @@ class PdoPool
         */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
+        //此处在高并发时会阻塞，需使用put手动快速回收连接对象，
         /* defer(function () use ($db) {
              $this->ch->push($db);
          });*/
@@ -107,10 +110,12 @@ class PdoPool
                     PDO::ATTR_CASE                     => PDO::CASE_NATURAL,
                     PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-                    PDO::ATTR_ORACLE_NULLS             => PDO::NULL_TO_STRING,
+                    PDO::ATTR_ORACLE_NULLS             => PDO::NULL_NATURAL,
                     PDO::ATTR_TIMEOUT                  => 3,
                     PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
-                    PDO::ATTR_PERSISTENT               => true,
+                    PDO::ATTR_STRINGIFY_FETCHES        => false,
+                    //PDO::ATTR_PERSISTENT               => true,
+                    PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES 'utf8';",
                 ],
                 'command'       => [
                     'SET SQL_MODE=ANSI_QUOTES',
@@ -158,17 +163,13 @@ class PdoPool
     /**
      * 连接池销毁, 置不可用状态, 防止新的客户端进入常驻连接池, 导致服务器无法平滑退出
      *
-     * public function __destruct()
-     * {
-     * echo 'destruct1';
-     * $this->available = false;
-     * var_dump($this->available);
-     * while (!$this->ch->isEmpty()) {
-     * $this->ch->pop();
-     * }
-     * }
-     *
-     *
      */
+    public function __destruct()
+    {
+        $this->available = false;
+        while (!$this->ch->isEmpty()) {
+            $this->ch->pop();
+        }
+    }
 
 }

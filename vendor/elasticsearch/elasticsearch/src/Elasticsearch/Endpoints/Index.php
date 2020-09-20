@@ -1,128 +1,86 @@
 <?php
-
+/**
+ * Elasticsearch PHP client
+ *
+ * @link      https://github.com/elastic/elasticsearch-php/
+ * @copyright Copyright (c) Elasticsearch B.V (https://www.elastic.co)
+ * @license   http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+ * @license   https://www.gnu.org/licenses/lgpl-2.1.html GNU Lesser General Public License, Version 2.1 
+ * 
+ * Licensed to Elasticsearch B.V under one or more agreements.
+ * Elasticsearch B.V licenses this file to you under the Apache 2.0 License or
+ * the GNU Lesser General Public License, Version 2.1, at your option.
+ * See the LICENSE file in the project root for more information.
+ */
 declare(strict_types = 1);
 
 namespace Elasticsearch\Endpoints;
 
-use Elasticsearch\Common\Exceptions;
+use Elasticsearch\Common\Exceptions\RuntimeException;
+use Elasticsearch\Endpoints\AbstractEndpoint;
 
 /**
  * Class Index
- *
- * @category Elasticsearch
- * @package  Elasticsearch\Endpoints
- * @author   Zachary Tong <zach@elastic.co>
- * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache2
- * @link     http://elastic.co
+ * Elasticsearch API name index
+ * Generated running $ php util/GenerateEndpoints.php 7.9
  */
 class Index extends AbstractEndpoint
 {
-    /** @var bool  */
-    private $createIfAbsent = false;
 
-    /**
-     * @param array $body
-     *
-     * @throws \Elasticsearch\Common\Exceptions\InvalidArgumentException
-     * @return $this
-     */
-    public function setBody($body)
+    public function getURI(): string
+    {
+        if (isset($this->index) !== true) {
+            throw new RuntimeException(
+                'index is required for index'
+            );
+        }
+        $index = $this->index;
+        $id = $this->id ?? null;
+        $type = $this->type ?? null;
+        if (isset($type)) {
+            @trigger_error('Specifying types in urls has been deprecated', E_USER_DEPRECATED);
+        }
+
+        if (isset($type) && isset($id)) {
+            return "/$index/$type/$id";
+        }
+        if (isset($id)) {
+            return "/$index/_doc/$id";
+        }
+        if (isset($type)) {
+            return "/$index/$type";
+        }
+        return "/$index/_doc";
+    }
+
+    public function getParamWhitelist(): array
+    {
+        return [
+            'wait_for_active_shards',
+            'op_type',
+            'refresh',
+            'routing',
+            'timeout',
+            'version',
+            'version_type',
+            'if_seq_no',
+            'if_primary_term',
+            'pipeline'
+        ];
+    }
+
+    public function getMethod(): string
+    {
+        return 'POST';
+    }
+
+    public function setBody($body): Index
     {
         if (isset($body) !== true) {
             return $this;
         }
-
         $this->body = $body;
 
         return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function createIfAbsent()
-    {
-        $this->createIfAbsent = true;
-
-        return $this;
-    }
-
-    /**
-     * @throws \Elasticsearch\Common\Exceptions\RuntimeException
-     * @return string
-     */
-    public function getURI()
-    {
-        if (isset($this->index) !== true) {
-            throw new Exceptions\RuntimeException(
-                'index is required for Index'
-            );
-        }
-
-        if (isset($this->type) !== true) {
-            throw new Exceptions\RuntimeException(
-                'type is required for Index'
-            );
-        }
-
-        $id    = $this->id;
-        $index = $this->index;
-        $type  = $this->type;
-        $uri   = "/$index/$type";
-
-        if (isset($id) === true) {
-            $uri = "/$index/$type/$id";
-        }
-        return $uri;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getParamWhitelist()
-    {
-        return array(
-            'consistency',
-            'op_type',
-            'parent',
-            'percolate',
-            'refresh',
-            'replication',
-            'routing',
-            'timeout',
-            'timestamp',
-            'ttl',
-            'version',
-            'version_type',
-            'pipeline',
-            'if_primary_term',
-            'if_seq_no',
-            'include_type_name'
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod()
-    {
-        if (isset($this->id) === true) {
-            return 'PUT';
-        } else {
-            return 'POST';
-        }
-    }
-
-    /**
-     * @return array
-     * @throws \Elasticsearch\Common\Exceptions\RuntimeException
-     */
-    public function getBody()
-    {
-        if (isset($this->body) !== true) {
-            throw new Exceptions\RuntimeException('Document body must be set for index request');
-        } else {
-            return $this->body;
-        }
     }
 }

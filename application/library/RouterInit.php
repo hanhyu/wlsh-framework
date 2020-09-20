@@ -80,7 +80,7 @@ class RouterInit
                 //throw new ProgramException($output['auth'],  400);
 
                 $output['method'] = strtoupper($output['method']) ?? 'GET';
-                $output['auth'] ?? 'true';
+                $output['auth'] ?? true;
                 $output['rate-limit'] ?? 0;
                 $output['circuit-breaker'] ?? 0;
                 $output['before'] ?? '';
@@ -92,10 +92,11 @@ class RouterInit
 
                 if ($method !== $output['method']) {
                     throw new ProgramException('请求方法不正确', 405);
-                } else if (true === $output['auth']) {
-                    $this->authToken();
                 }
 
+                if (true === $output['auth']) {
+                    $this->authToken();
+                }
             } else {
                 throw new ProgramException('请重试', 500);
             }
@@ -140,5 +141,4 @@ class RouterInit
             throw new ProgramException($res['msg'], $res['code']);
         }
     }
-
 }

@@ -21,7 +21,8 @@
     "monolog/monolog": "2.0.0",
     "swiftmailer/swiftmailer": "6.2.1",
     "webgeeker/validation": "0.4.4",
-    "mongodb/mongodb": "1.5.1"
+    "mongodb/mongodb": "1.5.1",
+    "elasticsearch/elasticsearch": "^7.9"
   },
   "repositories": {
     "packagist": {
@@ -43,7 +44,6 @@
     "roave/security-advisories": "dev-master",
     "friendsofphp/php-cs-fixer": "^2.14@dev",
     "phpunit/phpunit": "^7.4",
-    "elasticsearch/elasticsearch": "~6.0",
     "hightman/xunsearch": "1.4.13",
     "swoole/ide-helper": "4.4.10"
   }
