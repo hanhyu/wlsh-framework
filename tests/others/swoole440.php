@@ -13,14 +13,14 @@ class Server12
         $this->http->set([
             //'worker_num' => 16,
             'daemonize'                => false,
-            'max_request'              => 50000,
+            //'max_request'              => 50000,
             'dispatch_mode'            => 2,
             //'task_worker_num' => 16,
             'heartbeat_check_interval' => 660,
             'heartbeat_idle_time'      => 1200,
 
             'worker_num'                 => 4,
-            'max_coroutine'              => 10000,
+            'max_coroutine'              => 1000000,
             'enable_reuse_port'          => false,
             'package_max_length'         => 200000,
             'reload_async'               => true,

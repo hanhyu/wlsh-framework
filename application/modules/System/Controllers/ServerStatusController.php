@@ -6,8 +6,6 @@ namespace App\Modules\System\Controllers;
 use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Models\Mysql\SystemMenuMysql;
-use App\Models\MysqlFactory;
-use Swoole\Coroutine;
 
 /**
  * 查看服务器各种状态信息
@@ -29,8 +27,9 @@ class ServerStatusController
      * {"start_time":1544406749,"connection_num":1,"accept_count":2,"close_count":1,
      * "tasking_num":0,"request_count":34,"worker_request_count":3,"coroutine_num":1}
      * @router auth=true&method=get
+     * @throws \JsonException
      */
-    public function getStatusAction(): void
+    public function getStatusAction(): string
     {
         $swoole                = $this->server->stats();
         $content['version']    = DI::get('config_arr')['version'];
@@ -49,7 +48,11 @@ class ServerStatusController
 
         $data['swoole']  = $swoole;
         $data['content'] = $content;
-        $this->response->end(http_response(200, '', $data));
+
+        //获取本机所有网络接口的IP
+        //$server_ip = swoole_get_local_ip()['eth0'];
+
+        return http_response(200, '', $data);
     }
 
 }

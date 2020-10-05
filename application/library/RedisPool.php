@@ -24,12 +24,12 @@ class RedisPool
      * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
      * RedisPool constructor.
      *
-     * @param int $pool_min 启动的单进程中初始化默认最小连接池为5
-     * @param int $pool_max 启动的单进程中初始化默认最大连接池为100
+     * @param int $pool_min 启动的单进程中初始化默认最小连接池为2
+     * @param int $pool_max 启动的单进程中初始化默认最大连接池为10
      *
      * @throws RedisException
      */
-    public function __construct(int $pool_min = 5, int $pool_max = 100)
+    public function __construct(int $pool_min = 2, int $pool_max = 10)
     {
         $this->ch = new Channel($pool_max);
         try {

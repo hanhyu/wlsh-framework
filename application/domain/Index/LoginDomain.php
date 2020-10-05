@@ -9,6 +9,7 @@
 namespace App\Domain\Index;
 
 use App\Models\Redis\LoginRedis;
+use App\Models\Redis\UserRedis;
 
 class LoginDomain
 {
@@ -17,4 +18,8 @@ class LoginDomain
         return LoginRedis::getInstance()->getKey($key);
     }
 
+    public function existToken(array $data): ?bool
+    {
+        return UserRedis::getInstance()->existToken($data);
+    }
 }

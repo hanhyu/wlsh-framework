@@ -13,6 +13,7 @@ use JsonException;
 class RouterController
 {
     use ControllersTrait;
+
     /**
      * @var RouterDomain
      */
@@ -30,11 +31,11 @@ class RouterController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getListAction(): void
+    public function getListAction(): string
     {
         $data = $this->validator(SystemRouterForms::$getList);
         $res  = $this->router->getList($data);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
 
@@ -44,15 +45,15 @@ class RouterController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function setRouterAction(): void
+    public function setRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$setRouter);
         $res  = $this->router->setRouter($data);
         if ($res) {
-            $this->response->end(http_response(200, '路由添加成功'));
-        } else {
-            $this->response->end(http_response(500, '路由添加失败'));
+            return http_response(200, '路由添加成功');
         }
+
+        return http_response(500, '路由添加失败');
     }
 
 
@@ -62,15 +63,15 @@ class RouterController
      * @throws ValidateException|JsonException
      * @router auth=true&method=put
      */
-    public function editRouterAction(): void
+    public function editRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$editRouter);
         $res  = $this->router->editRouter($data);
         if ($res) {
-            $this->response->end(http_response(200, "{$data['name']}修改成功"));
-        } else {
-            $this->response->end(http_response(500, "{$data['name']}修改失败"));
+            return http_response(200, "{$data['name']}修改成功");
         }
+
+        return http_response(500, "{$data['name']}修改失败");
     }
 
     /**
@@ -79,29 +80,29 @@ class RouterController
      * @throws ValidateException|JsonException
      * @router auth=true&method=delete
      */
-    public function delRouterAction(): void
+    public function delRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$delRouter);
         $res  = $this->router->delRouter((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, '', ['id' => $data['id']]));
-        } else {
-            $this->response->end(http_response(500, "{$data['id']}删除失败"));
+            return http_response(200, '', ['id' => $data['id']]);
         }
+
+        return http_response(500, "{$data['id']}删除失败");
     }
 
     /**
      * @throws JsonException
      * @router auth=true&method=get
      */
-    public function getInfoAction(): void
+    public function getInfoAction(): string
     {
         $res = $this->router->getInfo();
         if (!empty($res)) {
-            $this->response->end(http_response(200, '', ['list' => $res]));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
+            return http_response(200, '', ['list' => $res]);
         }
+
+        return http_response(500, '查询失败');
     }
 
 }

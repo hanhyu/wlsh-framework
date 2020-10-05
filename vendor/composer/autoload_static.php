@@ -335,6 +335,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'App\\Models\\Mysql\\UserLogViewMysql' => __DIR__ . '/../..' . '/application/models/Mysql/UserLogViewMysql.php',
         'App\\Models\\Mysql\\UserMysql' => __DIR__ . '/../..' . '/application/models/Mysql/UserMysql.php',
         'App\\Models\\Redis\\LoginRedis' => __DIR__ . '/../..' . '/application/models/Redis/LoginRedis.php',
+        'App\\Models\\Redis\\UserRedis' => __DIR__ . '/../..' . '/application/models/Redis/UserRedis.php',
         'App\\Modules\\Close\\Controllers\\IndexController' => __DIR__ . '/../..' . '/application/modules/Close/Controllers/IndexController.php',
         'App\\Modules\\Finish\\Controllers\\FlogController' => __DIR__ . '/../..' . '/application/modules/Finish/Controllers/FlogController.php',
         'App\\Modules\\System\\Controllers\\BackupController' => __DIR__ . '/../..' . '/application/modules/System/Controllers/BackupController.php',

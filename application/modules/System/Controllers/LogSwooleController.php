@@ -7,7 +7,6 @@ use App\Library\ControllersTrait;
 use App\Library\ProgramException;
 use App\Library\ValidateException;
 use App\Models\Forms\SystemLogForms;
-use Swoole\Coroutine;
 use JsonException;
 
 /**
@@ -31,14 +30,14 @@ class LogSwooleController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getInfoAction(): void
+    public function getInfoAction(): string
     {
         $data      = $this->validator(SystemLogForms::$info);
         $file_path = ROOT_PATH . '/log/' . $data['name'];
         $fp        = fopen($file_path, 'rb');
         $content   = fread($fp, filesize($file_path));
         fclose($fp);
-        $this->response->end(http_response(200, '', ['content' => $content]));
+        return http_response(200, '', ['content' => $content]);
     }
 
     /**
@@ -47,7 +46,7 @@ class LogSwooleController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function cleanLogAction(): void
+    public function cleanLogAction(): string
     {
         $data = $this->validator(SystemLogForms::$info);
         if ($data['name'] === 'swoole.log' || $data['name'] === 'swoolePid.log') {
@@ -57,7 +56,7 @@ class LogSwooleController
         }
         $content = fwrite($fp, '日志已清空。。。');
         fclose($fp);
-        $this->response->end(http_response(200, '', ['content' => $content]));
+        return http_response(200, '', ['content' => $content]);
     }
 
     /**
@@ -66,7 +65,7 @@ class LogSwooleController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getMonologAction(): void
+    public function getMonologAction(): string
     {
         $data = $this->validator(SystemLogForms::$info);
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
@@ -74,10 +73,10 @@ class LogSwooleController
             $fp      = fopen($file, 'rb');
             $content = fread($fp, filesize($file));
             fclose($fp);
-            $this->response->end(http_response(200, '', ['content' => $content]));
-        } else {
-            $this->response->end(http_response(200, '', ['content' => '查询目录不存在']));
+            return http_response(200, '', ['content' => $content]);
         }
+
+        return http_response(200, '', ['content' => '查询目录不存在']);
     }
 
 }

@@ -44,11 +44,12 @@ class BackupController
     /**
      * 获取所有数据表名
      * @router auth=true&method=get
+     * @throws JsonException
      */
-    public function indexAction(): void
+    public function indexAction(): string
     {
         $res = $this->backup_domain->getTables();
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
     /**
@@ -58,7 +59,7 @@ class BackupController
      * @throws JsonException
      * @router auth=true&method=post
      */
-    public function addAction(): void
+    public function addAction(): string
     {
         $data = $this->validator(SystemUserForms::$pull);
         if ($data['pwd'] === 'wlsh_frame_mysql_backup_20180107') {
@@ -81,16 +82,13 @@ class BackupController
                 $arr['rand']     = $rand;
                 $let             = $this->backup_domain->setBackup($arr);
                 if ($let) {
-                    $this->response->end(http_response());
-                } else {
-                    $this->response->end(http_response(400, '存入数据失败'));
+                    return http_response();
                 }
-            } else {
-                $this->response->end(http_response(400, '生成备份数据文件失败'));
+                return http_response(400, '存入数据失败');
             }
-        } else {
-            $this->response->end(http_response(400, '密码错误'));
+            return http_response(400, '生成备份数据文件失败');
         }
+        return http_response(400, '密码错误');
     }
 
     /**
@@ -99,11 +97,11 @@ class BackupController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getListAction(): void
+    public function getListAction(): string
     {
         $data = $this->validator(SystemUserForms::$getList);
         $list = $this->backup_domain->getList($data);
-        $this->response->end(http_response(200, '', $list));
+        return http_response(200, '', $list);
     }
 
     /**
@@ -113,14 +111,15 @@ class BackupController
      * @router auth=true&method=post
      */
     //todo 下载链接直接在前端拼接，无需在后端操作，但是在后端操作有个好处是需要登录认证后才能下载，否则不能用url直接下载。
-    public function downAction(): void
+    public function downAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->backup_domain->getFileName((int)$data['id']);
         if (!empty($res)) {
             $res[0]['file_name'] = DI::get('config_arr')['backup']['downUrl'] . $res[0]['file_name'];
-            $this->response->end(http_response(200, '', $res[0]));
+            return http_response(200, '', $res[0]);
         }
+        return http_response(400, '获取下载文件名失败');
     }
 
     /**
@@ -129,7 +128,7 @@ class BackupController
      * @throws ValidateException|JsonException
      * @router auth=true&method=delete
      */
-    public function delAction(): void
+    public function delAction(): string
     {
         $data = $this->validator(SystemBackupForms::$del);
 
@@ -143,14 +142,13 @@ class BackupController
                 //删除备份文件
                 $unFile = unlink($linkname);
                 if ($unFile) {
-                    $this->response->end(http_response(200, '', ['id' => $data['id']]));
+                    return http_response(200, '', ['id' => $data['id']]);
                 }
             } else {
-                $this->response->end(http_response(400, "{$data['id']}-删除失败"));
+                return http_response(400, "{$data['id']}-删除失败");
             }
-        } else {
-            $this->response->end(http_response(400, "{$data['id']}-删除失败"));
         }
+        return http_response(400, "{$data['id']}-删除失败");
     }
 
 }

@@ -16,7 +16,6 @@ use Swoole\Coroutine\Channel;
  */
 class UserDomain
 {
-
     public function getInfoByName(string $name): array
     {
         return SystemUserMysql::getInstance()->getInfo($name);
@@ -215,17 +214,23 @@ class UserDomain
     {
         go(function () {
             $name = SystemUserMysql::getInstance()->testNameById(1);
-            if ('ceshi001' != $name) print_r('name:' . $name);
+            if ('ceshi001' != $name) {
+                print_r('name:' . $name);
+            }
         });
 
         go(function () {
             $name = SystemUserMysql::getInstance()->testNameById(7);
-            if ('ceshi12' != $name) print_r('name:' . $name);
+            if ('ceshi12' != $name) {
+                print_r('name:' . $name);
+            }
         });
 
         go(function () {
             $name2 = SystemUserMysql::getInstance()->getNameById([7]);
-            if ('ceshi12' != $name2[0]['name']) print_r('name2:' . $name2);
+            if ('ceshi12' != $name2[0]['name']) {
+                print_r('name2:' . $name2);
+            }
         });
     }
 
@@ -255,5 +260,4 @@ class UserDomain
     {
         return SystemUserMysql::getInstance()->existName($name);
     }
-
 }

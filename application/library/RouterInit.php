@@ -36,9 +36,10 @@ class RouterInit
      * @param array  $uri_arr 请求的链接地址
      * @param string $method  请求的方法
      *
+     * @return string
      * @throws Exception
      */
-    public function routerStartup(array $uri_arr, string $method): void
+    public function routerStartup(array $uri_arr, string $method): string
     {
         //todo 使用atomic做接口限流
 
@@ -80,7 +81,7 @@ class RouterInit
                 //throw new ProgramException($output['auth'],  400);
 
                 $output['method'] = strtoupper($output['method']) ?? 'GET';
-                $output['auth'] ?? true;
+                $output['auth'] ?? 'true';
                 $output['rate-limit'] ?? 0;
                 $output['circuit-breaker'] ?? 0;
                 $output['before'] ?? '';
@@ -94,7 +95,7 @@ class RouterInit
                     throw new ProgramException('请求方法不正确', 405);
                 }
 
-                if (true === $output['auth']) {
+                if ('true' === $output['auth']) {
                     $this->authToken();
                 }
             } else {
@@ -107,17 +108,23 @@ class RouterInit
                 if (method_exists($class, $action)) {
                     if (!empty($output['before'])) {
                         $before_action = $output['before'];
-                        $class->$before_action();
+                        if ($before_res = $class->$before_action()) {
+                            return $before_res;
+                        }
                     }
 
-                    $class->$action();
+                    $res = $class->$action();
 
                     if (!empty($output['after'])) {
                         $after_action = $output['after'];
                         $class->$after_action();
                     }
+
+                    return $res;
                 }
             }
+
+            return '非法请求';
         } catch (\ReflectionException $e) {
             throw new ProgramException('请求的接口不存在', 400);
         }

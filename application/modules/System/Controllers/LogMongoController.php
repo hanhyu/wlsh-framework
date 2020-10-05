@@ -39,11 +39,11 @@ class LogMongoController
      * @throws Exception|JsonException
      * @router auth=true&method=get
      */
-    public function getMongoListAction(): void
+    public function getMongoListAction(): string
     {
         $data = $this->validator(SystemLogForms::$getMongoList);
         $res  = $this->log->getMongoList($data);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
     /**
@@ -55,11 +55,11 @@ class LogMongoController
      * @throws Exception|JsonException
      * @router auth=true&method=get
      */
-    public function getMongoInfoAction(): void
+    public function getMongoInfoAction(): string
     {
         $data = $this->validator(SystemLogForms::$getMongoInfo);
         $res  = $this->log->getMongoById($data['id']);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
 }

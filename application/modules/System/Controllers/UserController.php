@@ -37,21 +37,20 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function setUserAction(): void
+    public function setUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->existName($data['name']);
         if (!empty($info)) {
-            $this->response->end(http_response(400, '该用户名已存在'));
-            return;
+            return http_response(400, '该用户名已存在');
         }
 
         $res = $this->user->setUser($data);
         if ($res) {
-            $this->response->end(http_response(200, $data['name'] . '注册成功'));
-        } else {
-            $this->response->end(http_response(400, $data['name'] . '注册失败'));
+            return http_response(200, $data['name'] . '注册成功');
         }
+
+        return http_response(400, $data['name'] . '注册失败');
     }
 
     /**
@@ -60,11 +59,11 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getUserListAction(): void
+    public function getUserListAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUserList);
         $res  = $this->user->getInfoList($data);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
     /**
@@ -73,15 +72,15 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=delete
      */
-    public function delUserAction(): void
+    public function delUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->delUser((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, '', ['id' => $data['id']]));
-        } else {
-            $this->response->end(http_response(400, "{$data['id']}删除失败"));
+            return http_response(200, '', ['id' => $data['id']]);
         }
+
+        return http_response(400, "{$data['id']}删除失败");
     }
 
     /**
@@ -90,15 +89,15 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getUserAction(): void
+    public function getUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->getUserById((int)$data['id']);
         if (!empty($res)) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
+            return http_response(200, '', $res);
         }
+
+        return http_response(500, '查询失败');
     }
 
     /**
@@ -107,15 +106,15 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=put
      */
-    public function editUserAction(): void
+    public function editUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$editUser);
         $res  = $this->user->editUser($data);
         if ($res) {
-            $this->response->end(http_response(200, $data['id'] . '修改成功'));
-        } else {
-            $this->response->end(http_response(400, "{$data['id']}修改失败"));
+            return http_response(200, $data['id'] . '修改成功');
         }
+
+        return http_response(400, "{$data['id']}修改失败");
     }
 
     /**
@@ -124,7 +123,7 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=false&method=post
      */
-    public function loginAction(): void
+    public function loginAction(): string
     {
         $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->getInfoByName($data['name']);
@@ -150,18 +149,20 @@ class UserController
             $resp_content = http_response(400, '用户名或密码错误');
         }
         sign($this->cid, $resp_content);
-        $this->response->end($resp_content);
+
+        return $resp_content;
     }
 
     /**
      * 用户退出
      * @router auth=true&method=post
+     * @throws JsonException
      */
-    public function logoutAction(): void
+    public function logoutAction(): string
     {
         $token = get_token_params((string)$this->request->header['authorization']);
         $this->user->setLogoutLog($token);
-        $this->response->end(http_response());
+        return http_response();
     }
 
     /**
@@ -170,7 +171,7 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function pullAction(): void
+    public function pullAction(): string
     {
         $data = $this->validator(SystemUserForms::$pull);
         //执行钩子方法，让程序自动更新git项目
@@ -178,16 +179,17 @@ class UserController
             $shell = 'cd /home/baseFrame/ && git pull';
             exec($shell, $result, $status);
             if ($status) {
-                $this->response->end(http_response(400, 'git自动更新数据失败'));
+                return http_response(400, 'git自动更新数据失败');
             } else { //成功
-                $this->response->end(http_response(200, '', ['content' => $result]));
                 //返回pull更新代码后重载服务
                 $this->server->defer(function () {
                     $this->server->reload();
                 });
+
+                return http_response(200, '', ['content' => $result]);
             }
         } else {
-            $this->response->end(http_response(400, '密码错误'));
+            return http_response(400, '密码错误');
         }
     }
 
@@ -199,7 +201,7 @@ class UserController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function editPwdAction(): void
+    public function editPwdAction(): string
     {
         $data = $this->validator(SystemUserForms::$editPwd);
 
@@ -209,13 +211,14 @@ class UserController
         $res = $this->user->editPwd($data);
 
         if (-1 === $res) {
-            $this->response->end(http_response(400, '旧密码错误'));
-        } else if (!empty($res)) {
-            $this->response->end(http_response(200, '密码修改成功'));
-        } else {
-            $this->response->end(http_response(500, '修改密码失败，请重新操作'));
+            return http_response(400, '旧密码错误');
         }
-    }
 
+        if (!empty($res)) {
+            return http_response(200, '密码修改成功');
+        }
+
+        return http_response(500, '修改密码失败，请重新操作');
+    }
 
 }

@@ -50,4 +50,9 @@ class SystemUserForms
         'page_size' => 'Required|IntGe:1',
     ];
 
+    public static array $existToken = [
+        'uid'   => 'Required|StrLenGe:1',
+        'token' => 'Required|StrLen:32',
+    ];
+
 }

@@ -37,11 +37,11 @@ class ProcessController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getMsgListAction(): void
+    public function getMsgListAction(): string
     {
         $data = $this->validator(SystemProcessForms::$getMsgList);
         $res  = $this->msg->getMsgList($data);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
     /**
@@ -52,7 +52,7 @@ class ProcessController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function setMsgAction(): void
+    public function setMsgAction(): string
     {
         $data = $this->validator(SystemProcessForms::$setMsg);
 
@@ -61,10 +61,10 @@ class ProcessController
 
         $res = $this->msg->setMsg($data);
         if ($res) {
-            $this->response->end(http_response(200, $data['name'] . '添加成功'));
-        } else {
-            $this->response->end(http_response(400, $data['name'] . '添加失败'));
+            return http_response(200, $data['name'] . '添加成功');
         }
+
+        return http_response(400, $data['name'] . '添加失败');
     }
 
 }

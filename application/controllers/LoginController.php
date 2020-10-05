@@ -9,8 +9,10 @@ use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Library\ProgramException;
+use App\Models\Forms\SystemUserForms;
 use App\Models\Mysql\UserMysql;
 use App\Models\Redis\LoginRedis;
+use App\Models\Redis\UserRedis;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swoole\Coroutine;
@@ -30,19 +32,22 @@ class LoginController
 
     public function __construct()
     {
-        $this->beforeInit();
+        $this->beforeInit(false);
     }
 
-    public function rule()
+    public function rule(): ?string
     {
         //todo 前置操作，相关权限业务判断
         $res = false;
         if ($res) {
-            $this->response->end('没有权限访问');
+            //$this->response->end('没有权限访问');
+            return '没有权限访问';
         }
+
+        return null;
     }
 
-    public function responseLog()
+    public function responseLog(): void
     {
         //todo 后置通知第三方接口、后置ack缓存机制等操作
         $fp = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
@@ -58,9 +63,10 @@ class LoginController
      *
      * @router auth=false&method=get&before=rule&after=responseLog
      */
-    public function indexTestAction(): void
+    public function indexTestAction(): string
     {
-        $this->response->end('hello world');
+        //$this->response->end('hello world');
+        return 'hello world';
     }
 
     /**
@@ -333,20 +339,19 @@ class LoginController
      *
      * @router auth=false&method=get
      */
-    public function testAction(): void
+    public function testAction(): string
     {
-        //$this->response->status(200);
-        $this->response->end('hello world');
+        return 'hello world';
     }
 
     /**
      * @router auth=false&method=get
      */
-    public function leveldbAction(): void
+    public function leveldbAction(): string
     {
         $db = new LevelDB(ROOT_PATH . '/log/level.db');
         $db->put("key", "value");
-        $this->response->end($db->get("key"));
+        return $db->get("key");
     }
 
     /**
@@ -407,30 +412,31 @@ class LoginController
      * 100%   7788 (longest request)
      *
      * @router auth=false&method=get
+     * @throws \JsonException
      */
-    public function getRedisAction(): void
+    public function getRedisAction(): string
     {
         $value = (new LoginDomain())->getKey('key');
-        $this->response->end(http_response(200, '', ['content' => $value]));
+        //return http_response(200, '', ['content' => $value]);
+        return $value;
     }
 
     /**
      * @router auth=false&method=get
      */
-    public function publisherRedisAction(): void
+    public function publisherRedisAction(): string
     {
         $redis = DI::get('redis_pool_obj')->get();
-        $let   = $redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
-        $this->response->end($let);
+        return $redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
     }
 
     /**
      * @router auth=false&method=get
      */
-    public function consumerRedisAction(): void
+    public function consumerRedisAction(): string
     {
         $redis = DI::get('redis_pool_obj')->get();
-        var_dump($redis->xRange('channel1', '-', '+'));
+        return http_response(200, '', $redis->xRange('channel1', '-', '+'));
     }
 
     /**
@@ -668,8 +674,9 @@ class LoginController
      * 100%   1113 (longest request)
      *
      * @router auth=false&method=get
+     * @throws \JsonException
      */
-    public function getUserListAction(): void
+    public function getUserListAction(): string
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
@@ -681,23 +688,24 @@ class LoginController
 
         //print_r('456' . PHP_EOL);
         if (!empty($res)) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
+            return http_response(200, '', $res);
         }
+
+        return http_response(500, '查询失败');
     }
 
     /**
      * @router auth=false&method=get
+     * @throws \JsonException
      */
-    public function getUserInfoAction(): void
+    public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
         if ($res) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '查询失败'));
+            return http_response(200, '', $res);
         }
+
+        return http_response(500, '查询失败');
     }
 
     /**
@@ -1230,6 +1238,22 @@ class LoginController
     {
         $data = (new UserMysql())->getInfo('ceshi123');
         $this->response->end(http_response(200, '', $data));
+    }
+
+    /**
+     * User: hanhyu
+     * Date: 2020/9/6
+     * Time: 上午9:02
+     *
+     * @router auth=false&method=get
+     * @throws \JsonException
+     */
+    public function existTokenAction(): string
+    {
+        $data = $this->validator(SystemUserForms::$existToken);
+        $res  = (new LoginDomain())->existToken($data);
+        //$this->response->end(http_response(200, '', ['exist' => $res]));
+        return http_response(200, '', ['exist' => $res]);
     }
 
 

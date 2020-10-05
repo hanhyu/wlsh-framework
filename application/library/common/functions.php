@@ -334,19 +334,18 @@ function validate_token(string $token): array
  * @param array $params
  *
  * @return string
+ * @throws JsonException
  */
 function get_token(array $params): string
 {
     $encrypted = openssl_encrypt(
-        json_encode($params, JSON_UNESCAPED_UNICODE),
+        json_encode($params, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
         'aes-256-cbc',
         base64_decode(DI::get('config_arr')['token']['encryptKey']),
         OPENSSL_RAW_DATA,
         base64_decode(DI::get('config_arr')['token']['encryptIv'])
     );
-    $encode    = base64_encode($encrypted);
-
-    return $encode;
+    return base64_encode($encrypted);
 }
 
 /**
@@ -355,6 +354,7 @@ function get_token(array $params): string
  * @param string $auth
  *
  * @return array
+ * @throws JsonException
  */
 function get_token_params(string $auth): array
 {
@@ -364,10 +364,11 @@ function get_token_params(string $auth): array
         $token,
         'aes-256-cbc',
         base64_decode(DI::get('config_arr')['token']['encryptKey']),
-        OPENSSL_RAW_DATA, base64_decode(DI::get('config_arr')['token']['encryptIv'])
+        OPENSSL_RAW_DATA,
+        base64_decode(DI::get('config_arr')['token']['encryptIv'])
     );
     if ($decrypted) {
-        $res = json_decode($decrypted, true);
+        $res = json_decode($decrypted, true, 512, JSON_THROW_ON_ERROR);
         if (json_last_error() === 0) {
             $data = $res;
         }

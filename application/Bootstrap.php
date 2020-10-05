@@ -54,7 +54,7 @@ class Bootstrap
             9770,
             SWOOLE_PROCESS,
             SWOOLE_SOCK_TCP
-            //SWOOLE_SOCK_TCP | SWOOLE_SSL
+        //SWOOLE_SOCK_TCP | SWOOLE_SSL
         );
 
         //todo 这里的所有配置参数，不建议使用外部配置文件引入，直接使用统一的docker镜像，无需额外配置。
@@ -66,7 +66,8 @@ class Bootstrap
             'daemonize'                  => SWOOLE_DAEMONIZE,
             //swoole4.4.2版本开始，已稳定内存，协程模式下无需再开启此参数。
             //'max_request'                => 300000,
-            'max_coroutine'              => 10000,
+            'enable_coroutine'           => true,
+            'max_coroutine'              => 100000,
             'dispatch_mode'              => 2,
             'enable_reuse_port'          => false,
             'log_level'                  => SWOOLE_LOG_LEVEL,
@@ -88,7 +89,7 @@ class Bootstrap
             //'open_mqtt_protocol'         => true,
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
-            'hook_flags'                 => SWOOLE_HOOK_ALL | SWOOLE_HOOK_CURL,
+            'hook_flags'                 => SWOOLE_HOOK_ALL,
             'user'                       => 'root',
             'group'                      => 'root',
         ]);
@@ -456,18 +457,19 @@ class Bootstrap
              DI::del('response_obj' . $cid);
          });*/
 
+        $response->status(200);
+
         try {
-            (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
+            $res = (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
+            $response->end($res);
         } catch (ValidateException $e) { //参数验证手动触发的信息
             $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
         } catch (ProgramException $e) { //程序手动抛出的异常
             $response->end(http_response($e->getCode(), $e->getMessage()));
         } catch (Throwable $e) {
             if (APP_DEBUG) {
-                $response->status(200);
                 $response->end(http_response(500, $e->getMessage(), $e->getTrace()));
             } else {
-                $response->status(200);
                 $response->end(http_response(500, '服务异常'));
             }
 
@@ -532,7 +534,7 @@ class Bootstrap
      */
     public function onTask(Server $server, Task $task): void
     {
-        $res = unserialize($task->data);
+        $res = unserialize((string)$task->data);
         //$req_obj = new Yaf\Request\Http($res['uri'], '/');
         //unset($res['uri']);
         //$req_obj->setParam($res);

@@ -45,9 +45,7 @@ trait ControllersTrait
         $this->atomic->add(1);
         $client_ip = get_ip($this->request->server);
         $server_ip = null;
-        //开启swoole_get_local_ip 性能降低40%左右
-        //$server_ip = swoole_get_local_ip()['eth0'];
-        $info = "【req_uri】{$this->request->server['request_uri']}【client_ip】{$client_ip}【server_ip】{$server_ip}";
+        $info      = "【req_uri】{$this->request->server['request_uri']}【client_ip】{$client_ip}【server_ip】{$server_ip}";
 
         $req_method  = $this->request->server['request_method'];
         $request_uri = explode('/', $this->request->server['request_uri']);

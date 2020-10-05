@@ -38,22 +38,22 @@ class MenuController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getMenuListAction(): void
+    public function getMenuListAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenuList);
         $res  = $this->menu->getList($data);
-        $this->response->end(http_response(200, '', $res));
+        return http_response(200, '', $res);
     }
 
     /**
      * @throws JsonException
      * @router auth=true&method=get
      */
-    public function getMenuInfoAction(): void
+    public function getMenuInfoAction(): string
     {
         $data['menu']  = $this->menu->getInfo();
         $data['title'] = DI::get('config_arr')['page']['title'];
-        $this->response->end(http_response(200, '', $data));
+        return http_response(200, '', $data);
     }
 
     /**
@@ -62,15 +62,15 @@ class MenuController
      * @throws ValidateException|JsonException
      * @router auth=true&method=post
      */
-    public function setMenuAction(): void
+    public function setMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$setMenu);
         $res  = $this->menu->setMenu($data);
         if ($res) {
-            $this->response->end(http_response(200, $data['name'] . '菜单添加成功'));
-        } else {
-            $this->response->end(http_response(500, '菜单添加失败'));
+            return http_response(200, $data['name'] . '菜单添加成功');
         }
+
+        return http_response(500, '菜单添加失败');
     }
 
     /**
@@ -79,15 +79,15 @@ class MenuController
      * @throws ValidateException|JsonException
      * @router auth=true&method=get
      */
-    public function getMenuAction(): void
+    public function getMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->getMenuById((int)$data['id']);
         if (!empty($res)) {
-            $this->response->end(http_response(200, '', $res));
-        } else {
-            $this->response->end(http_response(500, '获取菜单失败'));
+            return http_response(200, '', $res);
         }
+
+        return http_response(500, '获取菜单失败');
     }
 
     /**
@@ -96,15 +96,15 @@ class MenuController
      * @throws ValidateException|JsonException
      * @router auth=true&method=put
      */
-    public function editMenuAction(): void
+    public function editMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$setMenu);
         $res  = $this->menu->editMenu($data);
         if ($res) {
-            $this->response->end(http_response(200, $data['name'] . '修改成功'));
-        } else {
-            $this->response->end(http_response(500, "{$data['name']}修改失败"));
+            return http_response(200, $data['name'] . '修改成功');
         }
+
+        return http_response(500, "{$data['name']}修改失败");
     }
 
     /**
@@ -113,15 +113,15 @@ class MenuController
      * @throws ValidateException|JsonException
      * @router auth=true&method=delete
      */
-    public function delMenuAction(): void
+    public function delMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->delMenu((int)$data['id']);
         if ($res) {
-            $this->response->end(http_response(200, '', ['id' => $data['id']]));
-        } else {
-            $this->response->end(http_response(500, "{$data['id']}删除失败"));
+            return http_response(200, '', ['id' => $data['id']]);
         }
+
+        return http_response(500, "{$data['id']}删除失败");
     }
 
 }

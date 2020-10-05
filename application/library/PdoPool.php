@@ -28,8 +28,8 @@ class PdoPool
      * PdoPool constructor.
      *
      * @param string $db_type  数据库类型：mysql、pgsql等
-     * @param int    $pool_min 启动的单进程中初始化默认最小连接池为5
-     * @param int    $pool_max 启动的单进程中初始化默认最大连接池为100
+     * @param int    $pool_min 启动的单进程中初始化默认最小连接池为2
+     * @param int    $pool_max 启动的单进程中初始化默认最大连接池为10
      *
      * @throws PDOException
      */

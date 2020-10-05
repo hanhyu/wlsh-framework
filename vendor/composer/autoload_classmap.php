@@ -50,6 +50,7 @@ return array(
     'App\\Models\\Mysql\\UserLogViewMysql' => $baseDir . '/application/models/Mysql/UserLogViewMysql.php',
     'App\\Models\\Mysql\\UserMysql' => $baseDir . '/application/models/Mysql/UserMysql.php',
     'App\\Models\\Redis\\LoginRedis' => $baseDir . '/application/models/Redis/LoginRedis.php',
+    'App\\Models\\Redis\\UserRedis' => $baseDir . '/application/models/Redis/UserRedis.php',
     'App\\Modules\\Close\\Controllers\\IndexController' => $baseDir . '/application/modules/Close/Controllers/IndexController.php',
     'App\\Modules\\Finish\\Controllers\\FlogController' => $baseDir . '/application/modules/Finish/Controllers/FlogController.php',
     'App\\Modules\\System\\Controllers\\BackupController' => $baseDir . '/application/modules/System/Controllers/BackupController.php',
