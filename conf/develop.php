@@ -28,8 +28,8 @@ return [
 
     'log' => [
         'mongo'      => 'mongodb://wlsh-mongo:27017',
-        'username'   => 'test',
-        'pwd'        => 'test',
+        'username'   => 'admin',
+        'pwd'        => 'admin',
         'database'   => 'baseFrame',
         'collection' => 'monolog',
     ],

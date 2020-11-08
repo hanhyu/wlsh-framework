@@ -70,6 +70,11 @@ class LogSwooleController
         $data = $this->validator(SystemLogForms::$info);
         $file = ROOT_PATH . '/log/monolog/' . $data['name'];
         if (is_file($file)) {
+            $filesize = number_format(filesize($file) / 1024, 2);
+            if (30720 < $filesize) {
+                return http_response(400, "文件太大：{$filesize} kb，请直接查看。");
+            }
+
             $fp      = fopen($file, 'rb');
             $content = fread($fp, filesize($file));
             fclose($fp);

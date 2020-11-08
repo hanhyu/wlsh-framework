@@ -102,7 +102,7 @@ new Vue({
             let loadIndex = layer.load(2, {time: 30 * 1000});
             this.axios({
                 method: 'get',
-                url: 'system/log_swoole/get_monolog',
+                url: 'system/logSwoole/getMonolog',
                 params: {
                     name: startTime + '.log'
                 }

@@ -36,10 +36,10 @@ class RouterInit
      * @param array  $uri_arr 请求的链接地址
      * @param string $method  请求的方法
      *
-     * @return string
-     * @throws Exception
+     * @return string|null
+     * @throws ProgramException
      */
-    public function routerStartup(array $uri_arr, string $method): string
+    public function routerStartup(array $uri_arr, string $method): ?string
     {
         //todo 使用atomic做接口限流
 

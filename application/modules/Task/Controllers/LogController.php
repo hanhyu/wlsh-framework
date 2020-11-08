@@ -33,7 +33,7 @@ class LogController
         if (APP_DEBUG) {
             $let = monolog_by_mongodb($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
             if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
-                monolog_by_file($this->data['content'], $this->data['info'], $this->data['level']);
+                monolog_by_file($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
             }
         }
 

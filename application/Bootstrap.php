@@ -209,10 +209,6 @@ class Bootstrap
             }
 
             require_once CONF_PATH . DS . 'di.php';
-
-            //启动前判断mongodb是否能连接上
-            $mongo_pool = new MongoPool();
-            unset($mongo_pool);
         } catch (Throwable $e) {
             print_r($e . PHP_EOL);
             $this->server->shutdown();
@@ -531,6 +527,7 @@ class Bootstrap
      * @param Server $server
      * @param Task   $task
      *
+     * @throws Exception
      */
     public function onTask(Server $server, Task $task): void
     {

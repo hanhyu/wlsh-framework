@@ -9,6 +9,14 @@ declare(strict_types=1);
  */
 
 use App\Library\DI;
+use MongoDB\Driver\Manager;
+use Monolog\Handler\MongoDBHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Monolog\Processor\MemoryPeakUsageProcessor;
+use Monolog\Processor\MemoryUsageProcessor;
+use Monolog\Processor\ProcessIdProcessor;
+use Monolog\Processor\UidProcessor;
 use Swoole\Coroutine;
 
 /**
@@ -74,7 +82,9 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
     $result['uri']  = $uri;
 
     $lang_code = DI::get('ws_language_str');
-    if ('zh-cn' === $lang_code) $vail = true;
+    if ('zh-cn' === $lang_code) {
+        $vail = true;
+    }
     if ($msg and !$vail and $lang_code) {
         $result['msg'] = LANGUAGE[$lang_code][$msg] ?? '国际化：非法请求参数';
     } else {
@@ -96,7 +106,7 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
 
 
 /**
- * 协程记录日志信息
+ * 协程记录日志文件信息
  * 注意：如果是耗时的日志记录，必须使用task_log方法异步处理，
  * 推荐在请求的路由生命周期内都使用task_log记录日志，
  * critica、alert、emergency三种日志类型默认添加邮件通知。
@@ -113,20 +123,19 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
  *                      <p>alert (550): 必须立即采取行动。比如整个网站都挂了，数据库不可用了等。这种情况应该发送短信警报，并把你叫醒.</P>
  *                      <p>emergency (600): 紧急请求：系统不可用了</P>
  *
+ * @throws Exception
  */
 function co_log($content, string $info, string $channel = 'system', string $level = 'info'): void
 {
     if ($level === 'critica' or $level === 'alert' or $level === 'emergency') {
-        go(function () use ($content, $info) {
+        go(static function () use ($content, $info) {
             send_email($content, $info);
         });
     }
     if (APP_DEBUG) {
-        go(function () use ($content, $info, $channel, $level) {
-            $let = monolog_by_mongodb($content, $info, $channel, $level);
-            if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
-                monolog_by_file($content, $info, $level);
-            }
+        go(static function () use ($content, $info, $channel, $level) {
+            //使用文件存储日志，mongodb不支持在协程端。
+            monolog_by_file($content, $info, $channel, $level);
         });
     }
 }
@@ -144,25 +153,26 @@ function co_log($content, string $info, string $channel = 'system', string $leve
  */
 function monolog_by_mongodb($content, string $info, string $channel, string $level): bool
 {
-    $log    = new \Monolog\Logger($channel);
-    $config = DI::get('config_arr')['log'];
-
-    $log->pushHandler(new \Monolog\Handler\MongoDBHandler(
-        new \MongoDB\Driver\Manager($config['mongo'], [
-            'username'   => $config['username'],
-            'password'   => $config['pwd'],
-            'authSource' => $config['database'],
-        ]),
-        $config['database'],
-        $config['collection'],
-        $level
-    ));
-
-    $log->pushProcessor(new \Monolog\Processor\ProcessIdProcessor());
-    $log->pushProcessor(new \Monolog\Processor\UidProcessor());
-    $log->pushProcessor(new \Monolog\Processor\MemoryUsageProcessor());
-    $log->pushProcessor(new \Monolog\Processor\MemoryPeakUsageProcessor());
     try {
+        $log    = new Logger($channel);
+        $config = DI::get('config_arr')['log'];
+
+        $log->pushHandler(new MongoDBHandler(
+            new Manager($config['mongo'], [
+                'username'   => $config['username'],
+                'password'   => $config['pwd'],
+                'authSource' => $config['database'],
+            ]),
+            $config['database'],
+            $config['collection'],
+            $level
+        ));
+
+        $log->pushProcessor(new ProcessIdProcessor());
+        $log->pushProcessor(new UidProcessor());
+        $log->pushProcessor(new MemoryUsageProcessor());
+        $log->pushProcessor(new MemoryPeakUsageProcessor());
+
         if (is_array($content)) {
             $log->$level($info, $content);
         } else {
@@ -181,19 +191,20 @@ function monolog_by_mongodb($content, string $info, string $channel, string $lev
  *
  * @param        $content
  * @param string $info
+ * @param string $channel
  * @param string $level
  *
  * @throws Exception
  */
-function monolog_by_file($content, string $info, string $level): void
+function monolog_by_file($content, string $info, string $channel, string $level): void
 {
-    $dir = date("Y-m-d", time());
-    $log = new \Monolog\Logger(ini_get('wlsh.environ'));
-    $log->pushHandler(new \Monolog\Handler\StreamHandler(ROOT_PATH . "/log/monolog/{$dir}.log", Monolog\Logger::DEBUG));
-    $log->pushProcessor(new \Monolog\Processor\ProcessIdProcessor());
-    $log->pushProcessor(new \Monolog\Processor\UidProcessor());
-    $log->pushProcessor(new \Monolog\Processor\MemoryUsageProcessor());
-    $log->pushProcessor(new \Monolog\Processor\MemoryPeakUsageProcessor());
+    $dir = date("Y-m-d");
+    $log = new Logger($channel);
+    $log->pushHandler(new StreamHandler(ROOT_PATH . "/log/monolog/{$dir}.log", Monolog\Logger::DEBUG));
+    $log->pushProcessor(new ProcessIdProcessor());
+    $log->pushProcessor(new UidProcessor());
+    $log->pushProcessor(new MemoryUsageProcessor());
+    $log->pushProcessor(new MemoryPeakUsageProcessor());
     if (is_array($content)) {
         $log->$level($info, $content);
     } else {
@@ -209,17 +220,17 @@ function monolog_by_file($content, string $info, string $level): void
  */
 function send_email($content, string $info): void
 {
-    $email     = DI::get('email_config_arr')[ini_get('wlsh.environ')];
+    $email     = DI::get('email_config_arr')[CURRENT_ENV];
     $transport = (new Swift_SmtpTransport($email['host'], $email['port']))
         ->setUsername($email['uname'])
         ->setPassword($email['pwd']);
 
     $mailer  = new Swift_Mailer($transport);
-    $body    = $info . $content . '<br />记录时间：' . date('Y-m-d H:i:s');
+    $body    = $info . '<br />' . $content . '<br />记录时间：' . date('Y-m-d H:i:s');
     $message = (new Swift_Message($email['subject']))
         ->setFrom($email['from'])
         ->setTo($email['to'])
-        ->setBody($body, 'text/html');
+        ->setBody($body, 'text/html', 'utf-8');
 
     $mailer->send($message);
 }
@@ -245,7 +256,7 @@ function send_email($content, string $info): void
  *                                        <p>alert (550): 必须立即采取行动。比如整个网站都挂了，数据库不可用了等。这种情况应该发送短信警报，并把你叫醒.</P>
  *                                        <p>emergency (600): 紧急请求：系统不可用了</P>
  */
-function task_log(Swoole\WebSocket\Server &$server, $data, string $info, string $channel = 'system', string $level = 'info'): void
+function task_log(Swoole\WebSocket\Server $server, $data, string $info, string $channel = 'system', string $level = 'info'): void
 {
     $tasks['uri']     = '/task/log/index';
     $tasks['content'] = $data;
@@ -267,9 +278,9 @@ function get_ip(array $server): string
 {
     if (!empty($server['http_client_ip'])) {
         $cip = $server['http_client_ip'];
-    } else if (!empty($server['http_x_forwarded_for'])) {
+    } elseif (!empty($server['http_x_forwarded_for'])) {
         $cip = $server['http_x_forwarded_for'];
-    } else if (!empty($server['remote_addr'])) {
+    } elseif (!empty($server['remote_addr'])) {
         $cip = $server['remote_addr'];
     } else {
         $cip = '';
@@ -300,6 +311,7 @@ function msectime(): float
  * @param string $token
  *
  * @return array
+ * @throws JsonException
  */
 function validate_token(string $token): array
 {
@@ -557,4 +569,3 @@ function array_to_page_data(array $array_data = [], int $page = 1, int $page_siz
     $cli->close();
     return $data;
 }*/
-
