@@ -5,6 +5,8 @@ namespace App\Library;
 
 use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Driver\Exception\RuntimeException;
+use MongoDB\Exception\Exception;
 use Swoole\Coroutine;
 
 /**
@@ -60,8 +62,9 @@ abstract class AbstractMongo
 
             $this->db = $mongo->selectCollection($log_arr['database'], $col);
             $data     = call_user_func_array([$this, $method], $args);
-        } catch (PDOException $e) {
-            throw new RuntimeException($e->getMessage(), 500);
+        } catch (Exception $e) {
+            co_log($e->getMessage(), '连接mongodb服务端失败。', 'alert');
+            throw new RuntimeException('mongodb连接失败', 500);
         }
 
         return $data;

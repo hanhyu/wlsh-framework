@@ -13,7 +13,7 @@ use think\Model;
 
 class UserMysql extends Model
 {
-    protected $name = 'system_user';
+    protected string $name = 'system_user';
 
     /**
      * 测试think db性能

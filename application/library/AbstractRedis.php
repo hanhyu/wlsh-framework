@@ -47,7 +47,7 @@ abstract class AbstractRedis
             $data = call_user_func_array([$this, $method], $args);
 
         } catch (Exception $e) {
-            co_log($e->getMessage(), 'redis服务端断开连接', 'alert');
+            task_log(DI::get('server_obj'), $e->getMessage(), 'redis服务端断开连接', 'alert');
 
             if ($redis_pool_obj->ping($this->db)) {
                 sleep(3);

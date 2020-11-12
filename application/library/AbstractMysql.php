@@ -18,6 +18,11 @@ abstract class AbstractMysql
 {
     private static array $instance = [];
     protected Medoo $db;
+    /**
+     * 此处使用静态延迟绑定，实现选择不同的数据库
+     * @var string
+     */
+    protected static string $dbschema = 'mysql_pool_obj';
 
     /**
      * UserDomain: hanhyu
@@ -33,7 +38,7 @@ abstract class AbstractMysql
     public function __call(string $method, array $args)
     {
         /** @var $mysql_pool_obj PdoPool */
-        $mysql_pool_obj = DI::get('mysql_pool_obj');
+        $mysql_pool_obj = DI::get(self::$dbschema);
         try {
             if (!$mysql_pool_obj->available) return '';
 
@@ -67,7 +72,7 @@ abstract class AbstractMysql
                 }
             }
 
-            co_log($debugInfo, 'sql', 'mysql');
+            task_log(DI::get('server_obj'), $debugInfo, 'sql', 'mysql');
         }
 
         //只能使用__call方法实现快速回收连接池资源

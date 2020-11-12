@@ -29,6 +29,7 @@ use RuntimeException;
  */
 class SystemUserMysql extends AbstractMysql
 {
+    //protected static string $dbschema = 'mysql_user_obj';
     protected string $table = 'frame_system_user';
 
     /**

@@ -123,7 +123,6 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
  *                      <p>alert (550): 必须立即采取行动。比如整个网站都挂了，数据库不可用了等。这种情况应该发送短信警报，并把你叫醒.</P>
  *                      <p>emergency (600): 紧急请求：系统不可用了</P>
  *
- * @throws Exception
  */
 function co_log($content, string $info, string $channel = 'system', string $level = 'info'): void
 {
