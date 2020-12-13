@@ -1,12 +1,9 @@
 {
   "name": "wlsh/frame",
-  "description": "运行环境：php 7.4.0 / nginx 1.14.0 / swoole 4.2.5 / yaf 3.0.7 / Mysql 8.0.11/ Redis 4.0.10 / inotify",
+  "description": "运行环境：php 8.0 / nginx 1.18.0 / swoole 4.5.9 / Mysql 8.0 / Redis 6.0 / inotify",
   "keywords": [
     "swoole",
-    "redis",
-    "php",
-    "yaf",
-    "medoo"
+    "php"
   ],
   "authors": [
     {
@@ -16,13 +13,14 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.0",
     "catfan/medoo": "1.7.6",
     "monolog/monolog": "2.0.0",
     "swiftmailer/swiftmailer": "6.2.1",
     "webgeeker/validation": "0.4.4",
     "mongodb/mongodb": "1.5.1",
-    "elasticsearch/elasticsearch": "^7.9"
+    "elasticsearch/elasticsearch": "^7.9",
+    "longlang/phpkafka": "^1.0"
   },
   "repositories": {
     "packagist": {

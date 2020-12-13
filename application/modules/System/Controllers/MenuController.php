@@ -36,32 +36,32 @@ class MenuController
      *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMenuListAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenuList);
         $res  = $this->menu->getList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
     /**
      * @throws JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMenuInfoAction(): string
     {
         $data['menu']  = $this->menu->getInfo();
         $data['title'] = DI::get('config_arr')['page']['title'];
-        return http_response(200, '', $data);
+        return http_response(data: $data);
     }
 
     /**
      *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function setMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$setMenu);
@@ -77,14 +77,14 @@ class MenuController
      *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->getMenuById((int)$data['id']);
         if (!empty($res)) {
-            return http_response(200, '', $res);
+            return http_response(data: $res);
         }
 
         return http_response(500, '获取菜单失败');
@@ -94,8 +94,8 @@ class MenuController
      *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=put
      */
+    #[Router(method: 'PUT', auth: true)]
     public function editMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$setMenu);
@@ -111,14 +111,14 @@ class MenuController
      *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=delete
      */
+    #[Router(method: 'DELETE', auth: true)]
     public function delMenuAction(): string
     {
         $data = $this->validator(SystemMenuForms::$getMenu);
         $res  = $this->menu->delMenu((int)$data['id']);
         if ($res) {
-            return http_response(200, '', ['id' => $data['id']]);
+            return http_response(data: ['id' => $data['id']]);
         }
 
         return http_response(500, "{$data['id']}删除失败");

@@ -7,7 +7,9 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/reflection-docblock/src', $vendorDir . '/phpdocumentor/type-resolver/src'),
+    'longlang\\phpkafka\\' => array($vendorDir . '/longlang/phpkafka/src'),
     'hightman\\xunsearch\\' => array($vendorDir . '/hightman/xunsearch/wrapper/yii2-ext'),
+    'exussum12\\xxhash\\' => array($vendorDir . '/exussum12/xxhash/src'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
     'WebGeeker\\Validation\\' => array($vendorDir . '/webgeeker/validation/src/Validation'),
     'Tests\\' => array($baseDir . '/tests'),
@@ -35,8 +37,9 @@ return array(
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'MongoDB\\' => array($vendorDir . '/mongodb/mongodb/src'),
     'Medoo\\' => array($vendorDir . '/catfan/medoo/src'),
-    'GuzzleHttp\\Stream\\' => array($vendorDir . '/ezimuel/guzzlestreams/src', $vendorDir . '/guzzlehttp/streams/src'),
-    'GuzzleHttp\\Ring\\' => array($vendorDir . '/ezimuel/ringphp/src', $vendorDir . '/guzzlehttp/ringphp/src'),
+    'GuzzleHttp\\Stream\\' => array($vendorDir . '/ezimuel/guzzlestreams/src'),
+    'GuzzleHttp\\Ring\\' => array($vendorDir . '/ezimuel/ringphp/src'),
+    'Google\\CRC32\\' => array($vendorDir . '/google/crc32/src'),
     'Elasticsearch\\' => array($vendorDir . '/elasticsearch/elasticsearch/src/Elasticsearch'),
     'Egulias\\EmailValidator\\' => array($vendorDir . '/egulias/email-validator/EmailValidator'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),

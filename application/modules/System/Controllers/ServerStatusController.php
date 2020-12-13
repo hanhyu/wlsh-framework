@@ -26,9 +26,9 @@ class ServerStatusController
      * 查看当前server的活动tcp连接信息
      * {"start_time":1544406749,"connection_num":1,"accept_count":2,"close_count":1,
      * "tasking_num":0,"request_count":34,"worker_request_count":3,"coroutine_num":1}
-     * @router auth=true&method=get
      * @throws \JsonException
      */
+    #[Router(method: 'GET', auth: true)]
     public function getStatusAction(): string
     {
         $swoole                = $this->server->stats();
@@ -52,7 +52,7 @@ class ServerStatusController
         //获取本机所有网络接口的IP
         //$server_ip = swoole_get_local_ip()['eth0'];
 
-        return http_response(200, '', $data);
+        return http_response(data: $data);
     }
 
 }

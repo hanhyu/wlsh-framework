@@ -1,0 +1,11 @@
+vendor/
+.vscode/
+.idea/
+.buildpath
+.settings/
+.project
+.DS_Store
+*.lock
+*.log
+/coverage.txt
+/.php_cs.cache

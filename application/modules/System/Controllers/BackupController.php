@@ -43,22 +43,24 @@ class BackupController
 
     /**
      * 获取所有数据表名
-     * @router auth=true&method=get
+     *
      * @throws JsonException
      */
+    #[Router(method: 'GET', auth: true)]
     public function indexAction(): string
     {
         $res = $this->backup_domain->getTables();
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
     /**
      * 备份数据库
+     *
      * @throws ProgramException
      * @throws ValidateException
      * @throws JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function addAction(): string
     {
         $data = $this->validator(SystemUserForms::$pull);
@@ -93,31 +95,32 @@ class BackupController
 
     /**
      * 获取列表
+     *
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getListAction(): string
     {
         $data = $this->validator(SystemUserForms::$getList);
         $list = $this->backup_domain->getList($data);
-        return http_response(200, '', $list);
+        return http_response(data: $list);
     }
 
     /**
      * 下载数据库备份的文件
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
     //todo 下载链接直接在前端拼接，无需在后端操作，但是在后端操作有个好处是需要登录认证后才能下载，否则不能用url直接下载。
+    #[Router(method: 'POST', auth: true)]
     public function downAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->backup_domain->getFileName((int)$data['id']);
         if (!empty($res)) {
             $res[0]['file_name'] = DI::get('config_arr')['backup']['downUrl'] . $res[0]['file_name'];
-            return http_response(200, '', $res[0]);
+            return http_response(data: $res[0]);
         }
         return http_response(400, '获取下载文件名失败');
     }
@@ -126,8 +129,8 @@ class BackupController
      * 删除备份文件
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=delete
      */
+    #[Router(method: 'DELETE', auth: true)]
     public function delAction(): string
     {
         $data = $this->validator(SystemBackupForms::$del);
@@ -142,7 +145,7 @@ class BackupController
                 //删除备份文件
                 $unFile = unlink($linkname);
                 if ($unFile) {
-                    return http_response(200, '', ['id' => $data['id']]);
+                    return http_response(data: ['id' => $data['id']]);
                 }
             } else {
                 return http_response(400, "{$data['id']}-删除失败");

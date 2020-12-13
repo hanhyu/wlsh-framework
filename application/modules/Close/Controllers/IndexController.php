@@ -22,8 +22,8 @@ class IndexController
 
     /**
      * 这里可以做一些连接关闭或客户端退出的后续操作记录日志
-     * @router auth=false&method=cli
      */
+    #[Router(method: 'Cli', auth: false)]
     public function IndexAction(): void
     {
         //判断该fd是websocket客户端

@@ -22,8 +22,8 @@ class LogController
 
     /**
      * @throws \Exception
-     * @router auth=false&method=cli
      */
+    #[Router(method: 'CLI', auth: false)]
     public function IndexAction(): void
     {
         if ($this->data['level'] === 'critica' or $this->data['level'] === 'alert' or $this->data['level'] === 'emergency') {

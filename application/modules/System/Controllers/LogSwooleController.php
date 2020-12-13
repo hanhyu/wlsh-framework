@@ -28,8 +28,8 @@ class LogSwooleController
      * 查看swoole日志信息
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getInfoAction(): string
     {
         $data      = $this->validator(SystemLogForms::$info);
@@ -37,15 +37,15 @@ class LogSwooleController
         $fp        = fopen($file_path, 'rb');
         $content   = fread($fp, filesize($file_path));
         fclose($fp);
-        return http_response(200, '', ['content' => $content]);
+        return http_response(data: ['content' => $content]);
     }
 
     /**
      * 清空swoole日志
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function cleanLogAction(): string
     {
         $data = $this->validator(SystemLogForms::$info);
@@ -56,15 +56,15 @@ class LogSwooleController
         }
         $content = fwrite($fp, '日志已清空。。。');
         fclose($fp);
-        return http_response(200, '', ['content' => $content]);
+        return http_response(data: ['content' => $content]);
     }
 
     /**
      * 查询monolog日志
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMonologAction(): string
     {
         $data = $this->validator(SystemLogForms::$info);
@@ -78,10 +78,10 @@ class LogSwooleController
             $fp      = fopen($file, 'rb');
             $content = fread($fp, filesize($file));
             fclose($fp);
-            return http_response(200, '', ['content' => $content]);
+            return http_response(data: ['content' => $content]);
         }
 
-        return http_response(200, '', ['content' => '查询目录不存在']);
+        return http_response(data: ['content' => '查询目录不存在']);
     }
 
 }

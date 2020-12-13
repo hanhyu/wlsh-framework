@@ -35,14 +35,14 @@ class LogUserController
      * 列表
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getUserListAction(): string
     {
         $data = $this->validator(SystemLogForms::$getUserList);
         //$data['uid'] = get_token_params($this->request->header['authorization'])['id'];
         $res = $this->log->getLogList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
 }

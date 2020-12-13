@@ -35,13 +35,13 @@ class ProcessController
      * 列表
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMsgListAction(): string
     {
         $data = $this->validator(SystemProcessForms::$getMsgList);
         $res  = $this->msg->getMsgList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
     /**
@@ -50,8 +50,8 @@ class ProcessController
      * Time: 下午8:42
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function setMsgAction(): string
     {
         $data = $this->validator(SystemProcessForms::$setMsg);

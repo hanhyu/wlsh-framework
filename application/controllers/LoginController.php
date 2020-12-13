@@ -61,11 +61,10 @@ class LoginController
      * Date: 19-7-12
      * Time: 上午10:09
      *
-     * @router auth=false&method=get&before=rule&after=responseLog
      */
-    public function indexTestAction(): string
+    #[Router(method: 'GET', auth: false, before: 'rule', after: 'responseLog')]
+    public function test2Action(): string
     {
-        //$this->response->end('hello world');
         return 'hello world';
     }
 
@@ -339,6 +338,7 @@ class LoginController
      *
      * @router auth=false&method=get
      */
+    #[Router(method: 'GET')]
     public function testAction(): string
     {
         return 'hello world';
@@ -347,6 +347,7 @@ class LoginController
     /**
      * @router auth=false&method=get
      */
+    #[Router(method: 'GET')]
     public function leveldbAction(): string
     {
         $db = new LevelDB(ROOT_PATH . '/log/level.db');
@@ -411,9 +412,8 @@ class LoginController
      * 99%    172
      * 100%   7788 (longest request)
      *
-     * @router auth=false&method=get
-     * @throws \JsonException
      */
+    #[Router(method: 'GET', auth: false)]
     public function getRedisAction(): string
     {
         $value = (new LoginDomain())->getKey('key');
@@ -421,27 +421,21 @@ class LoginController
         return $value;
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function publisherRedisAction(): string
     {
         $redis = DI::get('redis_pool_obj')->get();
         return $redis->xAdd('channel1', '*', ['msg1' => 'hello ceshi']);
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function consumerRedisAction(): string
     {
         $redis = DI::get('redis_pool_obj')->get();
         return http_response(200, '', $redis->xRange('channel1', '-', '+'));
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function ackRedisAction(): void
     {
         $redis = DI::get('redis_pool')->get();
@@ -453,9 +447,7 @@ class LoginController
         $redis->xAck('channel1', 'chgroup4', array_keys($res['channel1']));
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function delRedisAction(): void
     {
         $redis = DI::get('redis_pool')->get();
@@ -463,10 +455,7 @@ class LoginController
         $redis->xDel('channel1', array_keys($res));
     }
 
-    /**
-     * elasticsearch
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function setEsAction(): void
     {
         $hosts  = [
@@ -490,10 +479,7 @@ class LoginController
         print_r($response);
     }
 
-    /**
-     * elasticsearch
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function getEsAction(): void
     {
         $hosts    = [
@@ -517,8 +503,8 @@ class LoginController
 
     /**
      * xunsearch
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function setXsAction(): void
     {
         $xs    = new XS('base');
@@ -535,11 +521,7 @@ class LoginController
         print_r($res);
     }
 
-    /**
-     * xunsearch
-     * @throws XSException
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function getXsAction(): void
     {
         $xs     = new XS('base');
@@ -673,9 +655,9 @@ class LoginController
      * 99%    109
      * 100%   1113 (longest request)
      *
-     * @router auth=false&method=get
      * @throws \JsonException
      */
+    #[Router(method: 'GET', auth: false)]
     public function getUserListAction(): string
     {
         $data['curr_page'] = 1;
@@ -694,10 +676,7 @@ class LoginController
         return http_response(500, '查询失败');
     }
 
-    /**
-     * @router auth=false&method=get
-     * @throws \JsonException
-     */
+    #[Router(method: 'GET', auth: false)]
     public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
@@ -766,8 +745,8 @@ class LoginController
      * 99%   1128
      * 100%   3263 (longest request)
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function getMongoLogListAction(): void
     {
         $data['curr_page'] = 1;
@@ -837,8 +816,8 @@ class LoginController
      * 99%    226
      * 100%    439 (longest request)
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function getLogUserListAction(): void
     {
         $data['curr_page']  = 1;
@@ -912,8 +891,8 @@ class LoginController
      * 99%     46
      * 100%     81 (longest request)
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function getLogUserViewAction(): void
     {
         $data['curr_page']  = 1;
@@ -991,8 +970,8 @@ class LoginController
      * 99%     96
      * 100%    333 (longest request)
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function swMysqlAction(): void
     {
         $sql = 'SELECT * FROM `users` WHERE id=1 LIMIT 1 ';
@@ -1014,9 +993,7 @@ class LoginController
         $this->response->end(http_response(200, '', $get));
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function swPgsqlAction(): void
     {
         $sql = 'SELECT * FROM users WHERE id=1 LIMIT 1 ';
@@ -1147,8 +1124,8 @@ class LoginController
      * 99%   1024
      * 100%   1091 (longest request)
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function coMysqlAction(): void
     {
         //压测协程数据结果是否错乱，连接池大小
@@ -1157,9 +1134,7 @@ class LoginController
 
     }
 
-    /**
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function getCoRedisAction(): void
     {
         //$ch = new Channel(1);
@@ -1178,11 +1153,7 @@ class LoginController
         //$this->response->end($res);
     }
 
-    /**
-     * @throws Exception
-     *
-     * @router auth=false&method=get
-     */
+    #[Router(method: 'GET', auth: false)]
     public function setRedisAction(): void
     {
         $value = LoginRedis::getInstance()->setKey('setKey', '123');
@@ -1195,8 +1166,8 @@ class LoginController
      * Date: 19-7-25
      * Time: 下午4:18
      *
-     * @router auth=false&method=get
      */
+    #[Router(method: 'GET', auth: false)]
     public function testCoAction(): void
     {
         //在开启Swoole\Runtime::enableCoroutine()模式下
@@ -1226,28 +1197,14 @@ class LoginController
         $this->response->end();
     }
 
-    /**
-     * User: hanhyu
-     * Date: 2020/9/6
-     * Time: 上午9:02
-     *
-     * @router auth=false&method=get
-     * @throws \JsonException
-     */
+    #[Router(method: 'GET', auth: false)]
     public function getUserNameAction(): void
     {
         $data = (new UserMysql())->getInfo('ceshi123');
         $this->response->end(http_response(200, '', $data));
     }
 
-    /**
-     * User: hanhyu
-     * Date: 2020/9/6
-     * Time: 上午9:02
-     *
-     * @router auth=false&method=get
-     * @throws \JsonException
-     */
+    #[Router(method: 'GET', auth: false)]
     public function existTokenAction(): string
     {
         $data = $this->validator(SystemUserForms::$existToken);

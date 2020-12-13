@@ -35,8 +35,8 @@ class UserController
      * 创建用户
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function setUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$userLogin);
@@ -57,27 +57,27 @@ class UserController
      * 用户列表
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getUserListAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUserList);
         $res  = $this->user->getInfoList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
     /**
      * 删除用户
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=delete
      */
+    #[Router(method: 'DELETE', auth: true)]
     public function delUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->delUser((int)$data['id']);
         if ($res) {
-            return http_response(200, '', ['id' => $data['id']]);
+            return http_response(data: ['id' => $data['id']]);
         }
 
         return http_response(400, "{$data['id']}删除失败");
@@ -87,14 +87,14 @@ class UserController
      * 根据id获取用户信息
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$getUser);
         $res  = $this->user->getUserById((int)$data['id']);
         if (!empty($res)) {
-            return http_response(200, '', $res);
+            return http_response(data: $res);
         }
 
         return http_response(500, '查询失败');
@@ -104,8 +104,8 @@ class UserController
      * 修改用户信息
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=put
      */
+    #[Router(method: 'GET', auth: true)]
     public function editUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$editUser);
@@ -121,8 +121,8 @@ class UserController
      * 用户登录
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=false&method=post
      */
+    #[Router(method: 'POST', auth: false)]
     public function loginAction(): string
     {
         $data = $this->validator(SystemUserForms::$userLogin);
@@ -136,7 +136,7 @@ class UserController
                 $params['time'] = time();
                 $token          = get_token($params);
                 //$this->response->cookie('token', $token);
-                $resp_content = http_response(200, '', ['token' => $token]);
+                $resp_content = http_response(data: ['token' => $token]);
 
                 $params['ip'] = ip2long($this->request->header['x-real-ip'] ?? get_ip($this->request->server));
                 $this->user->setLoginLog($params);
@@ -155,9 +155,9 @@ class UserController
 
     /**
      * 用户退出
-     * @router auth=true&method=post
      * @throws JsonException
      */
+    #[Router(method: 'POST', auth: true)]
     public function logoutAction(): string
     {
         $token = get_token_params((string)$this->request->header['authorization']);
@@ -169,8 +169,8 @@ class UserController
      * 自动更新服务器代码钩子
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function pullAction(): string
     {
         $data = $this->validator(SystemUserForms::$pull);
@@ -186,7 +186,7 @@ class UserController
                     $this->server->reload();
                 });
 
-                return http_response(200, '', ['content' => $result]);
+                return http_response(data: ['content' => $result]);
             }
         } else {
             return http_response(400, '密码错误');
@@ -199,8 +199,8 @@ class UserController
      * Time: 下午10:15
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function editPwdAction(): string
     {
         $data = $this->validator(SystemUserForms::$editPwd);

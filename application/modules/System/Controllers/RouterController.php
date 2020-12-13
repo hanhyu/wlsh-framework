@@ -29,13 +29,13 @@ class RouterController
      * 获取路由列表数据
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getListAction(): string
     {
         $data = $this->validator(SystemRouterForms::$getList);
         $res  = $this->router->getList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
 
@@ -43,8 +43,8 @@ class RouterController
      * 添加路由信息
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=post
      */
+    #[Router(method: 'POST', auth: true)]
     public function setRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$setRouter);
@@ -61,8 +61,8 @@ class RouterController
      * 修改路由
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=put
      */
+    #[Router(method: 'PUT', auth: true)]
     public function editRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$editRouter);
@@ -78,14 +78,14 @@ class RouterController
      * 删除路由
      * @throws ProgramException
      * @throws ValidateException|JsonException
-     * @router auth=true&method=delete
      */
+    #[Router(method: 'DELETE', auth: true)]
     public function delRouterAction(): string
     {
         $data = $this->validator(SystemRouterForms::$delRouter);
         $res  = $this->router->delRouter((int)$data['id']);
         if ($res) {
-            return http_response(200, '', ['id' => $data['id']]);
+            return http_response(data: ['id' => $data['id']]);
         }
 
         return http_response(500, "{$data['id']}删除失败");
@@ -93,13 +93,13 @@ class RouterController
 
     /**
      * @throws JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getInfoAction(): string
     {
         $res = $this->router->getInfo();
         if (!empty($res)) {
-            return http_response(200, '', ['list' => $res]);
+            return http_response(data: ['list' => $res]);
         }
 
         return http_response(500, '查询失败');

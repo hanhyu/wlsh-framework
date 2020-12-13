@@ -21,9 +21,7 @@ class FlogController
         $this->beforeInit();
     }
 
-    /**
-     * @router auth=false&method=cli
-     */
+    #[Router(method: 'Cli', auth: false)]
     public function IndexAction(): void
     {
         /*$content = "onFinish content:{$this->data['content']},info:{$this->data['info']},;level:{ $this->data['level']}";

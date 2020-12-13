@@ -37,13 +37,13 @@ class LogMongoController
      * @throws ProgramException
      * @throws ValidateException
      * @throws Exception|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMongoListAction(): string
     {
         $data = $this->validator(SystemLogForms::$getMongoList);
         $res  = $this->log->getMongoList($data);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
     /**
@@ -53,13 +53,13 @@ class LogMongoController
      * @throws ProgramException
      * @throws ValidateException
      * @throws Exception|JsonException
-     * @router auth=true&method=get
      */
+    #[Router(method: 'GET', auth: true)]
     public function getMongoInfoAction(): string
     {
         $data = $this->validator(SystemLogForms::$getMongoInfo);
         $res  = $this->log->getMongoById($data['id']);
-        return http_response(200, '', $res);
+        return http_response(data: $res);
     }
 
 }

@@ -67,47 +67,41 @@ class RouterInit
         }
 
         try {
-            $ref            = new \ReflectionClass($ctrl);
-            $ref_method_doc = $ref->getMethod($action)->getDocComment();
-            $flag           = preg_match_all('/@router(.*?)\n/', $ref_method_doc, $ref_method_doc);
+            //$ref            = new \ReflectionClass($ctrl);
+            // $ref_method_doc = $ref->getMethod($action)->getDocComment();
+            // $flag           = preg_match_all('/@router(.*?)\n/', $ref_method_doc, $ref_method_doc);
 
-            if (empty($ref_method_doc[1][0])) {
-                throw new ProgramException('请求的接口不存在', 400);
+            $ref     = new \ReflectionMethod($ctrl, $action);
+            $ref_arg = $ref->getAttributes()[0]?->getArguments();
+
+            if (empty($ref_arg)) {
+                throw new ProgramException('请求的接口不存在', 500);
             }
 
-            $description = trim($ref_method_doc[1][0]);
-            if (!empty($description)) {
-                parse_str($description, $output);
-                //throw new ProgramException($output['auth'],  400);
+            $ref_arg['method']          = strtoupper($ref_arg['method']) ?? 'GET';
+            $ref_arg['auth']            = $ref_arg['auth'] ?? true;
+            $ref_arg['rate-limit']      = $ref_arg['rate-limit'] ?? 0;
+            $ref_arg['circuit-breaker'] = $ref_arg['circuit-breaker'] ?? 0;
+            $ref_arg['before']          = $ref_arg['before'] ?? '';
+            $ref_arg['after']           = $ref_arg['after'] ?? '';
 
-                $output['method'] = strtoupper($output['method']) ?? 'GET';
-                $output['auth'] ?? 'true';
-                $output['rate-limit'] ?? 0;
-                $output['circuit-breaker'] ?? 0;
-                $output['before'] ?? '';
-                $output['after'] ?? '';
-
-                if ('CLI' === ucfirst($output['method'])) {
-                    $output['method'] = 'Cli';
-                }
-
-                if ($method !== $output['method']) {
-                    throw new ProgramException('请求方法不正确', 405);
-                }
-
-                if ('true' === $output['auth']) {
-                    $this->authToken();
-                }
-            } else {
-                throw new ProgramException('请重试', 500);
+            if ('CLI' === ucfirst($ref_arg['method'])) {
+                $ref_arg['method'] = 'Cli';
             }
-            unset($ref_method_doc, $description);
+
+            if ($method !== $ref_arg['method']) {
+                throw new ProgramException('请求方法不正确', 405);
+            }
+
+            if (true === $ref_arg['auth']) {
+                $this->authToken();
+            }
 
             if (class_exists($ctrl)) {
                 $class = new $ctrl();
                 if (method_exists($class, $action)) {
-                    if (!empty($output['before'])) {
-                        $before_action = $output['before'];
+                    if (!empty($ref_arg['before'])) {
+                        $before_action = $ref_arg['before'];
                         if ($before_res = $class->$before_action()) {
                             return $before_res;
                         }
@@ -115,8 +109,8 @@ class RouterInit
 
                     $res = $class->$action();
 
-                    if (!empty($output['after'])) {
-                        $after_action = $output['after'];
+                    if (!empty($ref_arg['after'])) {
+                        $after_action = $ref_arg['after'];
                         $class->$after_action();
                     }
 
@@ -125,8 +119,10 @@ class RouterInit
             }
 
             return '非法请求';
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             throw new ProgramException('请求的接口不存在', 400);
+        } catch (\RuntimeException) {
+            throw new ProgramException('服务路由配置错误', 500);
         }
     }
 
