@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -24,7 +24,7 @@ use Monolog\Logger;
 class ZendMonitorHandler extends AbstractProcessingHandler
 {
     /**
-     * MonologModel level / ZendMonitor Custom Event priority map
+     * Monolog level / ZendMonitor Custom Event priority map
      *
      * @var array
      */
@@ -71,10 +71,10 @@ class ZendMonitorHandler extends AbstractProcessingHandler
 
     /**
      * Write to Zend Monitor Events
-     * @param string $type Text displayed in "Class Name (custom)" field
-     * @param string $message Text displayed in "Error String"
-     * @param mixed $formatted Displayed in Custom Variables tab
-     * @param int $severity Set the event severity level (-1,0,1)
+     * @param string $type      Text displayed in "Class Name (custom)" field
+     * @param string $message   Text displayed in "Error String"
+     * @param array  $formatted Displayed in Custom Variables tab
+     * @param int    $severity  Set the event severity level (-1,0,1)
      */
     protected function writeZendMonitorCustomEvent(string $type, string $message, array $formatted, int $severity): void
     {

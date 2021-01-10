@@ -24,9 +24,8 @@ trait WebsocketTrait
     protected array $data;
 
     /**
-     * 实现aop编程前置方法，供yaf控制器初始化中使用。
      *
-     * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
+     * @param bool $log 手动设置记录日志，默认true自动记录。
      */
     public function beforeInit(bool $log = true): void
     {
@@ -37,13 +36,7 @@ trait WebsocketTrait
 
         DI::get('atomic_obj')->add(1);
 
-        if ($log) {
-            co_log(
-                $this->data,
-                'websocket send data:',
-                'ws'
-            );
-        }
+        if ($log) task_log($this->server, $this->data, 'websocket send data:', 'ws');
     }
 
     /**
@@ -56,7 +49,7 @@ trait WebsocketTrait
      */
     public function validator(array $validations): array
     {
-        if (empty($this->data['data']) or !isset($this->data['data'])) {
+        if (empty($this->data['data'] ?? '')) {
             throw new ProgramException('参数错误', 400);
         }
 
@@ -77,6 +70,7 @@ trait WebsocketTrait
 
         try {
             $vali_data = FormsVali::validate($this->data['data'], $validations);
+            unset($this->data['data']);
             $vali_data = array_intersect_key($vali_data, $validations);
         } catch (Exception $e) {
             throw new ValidateException($e->getMessage(), 400);

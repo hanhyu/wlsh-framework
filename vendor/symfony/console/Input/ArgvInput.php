@@ -43,15 +43,9 @@ class ArgvInput extends Input
     private $tokens;
     private $parsed;
 
-    /**
-     * @param array|null           $argv       An array of parameters from the CLI (in the argv format)
-     * @param InputDefinition|null $definition A InputDefinition instance
-     */
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {
-        if (null === $argv) {
-            $argv = $_SERVER['argv'];
-        }
+        $argv = $argv ?? $_SERVER['argv'] ?? [];
 
         // strip the application name
         array_shift($argv);
@@ -90,10 +84,8 @@ class ArgvInput extends Input
 
     /**
      * Parses a short option.
-     *
-     * @param string $token The current token
      */
-    private function parseShortOption($token)
+    private function parseShortOption(string $token)
     {
         $name = substr($token, 1);
 
@@ -112,11 +104,9 @@ class ArgvInput extends Input
     /**
      * Parses a short option set.
      *
-     * @param string $name The current token
-     *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function parseShortOptionSet($name)
+    private function parseShortOptionSet(string $name)
     {
         $len = \strlen($name);
         for ($i = 0; $i < $len; ++$i) {
@@ -138,10 +128,8 @@ class ArgvInput extends Input
 
     /**
      * Parses a long option.
-     *
-     * @param string $token The current token
      */
-    private function parseLongOption($token)
+    private function parseLongOption(string $token)
     {
         $name = substr($token, 2);
 
@@ -158,11 +146,9 @@ class ArgvInput extends Input
     /**
      * Parses an argument.
      *
-     * @param string $token The current token
-     *
      * @throws RuntimeException When too many arguments are given
      */
-    private function parseArgument($token)
+    private function parseArgument(string $token)
     {
         $c = \count($this->arguments);
 
@@ -179,23 +165,34 @@ class ArgvInput extends Input
         // unexpected argument
         } else {
             $all = $this->definition->getArguments();
-            if (\count($all)) {
-                throw new RuntimeException(sprintf('Too many arguments, expected arguments "%s".', implode('" "', array_keys($all))));
+            $symfonyCommandName = null;
+            if (($inputArgument = $all[$key = array_key_first($all)] ?? null) && 'command' === $inputArgument->getName()) {
+                $symfonyCommandName = $this->arguments['command'] ?? null;
+                unset($all[$key]);
             }
 
-            throw new RuntimeException(sprintf('No arguments expected, got "%s".', $token));
+            if (\count($all)) {
+                if ($symfonyCommandName) {
+                    $message = sprintf('Too many arguments to "%s" command, expected arguments "%s".', $symfonyCommandName, implode('" "', array_keys($all)));
+                } else {
+                    $message = sprintf('Too many arguments, expected arguments "%s".', implode('" "', array_keys($all)));
+                }
+            } elseif ($symfonyCommandName) {
+                $message = sprintf('No arguments expected for "%s" command, got "%s".', $symfonyCommandName, $token);
+            } else {
+                $message = sprintf('No arguments expected, got "%s".', $token);
+            }
+
+            throw new RuntimeException($message);
         }
     }
 
     /**
      * Adds a short option value.
      *
-     * @param string $shortcut The short option key
-     * @param mixed  $value    The value for the option
-     *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addShortOption($shortcut, $value)
+    private function addShortOption(string $shortcut, $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new RuntimeException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -207,12 +204,9 @@ class ArgvInput extends Input
     /**
      * Adds a long option value.
      *
-     * @param string $name  The long option key
-     * @param mixed  $value The value for the option
-     *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addLongOption($name, $value)
+    private function addLongOption(string $name, $value)
     {
         if (!$this->definition->hasOption($name)) {
             throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
@@ -290,7 +284,7 @@ class ArgvInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, bool $onlyParams = false)
     {
         $values = (array) $values;
 
@@ -315,7 +309,7 @@ class ArgvInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false)
+    public function getParameterOption($values, $default = false, bool $onlyParams = false)
     {
         $values = (array) $values;
         $tokens = $this->tokens;

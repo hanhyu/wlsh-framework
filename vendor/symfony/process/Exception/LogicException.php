@@ -12,7 +12,7 @@
 namespace Symfony\Component\Process\Exception;
 
 /**
- * LogicException for the ProcessDomain Component.
+ * LogicException for the Process Component.
  *
  * @author Romain Neutron <imprec@gmail.com>
  */

@@ -98,21 +98,33 @@ class FunctionalTestCase extends BaseFunctionalTestCase
      * Assert data within the outcome collection.
      *
      * @param array $expectedDocuments
+     * @param int   $resultExpectation
      */
-    protected function assertOutcomeCollectionData(array $expectedDocuments)
+    protected function assertOutcomeCollectionData(array $expectedDocuments, $resultExpectation = ResultExpectation::ASSERT_SAME_DOCUMENT)
     {
-        $outcomeCollection = $this->getOutcomeCollection();
-        $findOptions = $this->getContext()->outcomeFindOptions;
+        $outcomeCollection = $this->getOutcomeCollection($this->getContext()->outcomeReadOptions);
 
         $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
         $mi->attachIterator(new ArrayIterator($expectedDocuments));
-        $mi->attachIterator(new IteratorIterator($outcomeCollection->find([], $findOptions)));
+        $mi->attachIterator(new IteratorIterator($outcomeCollection->find([], ['sort' => ['_id' => 1]])));
 
         foreach ($mi as $documents) {
             list($expectedDocument, $actualDocument) = $documents;
             $this->assertNotNull($expectedDocument);
             $this->assertNotNull($actualDocument);
-            $this->assertSameDocument($expectedDocument, $actualDocument);
+
+            switch ($resultExpectation) {
+                case ResultExpectation::ASSERT_SAME_DOCUMENT:
+                    $this->assertSameDocument($expectedDocument, $actualDocument);
+                    break;
+
+                case ResultExpectation::ASSERT_DOCUMENTS_MATCH:
+                    $this->assertDocumentsMatch($expectedDocument, $actualDocument);
+                    break;
+
+                default:
+                    $this->fail(sprintf('Invalid result expectation "%d" for %s', $resultExpectation, __METHOD__));
+            }
         }
     }
 
@@ -125,9 +137,9 @@ class FunctionalTestCase extends BaseFunctionalTestCase
     protected function checkServerRequirements(array $runOn)
     {
         foreach ($runOn as $req) {
-            $minServerVersion = isset($req->minServerVersion) ? $req->minServerVersion : null;
-            $maxServerVersion = isset($req->maxServerVersion) ? $req->maxServerVersion : null;
-            $topologies = isset($req->topology) ? $req->topology : null;
+            $minServerVersion = $req->minServerVersion ?? null;
+            $maxServerVersion = $req->maxServerVersion ?? null;
+            $topologies = $req->topology ?? null;
 
             if ($this->isServerRequirementSatisifed($minServerVersion, $maxServerVersion, $topologies)) {
                 return;
@@ -186,6 +198,10 @@ class FunctionalTestCase extends BaseFunctionalTestCase
     {
         $context = $this->getContext();
 
+        if ($context->databaseName === 'admin') {
+            return;
+        }
+
         if ($context->bucketName !== null) {
             $bucket = $context->getGridFSBucket($context->defaultWriteOptions);
             $bucket->drop();
@@ -193,16 +209,16 @@ class FunctionalTestCase extends BaseFunctionalTestCase
 
         $collection = null;
         if ($context->collectionName !== null) {
-            $collection = $context->getCollection();
-            $collection->drop($context->defaultWriteOptions);
+            $collection = $context->getCollection($context->defaultWriteOptions);
+            $collection->drop();
         }
 
         if ($context->outcomeCollectionName !== null) {
-            $outcomeCollection = $this->getOutcomeCollection();
+            $outcomeCollection = $this->getOutcomeCollection($context->defaultWriteOptions);
 
             // Avoid redundant drop if the test and outcome collections are the same
             if ($collection === null || $outcomeCollection->getNamespace() !== $collection->getNamespace()) {
-                $outcomeCollection->drop($context->defaultWriteOptions);
+                $outcomeCollection->drop();
             }
         }
     }
@@ -221,17 +237,18 @@ class FunctionalTestCase extends BaseFunctionalTestCase
 
         $context = $this->getContext();
         $collection = $collectionName ? $context->selectCollection($context->databaseName, $collectionName) : $context->getCollection();
+
         $collection->insertMany($documents, $context->defaultWriteOptions);
 
         return;
     }
 
-    private function getOutcomeCollection()
+    private function getOutcomeCollection(array $collectionOptions = [])
     {
         $context = $this->getContext();
 
         // Outcome collection need not use the client under test
-        return new Collection($this->manager, $context->databaseName, $context->outcomeCollectionName);
+        return new Collection($this->manager, $context->databaseName, $context->outcomeCollectionName, $collectionOptions);
     }
 
     /**

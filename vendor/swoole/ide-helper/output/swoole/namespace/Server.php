@@ -5,31 +5,35 @@ namespace Swoole;
 class Server
 {
 
-    private $onStart = null;
+    private $onStart;
 
-    private $onShutdown = null;
+    private $onShutdown;
 
-    private $onWorkerStart = null;
+    private $onWorkerStart;
 
-    private $onWorkerStop = null;
+    private $onWorkerStop;
 
-    private $onWorkerExit = null;
+    private $onBeforeReload;
 
-    private $onWorkerError = null;
+    private $onAfterReload;
 
-    private $onTask = null;
+    private $onWorkerExit;
 
-    private $onFinish = null;
+    private $onWorkerError;
 
-    private $onManagerStart = null;
+    private $onTask;
 
-    private $onManagerStop = null;
+    private $onFinish;
 
-    private $onPipeMessage = null;
+    private $onManagerStart;
 
-    public $setting = null;
+    private $onManagerStop;
 
-    public $connections = null;
+    private $onPipeMessage;
+
+    public $setting;
+
+    public $connections;
 
     public $host = '';
 
@@ -39,7 +43,7 @@ class Server
 
     public $mode = 0;
 
-    public $ports = null;
+    public $ports;
 
     public $master_pid = 0;
 
@@ -50,6 +54,8 @@ class Server
     public $taskworker = false;
 
     public $worker_pid = 0;
+
+    public $stats_timer;
 
     public function __construct($host, $port = null, $mode = null, $sock_type = null)
     {
@@ -259,6 +265,41 @@ class Server
      * @return mixed
      */
     public function getClientList($start_fd, $find_count = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWorkerId()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWorkerPid()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWorkerStatus($worker_id = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getManagerPid()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMasterPid()
     {
     }
 

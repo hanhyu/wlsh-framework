@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,7 +23,7 @@ use Monolog\Logger;
 class WildfireFormatter extends NormalizerFormatter
 {
     /**
-     * Translates MonologModel log levels to Wildfire levels.
+     * Translates Monolog log levels to Wildfire levels.
      */
     private $logLevels = [
         Logger::DEBUG     => 'LOG',
@@ -35,6 +35,17 @@ class WildfireFormatter extends NormalizerFormatter
         Logger::ALERT     => 'ERROR',
         Logger::EMERGENCY => 'ERROR',
     ];
+
+    /**
+     * @param string|null $dateFormat The format of the timestamp: one supported by DateTime::format
+     */
+    public function __construct(?string $dateFormat = null)
+    {
+        parent::__construct($dateFormat);
+
+        // http headers do not like non-ISO-8559-1 characters
+        $this->removeJsonEncodeOption(JSON_UNESCAPED_UNICODE);
+    }
 
     /**
      * {@inheritdoc}
@@ -105,7 +116,7 @@ class WildfireFormatter extends NormalizerFormatter
 
     /**
      * {@inheritdoc}
-     * @suppress PhanTypeMismatchReturn
+     * @return int|bool|string|null|array|object
      */
     protected function normalize($data, int $depth = 0)
     {

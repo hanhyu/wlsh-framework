@@ -32,7 +32,7 @@ trait ControllersTrait
      *
      * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
      *
-     * @throws JsonException
+     * @throws JsonException|ProgramException
      */
     public function beforeInit(bool $log = true): void
     {
@@ -64,7 +64,7 @@ trait ControllersTrait
                     if (!empty($this->request->rawContent())) {
                         try {
                             $this->data = json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-                        } catch (JsonException $e) {
+                        } catch (JsonException) {
                             throw new ProgramException('无法处理请求内容', 422);
                         }
                     }
@@ -84,7 +84,7 @@ trait ControllersTrait
                     if (!empty($this->request->rawContent())) {
                         try {
                             $this->data += json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-                        } catch (JsonException $e) {
+                        } catch (JsonException) {
                             throw new ProgramException('无法处理请求内容', 422);
                         }
                     }

@@ -1,8 +1,9 @@
 ---
 STACK_VERSION:
-  - 7.9.0-SNAPSHOT
-
+  - 7.x-SNAPSHOT
+  
 PHP_VERSION:
+  - 8.0-cli
   - 7.4-cli
   - 7.3-cli
   - 7.2-cli
@@ -10,5 +11,6 @@ PHP_VERSION:
 
 TEST_SUITE:
   - oss
+  - xpack
 
 exclude: ~

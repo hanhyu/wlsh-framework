@@ -11,7 +11,9 @@ class Frame
 
     public $opcode = 1;
 
-    public $finish = true;
+    public $flags = 1;
+
+    public $finish;
 
     /**
      * @return mixed
@@ -23,7 +25,7 @@ class Frame
     /**
      * @return mixed
      */
-    public static function pack($data, $opcode = null, $finish = null, $mask = null)
+    public static function pack($data, $opcode = null, $flags = null)
     {
     }
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -27,7 +27,7 @@ class InsightOpsHandler extends SocketHandler
     protected $logToken;
 
     /**
-     * @param string     $token  LogDomain token supplied by InsightOps
+     * @param string     $token  Log token supplied by InsightOps
      * @param string     $region Region where InsightOps account is hosted. Could be 'us' or 'eu'.
      * @param bool       $useSSL Whether or not SSL encryption should be used
      * @param string|int $level  The minimum logging level to trigger this handler
@@ -38,7 +38,7 @@ class InsightOpsHandler extends SocketHandler
     public function __construct(string $token, string $region = 'us', bool $useSSL = true, $level = Logger::DEBUG, bool $bubble = true)
     {
         if ($useSSL && !extension_loaded('openssl')) {
-            throw new MissingExtensionException('The OpenSSL PHP plugin is required to use SSL encrypted connection for LogEntriesHandler');
+            throw new MissingExtensionException('The OpenSSL PHP plugin is required to use SSL encrypted connection for InsightOpsHandler');
         }
 
         $endpoint = $useSSL

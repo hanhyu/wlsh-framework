@@ -52,12 +52,12 @@ function http_response(int $code = 200, string $msg = 'success', array $data = [
 
     $result['data'] = $data;
     try {
-        $res = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $res = json_encode($result, 320 | JSON_THROW_ON_ERROR);
     } catch (Throwable $e) {
         $result['code'] = 400;
         $result['msg']  = $e->getMessage();
         $result['data'] = [];
-        $res            = json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
         return $res;
     }
     //debug_print_backtrace();
@@ -93,7 +93,7 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
 
     $result['data'] = $data;
     try {
-        $res = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $res = json_encode($result, 320 | JSON_THROW_ON_ERROR);
     } catch (Throwable $e) {
         $result['code'] = 400;
         $result['msg']  = $e->getMessage();

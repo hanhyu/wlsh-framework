@@ -17,27 +17,27 @@ class Client
 
     public $ssl = false;
 
-    public $setting = null;
+    public $setting;
 
-    public $requestMethod = null;
+    public $requestMethod;
 
-    public $requestHeaders = null;
+    public $requestHeaders;
 
-    public $requestBody = null;
+    public $requestBody;
 
-    public $uploadFiles = null;
+    public $uploadFiles;
 
-    public $downloadFile = null;
+    public $downloadFile;
 
     public $downloadOffset = 0;
 
     public $statusCode = 0;
 
-    public $headers = null;
+    public $headers;
 
-    public $set_cookie_headers = null;
+    public $set_cookie_headers;
 
-    public $cookies = null;
+    public $cookies;
 
     public $body = '';
 
@@ -129,6 +129,20 @@ class Client
     /**
      * @return mixed
      */
+    public function getpeername()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getsockname()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function get($path)
     {
     }
@@ -185,6 +199,13 @@ class Client
     /**
      * @return mixed
      */
+    public function getPeerCert()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function upgrade($path)
     {
     }
@@ -192,7 +213,7 @@ class Client
     /**
      * @return mixed
      */
-    public function push($data, $opcode = null, $finish = null)
+    public function push($data, $opcode = null, $flags = null)
     {
     }
 

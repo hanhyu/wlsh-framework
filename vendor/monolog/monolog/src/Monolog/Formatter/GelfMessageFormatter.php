@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -31,12 +31,12 @@ class GelfMessageFormatter extends NormalizerFormatter
     protected $systemName;
 
     /**
-     * @var string a prefix for 'extra' fields from the MonologModel record (optional)
+     * @var string a prefix for 'extra' fields from the Monolog record (optional)
      */
     protected $extraPrefix;
 
     /**
-     * @var string a prefix for 'context' fields from the MonologModel record (optional)
+     * @var string a prefix for 'context' fields from the Monolog record (optional)
      */
     protected $contextPrefix;
 
@@ -46,7 +46,7 @@ class GelfMessageFormatter extends NormalizerFormatter
     protected $maxLength;
 
     /**
-     * Translates MonologModel log levels to Graylog2 log priorities.
+     * Translates Monolog log levels to Graylog2 log priorities.
      */
     private $logLevels = [
         Logger::DEBUG     => 7,
@@ -134,6 +134,7 @@ class GelfMessageFormatter extends NormalizerFormatter
             $message->setAdditional($this->contextPrefix . $key, $val);
         }
 
+        /** @phpstan-ignore-next-line */
         if (null === $message->getFile() && isset($record['context']['exception']['file'])) {
             if (preg_match("/^(.+):([0-9]+)$/", $record['context']['exception']['file'], $matches)) {
                 $message->setFile($matches[1]);

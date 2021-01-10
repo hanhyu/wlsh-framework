@@ -8,18 +8,19 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Model\BSONArray;
 use MongoDB\Model\BSONDocument;
-use MongoDB\Tests\Compat\PolyfillAssertTrait;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use ReflectionClass;
 use stdClass;
 use Traversable;
 use function array_map;
+use function array_merge;
 use function array_values;
 use function call_user_func;
 use function getenv;
 use function hash;
 use function is_array;
 use function is_object;
+use function is_string;
 use function iterator_to_array;
 use function MongoDB\BSON\fromPHP;
 use function MongoDB\BSON\toJSON;
@@ -30,8 +31,6 @@ use const E_USER_DEPRECATED;
 
 abstract class TestCase extends BaseTestCase
 {
-    use PolyfillAssertTrait;
-
     /**
      * Return the connection URI.
      *
@@ -113,6 +112,16 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
+    /**
+     * Compatibility method as PHPUnit 9 no longer includes this method.
+     */
+    public function dataDescription() : string
+    {
+        $dataName = $this->dataName();
+
+        return is_string($dataName) ? $dataName : '';
+    }
+
     public function provideInvalidArrayValues()
     {
         return $this->wrapValuesForDataProvider($this->getInvalidArrayValues());
@@ -165,91 +174,109 @@ abstract class TestCase extends BaseTestCase
     /**
      * Return a list of invalid array values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidArrayValues()
+    protected function getInvalidArrayValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true, new stdClass()];
+        return array_merge([123, 3.14, 'foo', true, new stdClass()], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid boolean values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidBooleanValues()
+    protected function getInvalidBooleanValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', [], new stdClass()];
+        return array_merge([123, 3.14, 'foo', [], new stdClass()], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid document values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidDocumentValues()
+    protected function getInvalidDocumentValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true];
+        return array_merge([123, 3.14, 'foo', true], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid integer values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidIntegerValues()
+    protected function getInvalidIntegerValues($includeNull = false)
     {
-        return [3.14, 'foo', true, [], new stdClass()];
+        return array_merge([3.14, 'foo', true, [], new stdClass()], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid ReadPreference values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidReadConcernValues()
+    protected function getInvalidReadConcernValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true, [], new stdClass(), new ReadPreference(ReadPreference::RP_PRIMARY), new WriteConcern(1)];
+        return array_merge([123, 3.14, 'foo', true, [], new stdClass(), new ReadPreference(ReadPreference::RP_PRIMARY), new WriteConcern(1)], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid ReadPreference values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidReadPreferenceValues()
+    protected function getInvalidReadPreferenceValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new WriteConcern(1)];
+        return array_merge([123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new WriteConcern(1)], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid Session values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidSessionValues()
+    protected function getInvalidSessionValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new ReadPreference(ReadPreference::RP_PRIMARY), new WriteConcern(1)];
+        return array_merge([123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new ReadPreference(ReadPreference::RP_PRIMARY), new WriteConcern(1)], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid string values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidStringValues()
+    protected function getInvalidStringValues($includeNull = false)
     {
-        return [123, 3.14, true, [], new stdClass()];
+        return array_merge([123, 3.14, true, [], new stdClass()], $includeNull ? [null] : []);
     }
 
     /**
      * Return a list of invalid WriteConcern values.
      *
+     * @param boolean $includeNull
+     *
      * @return array
      */
-    protected function getInvalidWriteConcernValues()
+    protected function getInvalidWriteConcernValues($includeNull = false)
     {
-        return [123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new ReadPreference(ReadPreference::RP_PRIMARY)];
+        return array_merge([123, 3.14, 'foo', true, [], new stdClass(), new ReadConcern(), new ReadPreference(ReadPreference::RP_PRIMARY)], $includeNull ? [null] : []);
     }
 
     /**

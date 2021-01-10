@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -108,6 +108,8 @@ class HandlerWrapper implements HandlerInterface, ProcessableHandlerInterface, F
     {
         if ($this->handler instanceof FormattableHandlerInterface) {
             $this->handler->setFormatter($formatter);
+
+            return $this;
         }
 
         throw new \LogicException('The wrapped handler does not implement ' . FormattableHandlerInterface::class);
@@ -128,7 +130,7 @@ class HandlerWrapper implements HandlerInterface, ProcessableHandlerInterface, F
     public function reset()
     {
         if ($this->handler instanceof ResettableInterface) {
-            return $this->handler->reset();
+            $this->handler->reset();
         }
     }
 }

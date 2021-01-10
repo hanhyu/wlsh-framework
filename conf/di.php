@@ -5,7 +5,6 @@ use App\Library\{
     DI,
     PdoPool,
     RedisPool,
-    CoMysqlPool,
 };
 
 //发送邮件配置
@@ -21,7 +20,4 @@ DI::set('mysql_pool_obj', new PdoPool('mysql'));
 //如需主从、读写库请在这里自行配置添加
 //$mysql_master = new PdoPool('mysql_master');
 //$mysql_slave = new PdoPool('mysql_slave');
-
-//添加协程mysql数据库连接池
-DI::set('co_mysql_pool_obj', new CoMysqlPool());
 

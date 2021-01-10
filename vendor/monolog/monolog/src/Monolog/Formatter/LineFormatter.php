@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -126,9 +126,6 @@ class LineFormatter extends NormalizerFormatter
         return $this->replaceNewlines($this->convertToString($value));
     }
 
-    /**
-     * @suppress PhanParamSignatureMismatch
-     */
     protected function normalizeException(\Throwable $e, int $depth = 0): string
     {
         $str = $this->formatException($e);
@@ -152,7 +149,7 @@ class LineFormatter extends NormalizerFormatter
             return (string) $data;
         }
 
-        return (string) $this->toJson($data, true);
+        return $this->toJson($data, true);
     }
 
     protected function replaceNewlines(string $str): string
@@ -181,7 +178,11 @@ class LineFormatter extends NormalizerFormatter
             }
 
             if (isset($e->detail)) {
-                $str .= ' detail: ' . $e->detail;
+                if (is_string($e->detail)) {
+                    $str .= ' detail: ' . $e->detail;
+                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                    $str .= ' detail: ' . $this->toJson($e->detail, true);
+                }
             }
         }
         $str .= '): ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine() . ')';

@@ -22,7 +22,7 @@ abstract class AbstractRedis
      * 此处使用静态延迟绑定，实现选择不同的数据库
      * @var int
      */
-    protected static int $dbindex = 0;
+    protected static int $db_index = 0;
 
     /**
      * 在协程中单例模式下使用
@@ -34,7 +34,7 @@ abstract class AbstractRedis
      * @throws Exception
      *
      */
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         $redis_pool_obj = DI::get('redis_pool_obj');
 
@@ -42,7 +42,7 @@ abstract class AbstractRedis
 
             $this->db = $redis_pool_obj->get();
 
-            $this->db->select(static::$dbindex);
+            $this->db->select(static::$db_index);
 
             $data = call_user_func_array([$this, $method], $args);
 
@@ -63,7 +63,7 @@ abstract class AbstractRedis
         return $data;
     }
 
-    public static function getInstance()
+    public static function getInstance(): static
     {
         $class_name = static::class;
         $cid        = Coroutine::getCid();

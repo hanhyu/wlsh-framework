@@ -26,9 +26,15 @@ use function is_array;
 use function is_object;
 use function is_string;
 use function key;
+use function ob_get_clean;
+use function ob_start;
 use function parse_url;
+use function phpinfo;
 use function preg_match;
+use function preg_quote;
+use function sprintf;
 use function version_compare;
+use const INFO_MODULES;
 
 abstract class FunctionalTestCase extends TestCase
 {
@@ -295,13 +301,14 @@ abstract class FunctionalTestCase extends TestCase
         throw new UnexpectedValueException('Could not determine server storage engine');
     }
 
+    protected function isReplicaSet()
+    {
+        return $this->getPrimaryServer()->getType() == Server::TYPE_RS_PRIMARY;
+    }
+
     protected function isShardedCluster()
     {
-        if ($this->getPrimaryServer()->getType() == Server::TYPE_MONGOS) {
-            return true;
-        }
-
-        return false;
+        return $this->getPrimaryServer()->getType() == Server::TYPE_MONGOS;
     }
 
     protected function isShardedClusterUsingReplicasets()
@@ -336,9 +343,6 @@ abstract class FunctionalTestCase extends TestCase
                 if (! $this->isShardedClusterUsingReplicasets()) {
                     $this->markTestSkipped('$changeStream is only supported with replicasets');
                 }
-
-                // Temporarily skip tests because of an issue with change streams in the driver
-                $this->markTestSkipped('$changeStreams currently don\'t on replica sets');
                 break;
 
             case Server::TYPE_RS_PRIMARY:
@@ -375,6 +379,17 @@ abstract class FunctionalTestCase extends TestCase
 
             default:
                 $this->markTestSkipped('Causal Consistency is not supported');
+        }
+    }
+
+    protected function skipIfClientSideEncryptionIsNotSupported()
+    {
+        if (version_compare($this->getFeatureCompatibilityVersion(), '4.2', '<')) {
+            $this->markTestSkipped('Client Side Encryption only supported on FCV 4.2 or higher');
+        }
+
+        if ($this->getModuleInfo('libmongocrypt') === 'disabled') {
+            $this->markTestSkipped('Client Side Encryption is not enabled in the MongoDB extension');
         }
     }
 
@@ -421,6 +436,26 @@ abstract class FunctionalTestCase extends TestCase
             $operation = new DatabaseCommand('admin', ['configureFailPoint' => $failPoint, 'mode' => 'off']);
             $operation->execute($server);
         }
+    }
+
+    /**
+     * @param string $row
+     *
+     * @return string|null
+     */
+    private function getModuleInfo($row)
+    {
+        ob_start();
+        phpinfo(INFO_MODULES);
+        $info = ob_get_clean();
+
+        $pattern = sprintf('/^%s([\w ]+)$/m', preg_quote($row . ' => '));
+
+        if (preg_match($pattern, $info, $matches) !== 1) {
+            return null;
+        }
+
+        return $matches[1];
     }
 
     /**

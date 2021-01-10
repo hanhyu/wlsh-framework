@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -139,13 +139,16 @@ class TestHandler extends AbstractProcessingHandler
      */
     public function hasRecordThatMatches(string $regex, $level): bool
     {
-        return $this->hasRecordThatPasses(function ($rec) use ($regex) {
+        return $this->hasRecordThatPasses(function (array $rec) use ($regex): bool {
             return preg_match($regex, $rec['message']) > 0;
         }, $level);
     }
 
     /**
+     * @psalm-param callable(array, int): mixed $predicate
+     *
      * @param string|int $level Logging level value or name
+     * @return bool
      */
     public function hasRecordThatPasses(callable $predicate, $level)
     {
@@ -156,7 +159,7 @@ class TestHandler extends AbstractProcessingHandler
         }
 
         foreach ($this->recordsByLevel[$level] as $i => $rec) {
-            if (call_user_func($predicate, $rec, $i)) {
+            if ($predicate($rec, $i)) {
                 return true;
             }
         }
@@ -177,7 +180,7 @@ class TestHandler extends AbstractProcessingHandler
     {
         if (preg_match('/(.*)(Debug|Info|Notice|Warning|Error|Critical|Alert|Emergency)(.*)/', $method, $matches) > 0) {
             $genericMethod = $matches[1] . ('Records' !== $matches[3] ? 'Record' : '') . $matches[3];
-            $level = constant('MonologModel\Logger::' . strtoupper($matches[2]));
+            $level = constant('Monolog\Logger::' . strtoupper($matches[2]));
             if (method_exists($this, $genericMethod)) {
                 $args[] = $level;
 

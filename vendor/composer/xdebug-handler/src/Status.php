@@ -134,7 +134,7 @@ class Status
 
     private function reportRestarting($command)
     {
-        $text = sprintf('ProcessDomain restarting (%s)', $this->getEnvAllow());
+        $text = sprintf('Process restarting (%s)', $this->getEnvAllow());
         $this->output($text);
         $text = 'Running '.$command;
         $this->output($text);
@@ -151,13 +151,13 @@ class Status
     }
 
     /**
-     * Returns the xdebug status and version
+     * Returns the Xdebug status and version
      *
      * @return string
      */
     private function getLoadedMessage()
     {
         $loaded = $this->loaded ? sprintf('loaded (%s)', $this->loaded) : 'not loaded';
-        return 'The xdebug extension is '.$loaded;
+        return 'The Xdebug extension is '.$loaded;
     }
 }

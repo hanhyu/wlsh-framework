@@ -77,12 +77,32 @@ class CommandExpectations implements CommandSubscriber
         return $o;
     }
 
+    public static function fromClientSideEncryption(array $expectedEvents)
+    {
+        $o = new self($expectedEvents);
+
+        $o->ignoreCommandFailed = true;
+        $o->ignoreCommandSucceeded = true;
+
+        return $o;
+    }
+
     public static function fromCommandMonitoring(array $expectedEvents)
     {
         return new self($expectedEvents);
     }
 
     public static function fromCrud(array $expectedEvents)
+    {
+        $o = new self($expectedEvents);
+
+        $o->ignoreCommandFailed = true;
+        $o->ignoreCommandSucceeded = true;
+
+        return $o;
+    }
+
+    public static function fromReadWriteConcern(array $expectedEvents)
     {
         $o = new self($expectedEvents);
 
@@ -120,7 +140,7 @@ class CommandExpectations implements CommandSubscriber
          * configureFailPoint needs to be ignored as the targetedFailPoint
          * operation will be caught by command monitoring and is also not
          * present in the expected commands in spec tests. */
-        $o->ignoredCommandNames = ['buildInfo', 'getParameter', 'configureFailPoint'];
+        $o->ignoredCommandNames = ['buildInfo', 'getParameter', 'configureFailPoint', 'listCollections', 'listIndexes'];
 
         return $o;
     }

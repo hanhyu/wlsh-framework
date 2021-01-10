@@ -42,6 +42,8 @@ class DocumentationExamplesTest extends FunctionalTestCase
         }
 
         $this->dropCollection();
+
+        parent::tearDown();
     }
 
     public function testExample_1_2()
@@ -935,6 +937,10 @@ class DocumentationExamplesTest extends FunctionalTestCase
     {
         $this->skipIfChangeStreamIsNotSupported();
 
+        if ($this->isShardedCluster()) {
+            $this->markTestSkipped('Test does not apply on sharded clusters: need more than a single getMore call on the change stream.');
+        }
+
         $db = new Database($this->manager, $this->getDatabaseName());
         $db->dropCollection('inventory');
         $db->createCollection('inventory');
@@ -1560,7 +1566,7 @@ class DocumentationExamplesTest extends FunctionalTestCase
 
         $client = new \MongoDB\Client($uriString);
 
-        // Prerequisite: Create collections. CRUD operations in transactions must be on existing collections.
+        // Prerequisite: Create collections.
         $client->selectCollection(
             'mydb1',
             'foo',

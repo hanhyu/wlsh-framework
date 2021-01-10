@@ -13,7 +13,7 @@ class UpdateTest extends TestCase
     public function testConstructorFilterArgumentTypeCheck($filter)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Expected \$filter to have type "array or object" but found "[\w ]+"/');
+        $this->expectExceptionMessageMatches('/Expected \$filter to have type "array or object" but found "[\w ]+"/');
         new Update($this->getDatabaseName(), $this->getCollectionName(), $filter, ['$set' => ['x' => 1]]);
     }
 
@@ -23,7 +23,7 @@ class UpdateTest extends TestCase
     public function testConstructorUpdateArgumentTypeCheck($update)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Expected \$update to have type "array or object" but found "[\w ]+"/');
+        $this->expectExceptionMessageMatches('/Expected \$update to have type "array or object" but found "[\w ]+"/');
         new Update($this->getDatabaseName(), $this->getCollectionName(), ['x' => 1], $update);
     }
 
@@ -52,7 +52,7 @@ class UpdateTest extends TestCase
             $options[][] = ['collation' => $value];
         }
 
-        foreach ($this->getInvalidBooleanValues() as $value) {
+        foreach ($this->getInvalidBooleanValues(true) as $value) {
             $options[][] = ['multi' => $value];
         }
 
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
             $options[][] = ['session' => $value];
         }
 
-        foreach ($this->getInvalidBooleanValues() as $value) {
+        foreach ($this->getInvalidBooleanValues(true) as $value) {
             $options[][] = ['upsert' => $value];
         }
 

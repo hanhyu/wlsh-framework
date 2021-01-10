@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -12,6 +12,7 @@
 namespace Monolog\Handler\Slack;
 
 use Monolog\Logger;
+use Monolog\Utils;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Formatter\FormatterInterface;
 
@@ -46,7 +47,7 @@ class SlackRecord
     private $username;
 
     /**
-     * UserDomain icon e.g. 'ghost', 'http://example.com/user.png'
+     * User icon e.g. 'ghost', 'http://example.com/user.png'
      * @var string|null
      */
     private $userIcon;
@@ -76,7 +77,7 @@ class SlackRecord
     private $excludeFields;
 
     /**
-     * @var FormatterInterface
+     * @var ?FormatterInterface
      */
     private $formatter;
 
@@ -158,7 +159,7 @@ class SlackRecord
 
                     if ($this->useShortAttachment) {
                         $attachment['fields'][] = $this->generateAttachmentField(
-                            $key,
+                            (string) $key,
                             $record[$key]
                         );
                     } else {
@@ -211,14 +212,13 @@ class SlackRecord
     public function stringify(array $fields): string
     {
         $normalized = $this->normalizerFormatter->format($fields);
-        $prettyPrintFlag = defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 128;
 
         $hasSecondDimension = count(array_filter($normalized, 'is_array'));
         $hasNonNumericKeys = !count(array_filter(array_keys($normalized), 'is_numeric'));
 
         return $hasSecondDimension || $hasNonNumericKeys
-            ? json_encode($normalized, $prettyPrintFlag|JSON_UNESCAPED_UNICODE)
-            : json_encode($normalized, JSON_UNESCAPED_UNICODE);
+            ? Utils::jsonEncode($normalized, JSON_PRETTY_PRINT|Utils::DEFAULT_JSON_FLAGS)
+            : Utils::jsonEncode($normalized, Utils::DEFAULT_JSON_FLAGS);
     }
 
     /**
@@ -226,7 +226,7 @@ class SlackRecord
      *
      * @param ?string $channel
      *
-     * @return SlackHandler
+     * @return static
      */
     public function setChannel(?string $channel = null): self
     {
@@ -240,7 +240,7 @@ class SlackRecord
      *
      * @param ?string $username
      *
-     * @return SlackHandler
+     * @return static
      */
     public function setUsername(?string $username = null): self
     {
@@ -324,7 +324,7 @@ class SlackRecord
     {
         $fields = array();
         foreach ($this->normalizerFormatter->format($data) as $key => $value) {
-            $fields[] = $this->generateAttachmentField($key, $value);
+            $fields[] = $this->generateAttachmentField((string) $key, $value);
         }
 
         return $fields;

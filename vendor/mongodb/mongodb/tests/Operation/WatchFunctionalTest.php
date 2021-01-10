@@ -3,6 +3,7 @@
 namespace MongoDB\Tests\Operation;
 
 use Closure;
+use Iterator;
 use MongoDB\BSON\TimestampInterface;
 use MongoDB\ChangeStream;
 use MongoDB\Driver\Cursor;
@@ -15,10 +16,10 @@ use MongoDB\Driver\Monitoring\CommandSucceededEvent;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\ResumeTokenException;
-use MongoDB\Operation\DatabaseCommand;
 use MongoDB\Operation\InsertOne;
 use MongoDB\Operation\Watch;
 use MongoDB\Tests\CommandObserver;
+use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 use stdClass;
 use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
@@ -71,8 +72,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['x' => 1]);
         $this->insertDocument(['x' => 2]);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertSameDocument($changeStream->current()->_id, $changeStream->getResumeToken());
 
         $changeStream->next();
@@ -81,8 +81,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['x' => 3]);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertSameDocument($changeStream->current()->_id, $changeStream->getResumeToken());
     }
 
@@ -134,76 +133,31 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['x' => 1]);
         $this->insertDocument(['x' => 2]);
 
-        $events = [];
+        $lastEvent = null;
 
         (new CommandObserver())->observe(
             function () use ($changeStream) {
-                $changeStream->next();
+                $this->advanceCursorUntilValid($changeStream);
             },
-            function (array $event) use (&$events) {
-                $events[] = $event;
+            function (array $event) use (&$lastEvent) {
+                $lastEvent = $event;
             }
         );
 
-        $this->assertCount(1, $events);
-        $this->assertSame('getMore', $events[0]['started']->getCommandName());
-        $postBatchResumeToken = $this->getPostBatchResumeTokenFromReply($events[0]['succeeded']->getReply());
+        $this->assertNotNull($lastEvent);
+        $this->assertSame('getMore', $lastEvent['started']->getCommandName());
+        $postBatchResumeToken = $this->getPostBatchResumeTokenFromReply($lastEvent['succeeded']->getReply());
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
         $this->assertSameDocument($changeStream->current()->_id, $changeStream->getResumeToken());
 
         $changeStream->next();
         $this->assertSameDocument($postBatchResumeToken, $changeStream->getResumeToken());
     }
 
-    /**
-     * Prose test 10: "ChangeStream will resume after a killCursors command is
-     * issued for its child cursor."
-     */
-    public function testNextResumesAfterCursorNotFound()
-    {
-        $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $this->defaultOptions);
-        $changeStream = $operation->execute($this->getPrimaryServer());
-
-        $changeStream->rewind();
-        $this->assertFalse($changeStream->valid());
-
-        $this->insertDocument(['_id' => 1, 'x' => 'foo']);
-
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
-
-        $expectedResult = [
-            '_id' => $changeStream->current()->_id,
-            'operationType' => 'insert',
-            'fullDocument' => ['_id' => 1, 'x' => 'foo'],
-            'ns' => ['db' => $this->getDatabaseName(), 'coll' => $this->getCollectionName()],
-            'documentKey' => ['_id' => 1],
-        ];
-
-        $this->assertMatchesDocument($expectedResult, $changeStream->current());
-
-        $this->killChangeStreamCursor($changeStream);
-
-        $this->insertDocument(['_id' => 2, 'x' => 'bar']);
-
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
-
-        $expectedResult = [
-            '_id' => $changeStream->current()->_id,
-            'operationType' => 'insert',
-            'fullDocument' => ['_id' => 2, 'x' => 'bar'],
-            'ns' => ['db' => $this->getDatabaseName(), 'coll' => $this->getCollectionName()],
-            'documentKey' => ['_id' => 2],
-        ];
-
-        $this->assertMatchesDocument($expectedResult, $changeStream->current());
-    }
-
     public function testNextResumesAfterConnectionException()
     {
+        $this->skipIfIsShardedCluster('initial aggregate command times out due to socketTimeoutMS');
+
         /* In order to trigger a dropped connection, we'll use a new client with
          * a socket timeout that is less than the change stream's maxAwaitTimeMS
          * option. */
@@ -271,7 +225,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $postBatchResumeToken = $this->getPostBatchResumeTokenFromReply($events[0]['succeeded']->getReply());
 
         $this->assertFalse($changeStream->valid());
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $this->assertNoCommandExecuted(function () use ($changeStream) {
             $changeStream->rewind();
@@ -350,7 +304,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->assertInstanceOf(TimestampInterface::class, $operationTime);
 
         $this->assertFalse($changeStream->valid());
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $this->assertNoCommandExecuted(function () use ($changeStream) {
             $changeStream->rewind();
@@ -395,6 +349,8 @@ class WatchFunctionalTest extends FunctionalTestCase
 
     public function testRewindMultipleTimesWithResults()
     {
+        $this->skipIfIsShardedCluster('Cursor needs to be advanced multiple times and can\'t be rewound afterwards.');
+
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $this->defaultOptions);
         $changeStream = $operation->execute($this->getPrimaryServer());
 
@@ -487,8 +443,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['_id' => 1, 'x' => 'foo']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -500,15 +455,14 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->assertMatchesDocument($expectedResult, $changeStream->current());
 
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertFalse($changeStream->valid());
 
         $this->insertDocument(['_id' => 2, 'x' => 'bar']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -523,13 +477,15 @@ class WatchFunctionalTest extends FunctionalTestCase
 
     public function testResumeMultipleTimesInSuccession()
     {
+        $this->skipIfIsShardedCluster('getMore may return empty response before periodicNoopIntervalSecs on sharded clusters.');
+
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $this->defaultOptions);
         $changeStream = $operation->execute($this->getPrimaryServer());
 
-        /* Killing the cursor when there are no results will test that neither
+        /* Forcing a resume when there are no results will test that neither
          * the initial rewind() nor a resume attempt via next() increment the
          * key. */
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $this->assertNoCommandExecuted(function () use ($changeStream) {
             $changeStream->rewind();
@@ -544,7 +500,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->assertNull($changeStream->current());
 
         // A consecutive resume attempt should still not increment the key
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertFalse($changeStream->valid());
@@ -570,10 +526,10 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->assertMatchesDocument($expectedResult, $changeStream->current());
 
-        /* Insert another document and kill the cursor. ChangeStream::next()
+        /* Insert another document and force a resume. ChangeStream::next()
          * should resume and pick up the last insert. */
         $this->insertDocument(['_id' => 2]);
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertTrue($changeStream->valid());
@@ -597,7 +553,7 @@ class WatchFunctionalTest extends FunctionalTestCase
          *
          * Note: PHPLIB-448 may require rewind() to throw an exception here. */
         $this->insertDocument(['_id' => 3]);
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $this->assertNoCommandExecuted(function () use ($changeStream) {
             $changeStream->rewind();
@@ -623,7 +579,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         // Test one final, consecutive resume via ChangeStream::next()
         $this->insertDocument(['_id' => 4]);
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertTrue($changeStream->valid());
@@ -656,8 +612,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['_id' => 1, 'x' => 'foo']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertSame(0, $changeStream->key());
 
         $changeStream->next();
@@ -668,7 +623,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->assertFalse($changeStream->valid());
         $this->assertNull($changeStream->key());
 
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertFalse($changeStream->valid());
@@ -676,8 +631,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['_id' => 2, 'x' => 'bar']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertSame(1, $changeStream->key());
     }
 
@@ -693,8 +647,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $changeStream->rewind();
         $this->assertFalse($changeStream->valid());
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -737,41 +690,6 @@ class WatchFunctionalTest extends FunctionalTestCase
     }
 
     /**
-     * Prose test 5: "ChangeStream will not attempt to resume after encountering
-     * error code 11601 (Interrupted), 136 (CappedPositionLost), or 237
-     * (CursorKilled) while executing a getMore command."
-     *
-     * @dataProvider provideNonResumableErrorCodes
-     */
-    public function testNonResumableErrorCodes($errorCode)
-    {
-        $this->configureFailPoint([
-            'configureFailPoint' => 'failCommand',
-            'mode' => ['times' => 1],
-            'data' => ['failCommands' => ['getMore'], 'errorCode' => $errorCode],
-        ]);
-
-        $this->insertDocument(['x' => 1]);
-
-        $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), []);
-        $changeStream = $operation->execute($this->getPrimaryServer());
-        $changeStream->rewind();
-
-        $this->expectException(ServerException::class);
-        $this->expectExceptionCode($errorCode);
-        $changeStream->next();
-    }
-
-    public function provideNonResumableErrorCodes()
-    {
-        return [
-            [136], // CappedPositionLost
-            [237], // CursorKilled
-            [11601], // Interrupted
-        ];
-    }
-
-    /**
      * Prose test 2: "ChangeStream will throw an exception if the server
      * response is missing the resume token (if wire version is < 8, this is a
      * driver-side error; for 8+, this is a server-side error)"
@@ -796,7 +714,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->expectException(ResumeTokenException::class);
         $this->expectExceptionMessage('Resume token not found in change document');
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
     }
 
     /**
@@ -819,7 +737,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['x' => 1]);
 
         $this->expectException(ServerException::class);
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
     }
 
     /**
@@ -847,7 +765,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->expectException(ResumeTokenException::class);
         $this->expectExceptionMessage('Expected resume token to have type "array or object" but found "string"');
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
     }
 
     /**
@@ -870,7 +788,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['x' => 1]);
 
         $this->expectException(ServerException::class);
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
     }
 
     public function testMaxAwaitTimeMS()
@@ -916,12 +834,27 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['_id' => 1]);
 
         /* Advancing the change stream again will issue a getMore, but the
-         * server should not block since a document has been inserted. */
-        $startTime = microtime(true);
-        $changeStream->next();
-        $duration = microtime(true) - $startTime;
-        $this->assertLessThan($pivot, $duration);
+         * server should not block since a document has been inserted.
+         * For sharded clusters, we have to repeat the getMore iteration until
+         * the cursor is valid since the first getMore commands after an insert
+         * may not return any data. Only the time of the last getMore command is
+         * taken. */
+        $attempts = $this->isShardedCluster() ? 5 : 1;
+        for ($i = 0; $i < $attempts; $i++) {
+            $startTime = microtime(true);
+            $changeStream->next();
+            $duration = microtime(true) - $startTime;
+
+            if ($changeStream->valid()) {
+                break;
+            }
+        }
+
         $this->assertTrue($changeStream->valid());
+
+        if (! $this->isShardedCluster()) {
+            $this->assertLessThan($pivot, $duration);
+        }
     }
 
     public function testRewindExtractsResumeTokenAndNextResumes()
@@ -940,17 +873,25 @@ class WatchFunctionalTest extends FunctionalTestCase
         $changeStream->rewind();
         $this->assertFalse($changeStream->valid());
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $resumeToken = $changeStream->current()->_id;
         $options = ['resumeAfter' => $resumeToken] + $this->defaultOptions;
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $options);
         $changeStream = $operation->execute($this->getPrimaryServer());
-        $this->assertSame($resumeToken, $changeStream->getResumeToken());
+        $this->assertSameDocument($resumeToken, $changeStream->getResumeToken());
 
         $changeStream->rewind();
-        $this->assertTrue($changeStream->valid());
+
+        if ($this->isShardedCluster()) {
+            /* aggregate on a sharded cluster may not return any data in the
+             * initial batch until periodicNoopIntervalSecs has passed. Thus,
+             * advance the change stream until we've received data. */
+            $this->advanceCursorUntilValid($changeStream);
+        } else {
+            $this->assertTrue($changeStream->valid());
+        }
+
         $this->assertSame(0, $changeStream->key());
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -961,10 +902,9 @@ class WatchFunctionalTest extends FunctionalTestCase
         ];
         $this->assertMatchesDocument($expectedResult, $changeStream->current());
 
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertSame(1, $changeStream->key());
 
         $expectedResult = [
@@ -988,18 +928,25 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['_id' => 1, 'x' => 'foo']);
         $this->insertDocument(['_id' => 2, 'x' => 'bar']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $resumeToken = $changeStream->current()->_id;
 
         $options = $this->defaultOptions + ['resumeAfter' => $resumeToken];
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $options);
         $changeStream = $operation->execute($this->getPrimaryServer());
-        $this->assertSame($resumeToken, $changeStream->getResumeToken());
+        $this->assertSameDocument($resumeToken, $changeStream->getResumeToken());
 
         $changeStream->rewind();
-        $this->assertTrue($changeStream->valid());
+
+        if ($this->isShardedCluster()) {
+            /* aggregate on a sharded cluster may not return any data in the
+             * initial batch until periodicNoopIntervalSecs has passed. Thus,
+             * advance the change stream until we've received data. */
+            $this->advanceCursorUntilValid($changeStream);
+        } else {
+            $this->assertTrue($changeStream->valid());
+        }
 
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -1027,18 +974,25 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->insertDocument(['_id' => 1, 'x' => 'foo']);
         $this->insertDocument(['_id' => 2, 'x' => 'bar']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $resumeToken = $changeStream->current()->_id;
 
         $options = $this->defaultOptions + ['startAfter' => $resumeToken];
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $options);
         $changeStream = $operation->execute($this->getPrimaryServer());
-        $this->assertSame($resumeToken, $changeStream->getResumeToken());
+        $this->assertSameDocument($resumeToken, $changeStream->getResumeToken());
 
         $changeStream->rewind();
-        $this->assertTrue($changeStream->valid());
+
+        if ($this->isShardedCluster()) {
+            /* aggregate on a sharded cluster may not return any data in the
+             * initial batch until periodicNoopIntervalSecs has passed. Thus,
+             * advance the change stream until we've received data. */
+            $this->advanceCursorUntilValid($changeStream);
+        } else {
+            $this->assertTrue($changeStream->valid());
+        }
 
         $expectedResult = [
             '_id' => $changeStream->current()->_id,
@@ -1064,8 +1018,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['_id' => 1, 'x' => 'foo']);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
 
         $this->assertMatchesDocument($expectedChangeDocument, $changeStream->current());
     }
@@ -1114,7 +1067,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         /* Note: we intentionally do not start iteration with rewind() to ensure
          * that next() behaves identically when called without rewind(). */
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
 
         $this->assertSame(0, $changeStream->key());
 
@@ -1139,7 +1092,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->assertNull($changeStream->key());
 
         try {
-            $changeStream->next();
+            $this->advanceCursorUntilValid($changeStream);
             $this->fail('Exception for missing resume token was not thrown');
         } catch (ResumeTokenException $e) {
             /* On server versions < 4.1.8, a client-side error is thrown. */
@@ -1188,7 +1141,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         );
 
         $changeStream->rewind();
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         (new CommandObserver())->observe(
             function () use (&$changeStream) {
@@ -1234,7 +1187,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         // Invalidate the cursor to verify that resumeCallable is unset when the cursor is exhausted.
         $this->dropCollection();
 
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
 
         $this->assertNull($rp->getValue($changeStream));
     }
@@ -1253,7 +1206,11 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->configureFailPoint([
             'configureFailPoint' => 'failCommand',
             'mode' => ['times' => 1],
-            'data' => ['failCommands' => ['getMore'], 'errorCode' => self::NOT_MASTER],
+            'data' => [
+                'failCommands' => ['getMore'],
+                'errorCode' => self::NOT_MASTER,
+                'errorLabels' => ['ResumableChangeStreamError'],
+            ],
         ]);
 
         (new CommandObserver())->observe(
@@ -1356,6 +1313,10 @@ class WatchFunctionalTest extends FunctionalTestCase
      */
     public function testOriginalReadPreferenceIsPreservedOnResume()
     {
+        if ($this->isShardedCluster()) {
+            $this->markTestSkipped('Test does not apply to sharded clusters');
+        }
+
         $readPreference = new ReadPreference('secondary');
         $options = ['readPreference' => $readPreference] + $this->defaultOptions;
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $options);
@@ -1368,7 +1329,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $changeStream = $operation->execute($secondary);
         $previousCursorId = $changeStream->getCursorId();
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $changeStream->next();
         $this->assertNotSame($previousCursorId, $changeStream->getCursorId());
@@ -1437,6 +1398,8 @@ class WatchFunctionalTest extends FunctionalTestCase
             $this->markTestSkipped('Testing resumeAfter and startAfter can only be tested on servers >= 4.1.1');
         }
 
+        $this->skipIfIsShardedCluster('Resume token behaviour can\'t be reliably tested on sharded clusters.');
+
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $this->defaultOptions);
 
         $lastOpTime = null;
@@ -1454,7 +1417,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['x' => 1]);
 
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertTrue($changeStream->valid());
         $resumeToken = $changeStream->getResumeToken();
 
@@ -1499,7 +1462,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['x' => 1]);
 
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertTrue($changeStream->valid());
         $resumeToken = $changeStream->getResumeToken();
 
@@ -1507,7 +1470,7 @@ class WatchFunctionalTest extends FunctionalTestCase
         $operation = new Watch($this->manager, $this->getDatabaseName(), $this->getCollectionName(), [], $options);
         $changeStream = $operation->execute($this->getPrimaryServer());
         $changeStream->rewind();
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $aggregateCommand = null;
 
@@ -1546,8 +1509,7 @@ class WatchFunctionalTest extends FunctionalTestCase
 
         $this->insertDocument(['x' => 1]);
 
-        $changeStream->next();
-        $this->assertTrue($changeStream->valid());
+        $this->advanceCursorUntilValid($changeStream);
         $resumeToken = $changeStream->getResumeToken();
 
         $options = ['startAfter' => $resumeToken] + $this->defaultOptions;
@@ -1556,10 +1518,10 @@ class WatchFunctionalTest extends FunctionalTestCase
         $changeStream->rewind();
 
         $this->insertDocument(['x' => 2]);
-        $changeStream->next();
+        $this->advanceCursorUntilValid($changeStream);
         $this->assertTrue($changeStream->valid());
 
-        $this->killChangeStreamCursor($changeStream);
+        $this->forceChangeStreamResume();
 
         $aggregateCommand = null;
 
@@ -1595,6 +1557,19 @@ class WatchFunctionalTest extends FunctionalTestCase
         $this->assertEmpty($commands);
     }
 
+    private function forceChangeStreamResume()
+    {
+        $this->configureFailPoint([
+            'configureFailPoint' => 'failCommand',
+            'mode' => ['times' => 1],
+            'data' => [
+                'failCommands' => ['getMore'],
+                'errorCode' => self::NOT_MASTER,
+                'errorLabels' => ['ResumableChangeStreamError'],
+            ],
+        ]);
+    }
+
     private function getPostBatchResumeTokenFromReply(stdClass $reply)
     {
         $this->assertObjectHasAttribute('cursor', $reply);
@@ -1627,14 +1602,31 @@ class WatchFunctionalTest extends FunctionalTestCase
         return server_supports_feature($this->getPrimaryServer(), self::$wireVersionForStartAtOperationTime);
     }
 
-    private function killChangeStreamCursor(ChangeStream $changeStream)
+    private function advanceCursorUntilValid(Iterator $iterator, $limitOnShardedClusters = 10)
     {
-        $command = [
-            'killCursors' => $this->getCollectionName(),
-            'cursors' => [ $changeStream->getCursorId() ],
-        ];
+        if (! $this->isShardedCluster()) {
+            $iterator->next();
+            $this->assertTrue($iterator->valid());
 
-        $operation = new DatabaseCommand($this->getDatabaseName(), $command);
-        $operation->execute($this->getPrimaryServer());
+            return;
+        }
+
+        for ($i = 0; $i < $limitOnShardedClusters; $i++) {
+            $iterator->next();
+            if ($iterator->valid()) {
+                return;
+            }
+        }
+
+        throw new ExpectationFailedException(sprintf('Expected cursor to return an element but none was found after %d attempts.', $limitOnShardedClusters));
+    }
+
+    private function skipIfIsShardedCluster($message)
+    {
+        if (! $this->isShardedCluster()) {
+            return;
+        }
+
+        $this->markTestSkipped(sprintf('Test does not apply on sharded clusters: %s', $message));
     }
 }

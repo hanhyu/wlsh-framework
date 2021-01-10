@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -16,7 +16,7 @@ use Psr\Log\LogLevel;
 use ReflectionExtension;
 
 /**
- * MonologModel POSIX signal handler
+ * Monolog POSIX signal handler
  *
  * @author Robert Gust-Bardon <robert@gust-bardon.org>
  */
@@ -41,9 +41,6 @@ class SignalHandler
 
         if ($callPrevious) {
             $handler = pcntl_signal_get_handler($signo);
-            if ($handler === false) {
-                return $this;
-            }
             $this->previousSignalHandler[$signo] = $handler;
         } else {
             unset($this->previousSignalHandler[$signo]);

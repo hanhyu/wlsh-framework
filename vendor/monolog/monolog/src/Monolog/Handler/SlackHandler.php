@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -13,6 +13,7 @@ namespace Monolog\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
+use Monolog\Utils;
 use Monolog\Handler\Slack\SlackRecord;
 
 /**
@@ -43,7 +44,7 @@ class SlackHandler extends SocketHandler
      * @param  string|null               $iconEmoji              The emoji name to use (or null)
      * @param  int                       $level                  The minimum logging level at which this handler will be triggered
      * @param  bool                      $bubble                 Whether the messages that are handled can bubble up the stack or not
-     * @param  bool                      $useShortAttachment     Whether the the context/extra messages added to Slack as attachments are in a short style
+     * @param  bool                      $useShortAttachment     Whether the context/extra messages added to Slack as attachments are in a short style
      * @param  bool                      $includeContextAndExtra Whether the attachment should include context and extra data
      * @param  array                     $excludeFields          Dot separated list of fields to exclude from slack message. E.g. ['context.field1', 'extra.field2']
      * @throws MissingExtensionException If no OpenSSL PHP extension configured
@@ -115,7 +116,7 @@ class SlackHandler extends SocketHandler
         $dataArray['token'] = $this->token;
 
         if (!empty($dataArray['attachments'])) {
-            $dataArray['attachments'] = json_encode($dataArray['attachments']);
+            $dataArray['attachments'] = Utils::jsonEncode($dataArray['attachments']);
         }
 
         return $dataArray;

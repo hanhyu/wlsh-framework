@@ -13,6 +13,7 @@ use MongoDB\Driver\Server;
 use MongoDB\Driver\Session;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\GridFS\Bucket;
+use MongoDB\Model\IndexInfo;
 use MongoDB\Operation\FindOneAndReplace;
 use MongoDB\Operation\FindOneAndUpdate;
 use stdClass;
@@ -20,7 +21,7 @@ use function array_diff_key;
 use function array_map;
 use function fclose;
 use function fopen;
-use function in_array;
+use function iterator_to_array;
 use function MongoDB\is_last_pipeline_operator_write;
 use function MongoDB\with_transaction;
 use function stream_get_contents;
@@ -58,6 +59,9 @@ final class Operation
 
     /** @var string|null */
     private $databaseName;
+
+    /** @var array */
+    private $databaseOptions = [];
 
     /** @var string */
     private $name;
@@ -117,6 +121,20 @@ final class Operation
         return $o;
     }
 
+    public static function fromClientSideEncryption(stdClass $operation)
+    {
+        $o = new self($operation);
+
+        $o->errorExpectation = ErrorExpectation::fromClientSideEncryption($operation);
+        $o->resultExpectation = ResultExpectation::fromClientSideEncryption($operation, $o->getResultAssertionType());
+
+        if (isset($operation->collectionOptions)) {
+            $o->collectionOptions = (array) $operation->collectionOptions;
+        }
+
+        return $o;
+    }
+
     public static function fromCommandMonitoring(stdClass $operation)
     {
         $o = new self($operation);
@@ -160,6 +178,24 @@ final class Operation
 
         $o->errorExpectation = ErrorExpectation::fromCrud($operation);
         $o->resultExpectation = ResultExpectation::fromCrud($operation, $o->getResultAssertionType());
+
+        if (isset($operation->collectionOptions)) {
+            $o->collectionOptions = (array) $operation->collectionOptions;
+        }
+
+        return $o;
+    }
+
+    public static function fromReadWriteConcern(stdClass $operation)
+    {
+        $o = new self($operation);
+
+        $o->errorExpectation = ErrorExpectation::fromReadWriteConcern($operation);
+        $o->resultExpectation = ResultExpectation::fromReadWriteConcern($operation, $o->getResultAssertionType());
+
+        if (isset($operation->databaseOptions)) {
+            $o->databaseOptions = (array) $operation->databaseOptions;
+        }
 
         if (isset($operation->collectionOptions)) {
             $o->collectionOptions = (array) $operation->collectionOptions;
@@ -261,7 +297,7 @@ final class Operation
 
                 return $this->executeForClient($client, $context);
             case self::OBJECT_COLLECTION:
-                $collection = $context->getCollection($this->collectionOptions);
+                $collection = $context->getCollection($this->collectionOptions, $this->databaseOptions);
 
                 return $this->executeForCollection($collection, $context);
             case self::OBJECT_DATABASE:
@@ -273,7 +309,7 @@ final class Operation
 
                 return $this->executeForGridFSBucket($bucket, $context);
             case self::OBJECT_SELECT_COLLECTION:
-                $collection = $context->selectCollection($this->databaseName, $this->collectionName, $this->collectionOptions);
+                $collection = $context->selectCollection($this->databaseName, $this->collectionName, $this->collectionOptions, $this->databaseOptions);
 
                 return $this->executeForCollection($collection, $context);
             case self::OBJECT_SELECT_DATABASE:
@@ -305,11 +341,13 @@ final class Operation
         $context->replaceArgumentSessionPlaceholder($args);
 
         switch ($this->name) {
+            case 'listDatabaseNames':
+                return iterator_to_array($client->listDatabaseNames($args));
             case 'listDatabases':
                 return $client->listDatabases($args);
             case 'watch':
                 return $client->watch(
-                    isset($args['pipeline']) ? $args['pipeline'] : [],
+                    $args['pipeline'] ?? [],
                     array_diff_key($args, ['pipeline' => 1])
                 );
             default:
@@ -346,11 +384,21 @@ final class Operation
                     array_map([$this, 'prepareBulkWriteRequest'], $args['requests']),
                     $options
                 );
+            case 'createIndex':
+                return $collection->createIndex(
+                    $args['keys'],
+                    array_diff_key($args, ['keys' => 1])
+                );
+            case 'dropIndex':
+                return $collection->dropIndex(
+                    $args['name'],
+                    array_diff_key($args, ['name' => 1])
+                );
             case 'count':
             case 'countDocuments':
             case 'find':
                 return $collection->{$this->name}(
-                    isset($args['filter']) ? $args['filter'] : [],
+                    $args['filter'] ?? [],
                     array_diff_key($args, ['filter' => 1])
                 );
             case 'estimatedDocumentCount':
@@ -365,7 +413,7 @@ final class Operation
             case 'distinct':
                 return $collection->distinct(
                     $args['fieldName'],
-                    isset($args['filter']) ? $args['filter'] : [],
+                    $args['filter'] ?? [],
                     array_diff_key($args, ['fieldName' => 1, 'filter' => 1])
                 );
             case 'drop':
@@ -426,7 +474,7 @@ final class Operation
                 );
             case 'watch':
                 return $collection->watch(
-                    isset($args['pipeline']) ? $args['pipeline'] : [],
+                    $args['pipeline'] ?? [],
                     array_diff_key($args, ['pipeline' => 1])
                 );
             default:
@@ -453,6 +501,18 @@ final class Operation
                     $args['pipeline'],
                     array_diff_key($args, ['pipeline' => 1])
                 );
+            case 'createCollection':
+                return $database->createCollection(
+                    $args['collection'],
+                    array_diff_key($args, ['collection' => 1])
+                );
+            case 'dropCollection':
+                return $database->dropCollection(
+                    $args['collection'],
+                    array_diff_key($args, ['collection' => 1])
+                );
+            case 'listCollectionNames':
+                return iterator_to_array($database->listCollectionNames($args));
             case 'listCollections':
                 return $database->listCollections($args);
             case 'runCommand':
@@ -462,7 +522,7 @@ final class Operation
                 )->toArray()[0];
             case 'watch':
                 return $database->watch(
-                    isset($args['pipeline']) ? $args['pipeline'] : [],
+                    $args['pipeline'] ?? [],
                     array_diff_key($args, ['pipeline' => 1])
                 );
             default:
@@ -557,6 +617,36 @@ final class Operation
         $context->replaceArgumentSessionPlaceholder($args);
 
         switch ($this->name) {
+            case 'assertCollectionExists':
+                $databaseName = $args['database'];
+                $collectionName = $args['collection'];
+
+                $test->assertContains($collectionName, $context->selectDatabase($databaseName)->listCollectionNames());
+
+                return null;
+            case 'assertCollectionNotExists':
+                $databaseName = $args['database'];
+                $collectionName = $args['collection'];
+
+                $test->assertNotContains($collectionName, $context->selectDatabase($databaseName)->listCollectionNames());
+
+                return null;
+            case 'assertIndexExists':
+                $databaseName = $args['database'];
+                $collectionName = $args['collection'];
+                $indexName = $args['index'];
+
+                $test->assertContains($indexName, $this->getIndexNames($context, $databaseName, $collectionName));
+
+                return null;
+            case 'assertIndexNotExists':
+                $databaseName = $args['database'];
+                $collectionName = $args['collection'];
+                $indexName = $args['index'];
+
+                $test->assertNotContains($indexName, $this->getIndexNames($context, $databaseName, $collectionName));
+
+                return null;
             case 'assertSessionPinned':
                 $test->assertInstanceOf(Session::class, $args['session']);
                 $test->assertInstanceOf(Server::class, $args['session']->getServer());
@@ -564,12 +654,7 @@ final class Operation
                 return null;
             case 'assertSessionTransactionState':
                 $test->assertInstanceOf(Session::class, $args['session']);
-                /* PHPC currently does not expose the exact session state, but
-                 * instead exposes a bool to let us know whether a transaction
-                 * is currently in progress. This code may fail down the line
-                 * and should be adjusted once PHPC-1438 is implemented. */
-                $expected = in_array($this->arguments['state'], ['in_progress', 'starting']);
-                $test->assertSame($expected, $args['session']->isInTransaction());
+                $test->assertSame($this->arguments['state'], $args['session']->getTransactionState());
 
                 return null;
             case 'assertSessionUnpinned':
@@ -585,6 +670,22 @@ final class Operation
             default:
                 throw new LogicException('Unsupported test runner operation: ' . $this->name);
         }
+    }
+
+    /**
+     * @param string $databaseName
+     * @param string $collectionName
+     *
+     * @return array
+     */
+    private function getIndexNames(Context $context, $databaseName, $collectionName)
+    {
+        return array_map(
+            function (IndexInfo $indexInfo) {
+                return $indexInfo->getName();
+            },
+            iterator_to_array($context->selectCollection($databaseName, $collectionName)->listIndexes())
+        );
     }
 
     /**
@@ -616,6 +717,8 @@ final class Operation
     private function getResultAssertionTypeForClient()
     {
         switch ($this->name) {
+            case 'listDatabaseNames':
+                return ResultExpectation::ASSERT_SAME;
             case 'listDatabases':
                 return ResultExpectation::ASSERT_SAME_DOCUMENTS;
             case 'watch':
@@ -645,6 +748,10 @@ final class Operation
                 return ResultExpectation::ASSERT_BULKWRITE;
             case 'count':
             case 'countDocuments':
+                return ResultExpectation::ASSERT_SAME;
+            case 'createIndex':
+            case 'dropIndex':
+                return ResultExpectation::ASSERT_MATCHES_DOCUMENT;
             case 'distinct':
             case 'estimatedDocumentCount':
                 return ResultExpectation::ASSERT_SAME;
@@ -688,6 +795,10 @@ final class Operation
             case 'aggregate':
             case 'listCollections':
                 return ResultExpectation::ASSERT_SAME_DOCUMENTS;
+            case 'listCollectionNames':
+                return ResultExpectation::ASSERT_SAME;
+            case 'createCollection':
+            case 'dropCollection':
             case 'runCommand':
                 return ResultExpectation::ASSERT_MATCHES_DOCUMENT;
             case 'watch':

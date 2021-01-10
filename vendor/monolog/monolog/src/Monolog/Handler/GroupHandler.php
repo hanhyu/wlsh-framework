@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,6 +23,7 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface, Reset
 {
     use ProcessableHandlerTrait;
 
+    /** @var HandlerInterface[] */
     protected $handlers;
     protected $bubble;
 
@@ -116,7 +117,9 @@ class GroupHandler extends Handler implements ProcessableHandlerInterface, Reset
     public function setFormatter(FormatterInterface $formatter): HandlerInterface
     {
         foreach ($this->handlers as $handler) {
-            $handler->setFormatter($formatter);
+            if ($handler instanceof FormattableHandlerInterface) {
+                $handler->setFormatter($formatter);
+            }
         }
 
         return $this;

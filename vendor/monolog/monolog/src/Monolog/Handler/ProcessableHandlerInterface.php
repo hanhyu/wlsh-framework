@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -23,6 +23,8 @@ interface ProcessableHandlerInterface
     /**
      * Adds a processor in the stack.
      *
+     * @psalm-param ProcessorInterface|callable(array): array $callback
+     *
      * @param  ProcessorInterface|callable $callback
      * @return HandlerInterface            self
      */
@@ -30,6 +32,8 @@ interface ProcessableHandlerInterface
 
     /**
      * Removes the processor on top of the stack and returns it.
+     *
+     * @psalm-return callable(array): array
      *
      * @throws \LogicException In case the processor stack is empty
      * @return callable

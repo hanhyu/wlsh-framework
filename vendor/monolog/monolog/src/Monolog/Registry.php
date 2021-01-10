@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -14,22 +14,22 @@ namespace Monolog;
 use InvalidArgumentException;
 
 /**
- * MonologModel log registry
+ * Monolog log registry
  *
  * Allows to get `Logger` instances in the global scope
  * via static method calls on this class.
  *
  * <code>
- * $application = new MonologModel\Logger('application');
- * $api = new MonologModel\Logger('api');
+ * $application = new Monolog\Logger('application');
+ * $api = new Monolog\Logger('api');
  *
- * MonologModel\Registry::addLogger($application);
- * MonologModel\Registry::addLogger($api);
+ * Monolog\Registry::addLogger($application);
+ * Monolog\Registry::addLogger($api);
  *
  * function testLogger()
  * {
- *     MonologModel\Registry::api()->error('Sent to $api Logger instance');
- *     MonologModel\Registry::application()->error('Sent to $application Logger instance');
+ *     Monolog\Registry::api()->error('Sent to $api Logger instance');
+ *     Monolog\Registry::application()->error('Sent to $application Logger instance');
  * }
  * </code>
  *

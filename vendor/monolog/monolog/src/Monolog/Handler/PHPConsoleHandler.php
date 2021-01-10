@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -14,12 +14,13 @@ namespace Monolog\Handler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
+use Monolog\Utils;
 use PhpConsole\Connector;
 use PhpConsole\Handler as VendorPhpConsoleHandler;
 use PhpConsole\Helper;
 
 /**
- * MonologModel handler for Google Chrome extension "PHP Console"
+ * Monolog handler for Google Chrome extension "PHP Console"
  *
  * Display PHP error/debug log messages in Google Chrome console and notification popups, executes PHP code remotely
  *
@@ -29,8 +30,8 @@ use PhpConsole\Helper;
  * 3. Install PHP Console library https://github.com/barbushin/php-console#installation
  * 4. Example (result will looks like http://i.hizliresim.com/vg3Pz4.png)
  *
- *      $logger = new \MonologModel\Logger('all', array(new \MonologModel\Handler\PHPConsoleHandler()));
- *      \MonologModel\ErrorHandler::register($logger);
+ *      $logger = new \Monolog\Logger('all', array(new \Monolog\Handler\PHPConsoleHandler()));
+ *      \Monolog\ErrorHandler::register($logger);
  *      echo $undefinedVar;
  *      $logger->debug('SELECT * FROM users', array('db', 'time' => 0.012));
  *      PC::debug($_SERVER); // PHP Console debugger for any type of vars
@@ -41,7 +42,7 @@ class PHPConsoleHandler extends AbstractProcessingHandler
 {
     private $options = [
         'enabled' => true, // bool Is PHP Console server enabled
-        'classesPartialsTraceIgnore' => ['MonologModel\\'], // array Hide calls of classes started with...
+        'classesPartialsTraceIgnore' => ['Monolog\\'], // array Hide calls of classes started with...
         'debugTagsKeysInContext' => [0, 'tag'], // bool Is PHP Console server enabled
         'useOwnErrorsHandler' => false, // bool Enable errors handling
         'useOwnExceptionsHandler' => false, // bool Enable exceptions handling
@@ -66,7 +67,7 @@ class PHPConsoleHandler extends AbstractProcessingHandler
     private $connector;
 
     /**
-     * @param  array             $options   See \MonologModel\Handler\PHPConsoleHandler::$options for more details
+     * @param  array             $options   See \Monolog\Handler\PHPConsoleHandler::$options for more details
      * @param  Connector|null    $connector Instance of \PhpConsole\Connector class (optional)
      * @param  string|int        $level     The minimum logging level at which this handler will be triggered.
      * @param  bool              $bubble    Whether the messages that are handled can bubble up the stack or not.
@@ -92,9 +93,6 @@ class PHPConsoleHandler extends AbstractProcessingHandler
         return array_replace($this->options, $options);
     }
 
-    /**
-     * @suppress PhanTypeMismatchArgument
-     */
     private function initConnector(?Connector $connector = null): Connector
     {
         if (!$connector) {
@@ -188,7 +186,7 @@ class PHPConsoleHandler extends AbstractProcessingHandler
         $tags = $this->getRecordTags($record);
         $message = $record['message'];
         if ($record['context']) {
-            $message .= ' ' . json_encode($this->connector->getDumper()->dump(array_filter($record['context'])));
+            $message .= ' ' . Utils::jsonEncode($this->connector->getDumper()->dump(array_filter($record['context'])), null, true);
         }
         $this->connector->getDebugDispatcher()->dispatchDebug($message, $tags, $this->options['classesPartialsTraceIgnore']);
     }

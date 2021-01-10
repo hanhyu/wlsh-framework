@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -13,6 +13,7 @@ namespace Monolog\Handler;
 
 use Monolog\Logger;
 use Monolog\ResettableInterface;
+use Monolog\Formatter\FormatterInterface;
 
 /**
  * Buffers all records until closing the handler and then pass them as batch.
@@ -22,10 +23,11 @@ use Monolog\ResettableInterface;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class BufferHandler extends AbstractHandler implements ProcessableHandlerInterface
+class BufferHandler extends AbstractHandler implements ProcessableHandlerInterface, FormattableHandlerInterface
 {
     use ProcessableHandlerTrait;
 
+    /** @var HandlerInterface */
     protected $handler;
     protected $bufferSize = 0;
     protected $bufferLimit;
@@ -129,5 +131,31 @@ class BufferHandler extends AbstractHandler implements ProcessableHandlerInterfa
         if ($this->handler instanceof ResettableInterface) {
             $this->handler->reset();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormatter(FormatterInterface $formatter): HandlerInterface
+    {
+        if ($this->handler instanceof FormattableHandlerInterface) {
+            $this->handler->setFormatter($formatter);
+
+            return $this;
+        }
+
+        throw new \UnexpectedValueException('The nested handler of type '.get_class($this->handler).' does not support formatters.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormatter(): FormatterInterface
+    {
+        if ($this->handler instanceof FormattableHandlerInterface) {
+            return $this->handler->getFormatter();
+        }
+
+        throw new \UnexpectedValueException('The nested handler of type '.get_class($this->handler).' does not support formatters.');
     }
 }

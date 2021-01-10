@@ -382,9 +382,43 @@ class ErrorCode
     public static function check(int $code): bool
     {
         if (self::NONE !== $code) {
-            throw new KafkaErrorException(sprintf('[%s] %s', $code, self::getMessage($code)));
+            throw new KafkaErrorException(sprintf('[%s] %s', $code, self::getMessage($code)), $code);
         }
 
         return true;
+    }
+
+    public static function success(int $code): bool
+    {
+        return self::NONE === $code;
+    }
+
+    public static function canRetry(int $code): bool
+    {
+        return \in_array($code, [
+            self::COORDINATOR_LOAD_IN_PROGRESS,
+            self::COORDINATOR_NOT_AVAILABLE,
+            self::CORRUPT_MESSAGE,
+            self::FETCH_SESSION_ID_NOT_FOUND,
+            self::INVALID_FETCH_SESSION_EPOCH,
+            self::NOT_CONTROLLER,
+            self::NOT_COORDINATOR,
+            self::NOT_ENOUGH_REPLICAS_AFTER_APPEND,
+            self::NOT_ENOUGH_REPLICAS,
+            self::OFFSET_NOT_AVAILABLE,
+            self::REQUEST_TIMED_OUT,
+            self::UNKNOWN_LEADER_EPOCH,
+            self::UNSTABLE_OFFSET_COMMIT,
+            self::ELECTION_NOT_NEEDED,
+            self::ELIGIBLE_LEADERS_NOT_AVAILABLE,
+            self::FENCED_LEADER_EPOCH,
+            self::KAFKA_STORAGE_ERROR,
+            self::LEADER_NOT_AVAILABLE,
+            self::LISTENER_NOT_FOUND,
+            self::NETWORK_EXCEPTION,
+            self::PREFERRED_LEADER_NOT_AVAILABLE,
+            self::REPLICA_NOT_AVAILABLE,
+            self::UNKNOWN_TOPIC_OR_PARTITION,
+        ]);
     }
 }

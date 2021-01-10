@@ -22,7 +22,6 @@
 | groupId | 分组 ID | `null` |
 | memberId | 用户 ID | `null` |
 | groupInstanceId | 分组实例 ID | `null` |
-| protocols | 协议列表 | `[]` |
 | sessionTimeout | 如果超时后没有收到心跳信号，则协调器会认为该用户死亡。（单位：秒，支持小数） | `60` |
 | rebalanceTimeout | 重新平衡组时，协调器等待每个成员重新加入的最长时间（单位：秒，支持小数）。 | `60` |
 | topic | 主题名称 | `null` |
@@ -30,6 +29,10 @@
 | replicaId | 副本 ID | `-1` |
 | rackId | 机架编号 | `''` |
 | autoCommit | 自动提交 offset | `true` |
+| groupRetry | 分组操作，匹配预设的错误码时，自动重试次数 | `5` |
+| groupRetrySleep | 分组操作重试延迟，单位：秒 | `1` |
+| offsetRetry | 偏移量操作，匹配预设的错误码时，自动重试次数 | `5` |
+| groupHeartbeat | 分组心跳时间间隔，单位：秒 | `3` |
 
 ## 异步消费（回调）
 
@@ -47,7 +50,9 @@ function consume(ConsumeMessage $message)
 }
 $config = new ConsumerConfig();
 $config->setBroker('127.0.0.1:9092');
-$config->setTopic('test');
+$config->setTopic('test'); // 主题名称
+$config->setGroupId('testGroup'); // 分组ID
+$config->setClientId('test'); // 客户端ID
 $config->setInterval(0.1);
 $consumer = new Consumer($config, 'consume');
 $consumer->start();
@@ -63,13 +68,13 @@ use longlang\phpkafka\Consumer\ConsumerConfig;
 
 $config = new ConsumerConfig();
 $config->setBroker('127.0.0.1:9092');
-$config->setTopic('test');
+$config->setTopic('test'); // 主题名称
+$config->setGroupId('testGroup'); // 分组ID
+$config->setClientId('test'); // 客户端ID
 $consumer = new Consumer($config);
-while(true)
-{
+while(true) {
     $message = $consumer->consume();
-    if($message)
-    {
+    if($message) {
         var_dump($message->getKey() . ':' . $message->getValue());
         $consumer->ack($message->getPartition()); // 手动提交
     }

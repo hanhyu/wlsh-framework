@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -33,6 +33,15 @@ class TelegramBotHandler extends AbstractProcessingHandler
     private const BOT_API = 'https://api.telegram.org/bot';
 
     /**
+     * @var array AVAILABLE_PARSE_MODES The available values of parseMode according to the Telegram api documentation
+     */
+    private const AVAILABLE_PARSE_MODES = [
+        'HTML',
+        'MarkdownV2',
+        'Markdown' // legacy mode without underline and strikethrough, use MarkdownV2 instead
+    ];
+
+    /**
      * Telegram bot access token provided by BotFather.
      * Create telegram bot with https://telegram.me/BotFather and use access token from it.
      * @var string
@@ -47,6 +56,26 @@ class TelegramBotHandler extends AbstractProcessingHandler
     private $channel;
 
     /**
+     * The kind of formatting that is used for the message.
+     * See available options at https://core.telegram.org/bots/api#formatting-options
+     * or in AVAILABLE_PARSE_MODES
+     * @var string|null
+     */
+    private $parseMode;
+
+    /**
+     * Disables link previews for links in the message.
+     * @var bool|null
+     */
+    private $disableWebPagePreview;
+
+    /**
+     * Sends the message silently. Users will receive a notification with no sound.
+     * @var bool|null
+     */
+    private $disableNotification;
+
+    /**
      * @param string $apiKey  Telegram bot access token provided by BotFather
      * @param string $channel Telegram channel name
      * @inheritDoc
@@ -55,14 +84,64 @@ class TelegramBotHandler extends AbstractProcessingHandler
         string $apiKey,
         string $channel,
         $level = Logger::DEBUG,
-        bool $bubble = true
+        bool $bubble = true,
+        string $parseMode = null,
+        bool $disableWebPagePreview = null,
+        bool $disableNotification = null
     ) {
         parent::__construct($level, $bubble);
 
         $this->apiKey = $apiKey;
         $this->channel = $channel;
-        $this->level = $level;
-        $this->bubble = $bubble;
+        $this->setParseMode($parseMode);
+        $this->disableWebPagePreview($disableWebPagePreview);
+        $this->disableNotification($disableNotification);
+    }
+
+    public function setParseMode(string $parseMode = null): self
+    {
+        if ($parseMode !== null && !in_array($parseMode, self::AVAILABLE_PARSE_MODES)) {
+            throw new \InvalidArgumentException('Unknown parseMode, use one of these: ' . implode(', ', self::AVAILABLE_PARSE_MODES) . '.');
+        }
+
+        $this->parseMode = $parseMode;
+        return $this;
+    }
+
+    public function disableWebPagePreview(bool $disableWebPagePreview = null): self
+    {
+        $this->disableWebPagePreview = $disableWebPagePreview;
+        return $this;
+    }
+
+    public function disableNotification(bool $disableNotification = null): self
+    {
+        $this->disableNotification = $disableNotification;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleBatch(array $records): void
+    {
+        $messages = [];
+
+        foreach ($records as $record) {
+            if (!$this->isHandling($record)) {
+                continue;
+            }
+
+            if ($this->processors) {
+                $record = $this->processRecord($record);
+            }
+
+            $messages[] = $record;
+        }
+
+        if (!empty($messages)) {
+            $this->send((string) $this->getFormatter()->formatBatch($messages));
+        }
     }
 
     /**
@@ -87,6 +166,9 @@ class TelegramBotHandler extends AbstractProcessingHandler
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
             'text' => $message,
             'chat_id' => $this->channel,
+            'parse_mode' => $this->parseMode,
+            'disable_web_page_preview' => $this->disableWebPagePreview,
+            'disable_notification' => $this->disableNotification,
         ]));
 
         $result = Curl\Util::execute($ch);

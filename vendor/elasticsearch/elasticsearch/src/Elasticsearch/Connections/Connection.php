@@ -35,8 +35,10 @@ use Elasticsearch\Common\Exceptions\RoutingMissingException;
 use Elasticsearch\Common\Exceptions\ScriptLangNotSupportedException;
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Elasticsearch\Common\Exceptions\TransportException;
+use Elasticsearch\Common\Exceptions\Unauthorized401Exception;
 use Elasticsearch\Serializers\SerializerInterface;
 use Elasticsearch\Transport;
+use Exception;
 use GuzzleHttp\Ring\Core;
 use GuzzleHttp\Ring\Exception\ConnectException;
 use GuzzleHttp\Ring\Exception\RingException;
@@ -167,6 +169,11 @@ class Connection implements ConnectionInterface
             phpversion()
         )];
 
+        // Add x-elastic-client-meta header, if enabled
+        if (isset($connectionParams['client']['x-elastic-client-meta']) && $connectionParams['client']['x-elastic-client-meta']) {
+            $this->headers['x-elastic-client-meta'] = [$this->getElasticMetaHeader($connectionParams)];
+        }
+
         $host = $hostDetails['host'];
         $path = null;
         if (isset($hostDetails['path']) === true) {
@@ -188,7 +195,7 @@ class Connection implements ConnectionInterface
     /**
      * @param  string    $method
      * @param  string    $uri
-     * @param  array     $params
+     * @param  null|array   $params
      * @param  null      $body
      * @param  array     $options
      * @param  Transport $transport
@@ -200,8 +207,9 @@ class Connection implements ConnectionInterface
             $body = $this->serializer->serialize($body);
         }
 
+        $headers = $this->headers;
         if (isset($options['client']['headers']) && is_array($options['client']['headers'])) {
-            $this->headers = array_merge($this->headers, $options['client']['headers']);
+            $headers = array_merge($this->headers, $options['client']['headers']);
         }
 
         $host = $this->host;
@@ -218,7 +226,7 @@ class Connection implements ConnectionInterface
                 [
                 'Host'  => [$host]
                 ],
-                $this->headers
+                $headers
             )
         ];
 
@@ -254,7 +262,7 @@ class Connection implements ConnectionInterface
 
             // Send the request using the wrapped handler.
             $response =  Core::proxy(
-                $handler($request),
+                $handler($request), 
                 function ($response) use ($connection, $transport, $request, $options) {
 
                     $this->lastRequest['response'] = $response;
@@ -344,15 +352,17 @@ class Connection implements ConnectionInterface
     private function getURI(string $uri, ?array $params): string
     {
         if (isset($params) === true && !empty($params)) {
-            array_walk(
-                $params,
-                function (&$value, &$key) {
+            $params = array_map(
+                function ($value) {
                     if ($value === true) {
-                        $value = 'true';
+                        return 'true';
                     } elseif ($value === false) {
-                        $value = 'false';
+                        return 'false';
                     }
-                }
+
+                    return $value;
+                },
+                $params
             );
 
             $uri .= '?' . http_build_query($params);
@@ -572,6 +582,33 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the x-elastic-client-meta header
+     * 
+     * The header format is specified by the following regex:
+     * ^[a-z]{1,}=[a-z0-9\.\-]{1,}(?:,[a-z]{1,}=[a-z0-9\.\-]+)*$
+     */
+    private function getElasticMetaHeader(array $connectionParams): string
+    {
+        $phpSemVersion = sprintf("%d.%d.%d", PHP_MAJOR_VERSION, PHP_MINOR_VERSION, PHP_RELEASE_VERSION);
+        // Reduce the size in case of '-snapshot' version
+        $clientVersion = str_replace('-snapshot', '-s', strtolower(Client::VERSION)); 
+        $clientMeta = sprintf(
+            "es=%s,php=%s,t=%s,a=%d",
+            $clientVersion,
+            $phpSemVersion,
+            $clientVersion,
+            isset($connectionParams['client']['future']) && $connectionParams['client']['future'] === 'lazy' ? 1 : 0
+        );
+        if (function_exists('curl_version')) {
+            $curlVersion = curl_version();
+            if (isset($curlVersion['version'])) {
+                $clientMeta .= sprintf(",cu=%s", $curlVersion['version']); // cu = curl library
+            }
+        }
+        return $clientMeta;
+    }
+
+    /**
      * Get the OS version using php_uname if available
      * otherwise it returns an empty string
      *
@@ -611,7 +648,6 @@ class Connection implements ConnectionInterface
     private function process4xxError(array $request, array $response, array $ignore): ?ElasticsearchException
     {
         $statusCode = $response['status'];
-        $responseBody = $response['body'];
 
         /**
  * @var \Exception $exception
@@ -621,13 +657,11 @@ class Connection implements ConnectionInterface
         if (array_search($response['status'], $ignore) !== false) {
             return null;
         }
-
-        // if responseBody is not string, we convert it so it can be used as Exception message
-        if (!is_string($responseBody)) {
-            $responseBody = json_encode($responseBody);
-        }
-
-        if ($statusCode === 403) {
+        
+        $responseBody = $this->convertBodyToString($response['body'], $statusCode, $exception);
+        if ($statusCode === 401) {
+            $exception = new Unauthorized401Exception($responseBody, $statusCode);
+        } elseif ($statusCode === 403) {
             $exception = new Forbidden403Exception($responseBody, $statusCode);
         } elseif ($statusCode === 404) {
             $exception = new Missing404Exception($responseBody, $statusCode);
@@ -671,12 +705,31 @@ class Connection implements ConnectionInterface
         } elseif ($statusCode === 500 && strpos($responseBody, 'NoShardAvailableActionException') !== false) {
             $exception = new NoShardAvailableException($exception->getMessage(), $statusCode, $exception);
         } else {
-            $exception = new ServerErrorResponseException($responseBody, $statusCode);
+            $exception = new ServerErrorResponseException(
+                $this->convertBodyToString($responseBody, $statusCode, $exception),
+                $statusCode
+            );
         }
 
         $this->logRequestFail($request, $response, $exception);
 
         throw $exception;
+    }
+
+    private function convertBodyToString($body, int $statusCode, Exception $exception) : string
+    {
+        if (empty($body)) {
+            return sprintf(
+                "Unknown %d error from Elasticsearch %s",
+                $statusCode,
+                $exception->getMessage()
+            );
+        }
+        // if body is not string, we convert it so it can be used as Exception message
+        if (!is_string($body)) {
+            return json_encode($body);
+        }
+        return $body;
     }
 
     private function tryDeserialize400Error(array $response): ElasticsearchException

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -13,6 +13,7 @@ namespace Monolog\Handler;
 
 use InvalidArgumentException;
 use Monolog\Logger;
+use Monolog\Utils;
 
 /**
  * Stores logs to files that are rotated every day and a limited number of files are kept.
@@ -46,7 +47,7 @@ class RotatingFileHandler extends StreamHandler
      */
     public function __construct(string $filename, int $maxFiles = 0, $level = Logger::DEBUG, bool $bubble = true, ?int $filePermission = null, bool $useLocking = false)
     {
-        $this->filename = $filename;
+        $this->filename = Utils::canonicalizePath($filename);
         $this->maxFiles = $maxFiles;
         $this->nextRotation = new \DateTimeImmutable('tomorrow');
         $this->filenameFormat = '{filename}-{date}';

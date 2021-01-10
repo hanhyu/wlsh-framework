@@ -27,7 +27,7 @@ class InsertManyTest extends TestCase
     public function testConstructorDocumentsArgumentElementTypeChecks($document)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Expected \$documents[0\] to have type "array or object" but found "[\w ]+"/');
+        $this->expectExceptionMessageMatches('/Expected \$documents[0\] to have type "array or object" but found "[\w ]+"/');
         new InsertMany($this->getDatabaseName(), $this->getCollectionName(), [$document]);
     }
 
@@ -48,7 +48,7 @@ class InsertManyTest extends TestCase
             $options[][] = ['bypassDocumentValidation' => $value];
         }
 
-        foreach ($this->getInvalidBooleanValues() as $value) {
+        foreach ($this->getInvalidBooleanValues(true) as $value) {
             $options[][] = ['ordered' => $value];
         }
 

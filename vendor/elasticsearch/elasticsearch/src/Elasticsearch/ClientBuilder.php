@@ -38,6 +38,7 @@ use GuzzleHttp\Ring\Client\CurlMultiHandler;
 use GuzzleHttp\Ring\Client\Middleware;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 
 class ClientBuilder
 {
@@ -136,6 +137,11 @@ class ClientBuilder
     /**
      * @var bool
      */
+    private $elasticMetaHeader = true;
+
+    /**
+     * @var bool
+     */
     private $includePortInHostHeader = false;
 
     public static function create(): ClientBuilder
@@ -188,8 +194,14 @@ class ClientBuilder
         $builder = new static;
         foreach ($config as $key => $value) {
             $method = "set$key";
-            if (method_exists($builder, $method)) {
-                $builder->$method($value);
+            $reflection = new ReflectionClass($builder);
+            if ($reflection->hasMethod($method)) {
+                $func = $reflection->getMethod($method);
+                if ($func->getNumberOfParameters() > 1) {
+                    $builder->$method(...$value);
+                } else {
+                    $builder->$method($value);
+                }
                 unset($config[$key]);
             }
         }
@@ -305,10 +317,6 @@ class ClientBuilder
 
     public function setLogger(LoggerInterface $logger): ClientBuilder
     {
-        if (!$logger instanceof LoggerInterface) {
-            throw new InvalidArgumentException('$logger must implement \Psr\Log\LoggerInterface!');
-        }
-
         $this->logger = $logger;
 
         return $this;
@@ -316,10 +324,6 @@ class ClientBuilder
 
     public function setTracer(LoggerInterface $tracer): ClientBuilder
     {
-        if (!$tracer instanceof LoggerInterface) {
-            throw new InvalidArgumentException('$tracer must implement \Psr\Log\LoggerInterface!');
-        }
-
         $this->tracer = $tracer;
 
         return $this;
@@ -474,6 +478,16 @@ class ClientBuilder
     }
 
     /**
+     * Set or disable the x-elastic-client-meta header
+     */
+    public function setElasticMetaHeader($value = true): ClientBuilder
+    {
+        $this->elasticMetaHeader = $value;
+
+        return $this;
+    }
+
+    /**
      * Include the port in Host header
      *
      * @see https://github.com/elastic/elasticsearch-php/issues/993
@@ -525,6 +539,7 @@ class ClientBuilder
             $this->serializer = new $this->serializer;
         }
 
+        $this->connectionParams['client']['x-elastic-client-meta']= $this->elasticMetaHeader;
         $this->connectionParams['client']['port_in_header'] = $this->includePortInHostHeader;
 
         if (is_null($this->connectionFactory)) {
@@ -564,7 +579,11 @@ class ClientBuilder
 
             $this->endpoint = function ($class) use ($serializer) {
                 $fullPath = '\\Elasticsearch\\Endpoints\\' . $class;
-                if ($class === 'Bulk' || $class === 'Msearch' || $class === 'MsearchTemplate' || $class === 'MPercolate') {
+                
+                $reflection = new ReflectionClass($fullPath);
+                $constructor = $reflection->getConstructor();
+
+                if ($constructor && $constructor->getParameters()) {
                     return new $fullPath($serializer);
                 } else {
                     return new $fullPath();

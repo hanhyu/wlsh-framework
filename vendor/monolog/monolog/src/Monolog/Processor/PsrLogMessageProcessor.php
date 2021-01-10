@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -70,7 +70,7 @@ class PsrLogMessageProcessor implements ProcessorInterface
             } elseif (is_object($val)) {
                 $replacements[$placeholder] = '[object '.Utils::getClass($val).']';
             } elseif (is_array($val)) {
-                $replacements[$placeholder] = 'array'.@json_encode($val);
+                $replacements[$placeholder] = 'array'.Utils::jsonEncode($val, null, true);
             } else {
                 $replacements[$placeholder] = '['.gettype($val).']';
             }

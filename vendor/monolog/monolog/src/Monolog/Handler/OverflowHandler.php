@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -12,6 +12,7 @@
 namespace Monolog\Handler;
 
 use Monolog\Logger;
+use Monolog\Formatter\FormatterInterface;
 
 /**
  * Handler to only pass log messages when a certain threshold of number of messages is reached.
@@ -33,7 +34,7 @@ use Monolog\Logger;
  *
  * @author Kris Buist <krisbuist@gmail.com>
  */
-class OverflowHandler extends AbstractHandler
+class OverflowHandler extends AbstractHandler implements FormattableHandlerInterface
 {
     /** @var HandlerInterface */
     private $handler;
@@ -60,13 +61,13 @@ class OverflowHandler extends AbstractHandler
     /**
      * @param HandlerInterface $handler
      * @param int[]            $thresholdMap Dictionary of logger level => threshold
-     * @param int              $level
+     * @param int|string       $level        The minimum logging level at which this handler will be triggered
      * @param bool             $bubble
      */
     public function __construct(
         HandlerInterface $handler,
         array $thresholdMap = [],
-        int $level = Logger::DEBUG,
+        $level = Logger::DEBUG,
         bool $bubble = true
     ) {
         $this->handler = $handler;
@@ -123,5 +124,31 @@ class OverflowHandler extends AbstractHandler
         $this->handler->handle($record);
 
         return false === $this->bubble;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormatter(FormatterInterface $formatter): HandlerInterface
+    {
+        if ($this->handler instanceof FormattableHandlerInterface) {
+            $this->handler->setFormatter($formatter);
+
+            return $this;
+        }
+
+        throw new \UnexpectedValueException('The nested handler of type '.get_class($this->handler).' does not support formatters.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormatter(): FormatterInterface
+    {
+        if ($this->handler instanceof FormattableHandlerInterface) {
+            return $this->handler->getFormatter();
+        }
+
+        throw new \UnexpectedValueException('The nested handler of type '.get_class($this->handler).' does not support formatters.');
     }
 }

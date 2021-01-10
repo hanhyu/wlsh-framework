@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -21,7 +21,7 @@ use Monolog\Logger;
 class ChromePHPFormatter implements FormatterInterface
 {
     /**
-     * Translates MonologModel log levels to Wildfire levels.
+     * Translates Monolog log levels to Wildfire levels.
      */
     private $logLevels = [
         Logger::DEBUG     => 'log',

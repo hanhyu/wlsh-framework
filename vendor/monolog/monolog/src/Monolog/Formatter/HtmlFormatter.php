@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -12,6 +12,7 @@
 namespace Monolog\Formatter;
 
 use Monolog\Logger;
+use Monolog\Utils;
 
 /**
  * Formats incoming records into an HTML table
@@ -23,16 +24,16 @@ use Monolog\Logger;
 class HtmlFormatter extends NormalizerFormatter
 {
     /**
-     * Translates MonologModel log levels to html color priorities.
+     * Translates Monolog log levels to html color priorities.
      */
     protected $logLevels = [
-        Logger::DEBUG     => '#cccccc',
-        Logger::INFO      => '#468847',
-        Logger::NOTICE    => '#3a87ad',
-        Logger::WARNING   => '#c09853',
-        Logger::ERROR     => '#f0ad4e',
-        Logger::CRITICAL  => '#FF7708',
-        Logger::ALERT     => '#C12A19',
+        Logger::DEBUG     => '#CCCCCC',
+        Logger::INFO      => '#28A745',
+        Logger::NOTICE    => '#17A2B8',
+        Logger::WARNING   => '#FFC107',
+        Logger::ERROR     => '#FD7E14',
+        Logger::CRITICAL  => '#DC3545',
+        Logger::ALERT     => '#821722',
         Logger::EMERGENCY => '#000000',
     ];
 
@@ -92,7 +93,7 @@ class HtmlFormatter extends NormalizerFormatter
         if ($record['context']) {
             $embeddedTable = '<table cellspacing="1" width="100%">';
             foreach ($record['context'] as $key => $value) {
-                $embeddedTable .= $this->addRow($key, $this->convertToString($value));
+                $embeddedTable .= $this->addRow((string) $key, $this->convertToString($value));
             }
             $embeddedTable .= '</table>';
             $output .= $this->addRow('Context', $embeddedTable, false);
@@ -100,7 +101,7 @@ class HtmlFormatter extends NormalizerFormatter
         if ($record['extra']) {
             $embeddedTable = '<table cellspacing="1" width="100%">';
             foreach ($record['extra'] as $key => $value) {
-                $embeddedTable .= $this->addRow($key, $this->convertToString($value));
+                $embeddedTable .= $this->addRow((string) $key, $this->convertToString($value));
             }
             $embeddedTable .= '</table>';
             $output .= $this->addRow('Extra', $embeddedTable, false);
@@ -133,6 +134,6 @@ class HtmlFormatter extends NormalizerFormatter
 
         $data = $this->normalize($data);
 
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return Utils::jsonEncode($data, JSON_PRETTY_PRINT | Utils::DEFAULT_JSON_FLAGS, true);
     }
 }

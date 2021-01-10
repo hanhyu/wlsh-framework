@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -60,7 +60,7 @@ class FirePHPHandler extends AbstractProcessingHandler
      * Base header creation function used by init headers & record headers
      *
      * @param  array  $meta    Wildfire Plugin, Protocol & Structure Indexes
-     * @param  string $message LogDomain message
+     * @param  string $message Log message
      * @return array  Complete header string ready for the client as key and message as value
      */
     protected function createHeader(array $meta, string $message): array

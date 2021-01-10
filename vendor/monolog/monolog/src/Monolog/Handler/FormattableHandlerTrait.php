@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -22,13 +22,12 @@ use Monolog\Formatter\LineFormatter;
 trait FormattableHandlerTrait
 {
     /**
-     * @var FormatterInterface
+     * @var ?FormatterInterface
      */
     protected $formatter;
 
     /**
      * {@inheritdoc}
-     * @suppress PhanTypeMismatchReturn
      */
     public function setFormatter(FormatterInterface $formatter): HandlerInterface
     {

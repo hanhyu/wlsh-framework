@@ -3,8 +3,14 @@
 # To generate IDE help files of Swoole.
 #
 # How to use this script:
-#     ./bin/generator.sh       # To generate stubs with latest code from the master branch of Swoole.
-#     ./bin/generator.sh 4.4.7 # To generate stubs for a specific version of Swoole.
+#     ./bin/generator.sh 4.4.16
+#     ./bin/generator.sh 4.4.16   master
+#     ./bin/generator.sh 4.4.16   4.4.16
+#     ./bin/generator.sh 4.4.16   b5c9cede8c6150feba50d0e28d56de355fa69d16
+#     ./bin/generator.sh 4.5.0RC1 7c913105c3273aab005489d78e0ff9043bfecb54
+#
+# The first parameter specifies a stable release of Swoole. The second parameter is optional; it is to specify which
+# version of Swoole library to be integrated with (by default it will have the latest Swoole library included).
 #
 
 set -e
@@ -15,28 +21,10 @@ popd > /dev/null # Switch back to current directory.
 
 cd "${ROOT_PATH}" # Switch to root directory of project "ide-helper".
 
-if [ -z "${1}" ] ; then
-    echo INFO: Generating stubs with latest code from the master branch of Swoole.
-    image_tag=latest
-else
-    if [[ "${1}" =~ ^[1-9][0-9]*\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[A-Za-z0-9_]+)?$ ]] ; then
-        echo INFO: Generating stubs for Swoole ${1}.
-        image_tag=${1}-php7.3
-    else
-        echo "Error: '${1}' is not a valid Swoole version."
-        exit 1
-    fi
-fi
-image_tag=${image_tag}-dev
-
 rm -rf ./output
-docker run --rm                      \
-    -v "`pwd`":/var/www              \
-    -e SWOOLE_EXT_ASYNC=enabled      \
-    -e SWOOLE_EXT_ORM=enabled        \
-    -e SWOOLE_EXT_POSTGRESQL=enabled \
-    -e SWOOLE_EXT_SERIALIZE=enabled  \
-    -e SWOOLE_EXT_ZOOKEEPER=enabled  \
-    -t phpswoole/swoole:${image_tag} \
-    bash -c "composer install && SWOOLE_SRC_DIR=/usr/src/swoole ./bin/generator.php"
+docker run --rm                     \
+    -v "$(pwd)":/var/www            \
+    -e SWOOLE_LIB_VERSION=${2}      \
+    -ti phpswoole/swoole:${1}-php7.2-alpine \
+    sh -c "composer selfupdate --2 && composer install -n && ./bin/generator.php"
 git add ./output

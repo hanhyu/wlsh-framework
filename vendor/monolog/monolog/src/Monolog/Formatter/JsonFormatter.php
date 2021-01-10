@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -11,7 +11,6 @@
 
 namespace Monolog\Formatter;
 
-use Monolog\Utils;
 use Throwable;
 
 /**
@@ -28,16 +27,18 @@ class JsonFormatter extends NormalizerFormatter
 
     protected $batchMode;
     protected $appendNewline;
+    protected $ignoreEmptyContextAndExtra;
 
     /**
      * @var bool
      */
     protected $includeStacktraces = false;
 
-    public function __construct(int $batchMode = self::BATCH_MODE_JSON, bool $appendNewline = true)
+    public function __construct(int $batchMode = self::BATCH_MODE_JSON, bool $appendNewline = true, bool $ignoreEmptyContextAndExtra = false)
     {
         $this->batchMode = $batchMode;
         $this->appendNewline = $appendNewline;
+        $this->ignoreEmptyContextAndExtra = $ignoreEmptyContextAndExtra;
     }
 
     /**
@@ -62,17 +63,24 @@ class JsonFormatter extends NormalizerFormatter
 
     /**
      * {@inheritdoc}
-     *
-     * @suppress PhanTypeComparisonToArray
      */
     public function format(array $record): string
     {
         $normalized = $this->normalize($record);
+
         if (isset($normalized['context']) && $normalized['context'] === []) {
-            $normalized['context'] = new \stdClass;
+            if ($this->ignoreEmptyContextAndExtra) {
+                unset($normalized['context']);
+            } else {
+                $normalized['context'] = new \stdClass;
+            }
         }
         if (isset($normalized['extra']) && $normalized['extra'] === []) {
-            $normalized['extra'] = new \stdClass;
+            if ($this->ignoreEmptyContextAndExtra) {
+                unset($normalized['extra']);
+            } else {
+                $normalized['extra'] = new \stdClass;
+            }
         }
 
         return $this->toJson($normalized, true) . ($this->appendNewline ? "\n" : '');
@@ -137,7 +145,7 @@ class JsonFormatter extends NormalizerFormatter
             return 'Over '.$this->maxNormalizeDepth.' levels deep, aborting normalization';
         }
 
-        if (is_array($data) || $data instanceof \Traversable) {
+        if (is_array($data)) {
             $normalized = [];
 
             $count = 1;
@@ -155,6 +163,10 @@ class JsonFormatter extends NormalizerFormatter
 
         if ($data instanceof Throwable) {
             return $this->normalizeException($data, $depth);
+        }
+
+        if (is_resource($data)) {
+            return parent::normalize($data);
         }
 
         return $data;

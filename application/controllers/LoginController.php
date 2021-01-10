@@ -338,7 +338,7 @@ class LoginController
      *
      * @router auth=false&method=get
      */
-    #[Router(method: 'GET')]
+    #[Router(method: 'GET', auth: false)]
     public function testAction(): string
     {
         return 'hello world';

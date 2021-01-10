@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -24,7 +24,7 @@ class LogEntriesHandler extends SocketHandler
     protected $logToken;
 
     /**
-     * @param string     $token  LogDomain token supplied by LogEntries
+     * @param string     $token  Log token supplied by LogEntries
      * @param bool       $useSSL Whether or not SSL encryption should be used.
      * @param string|int $level  The minimum logging level to trigger this handler
      * @param bool       $bubble Whether or not messages that are handled should bubble up the stack.

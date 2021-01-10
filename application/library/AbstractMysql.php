@@ -22,7 +22,7 @@ abstract class AbstractMysql
      * 此处使用静态延迟绑定，实现选择不同的数据库
      * @var string
      */
-    protected static string $dbschema = 'mysql_pool_obj';
+    protected static string $db_schema = 'mysql_pool_obj';
 
     /**
      * UserDomain: hanhyu
@@ -35,10 +35,10 @@ abstract class AbstractMysql
      * @return mixed
      * @throws Exception
      */
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         /** @var $mysql_pool_obj PdoPool */
-        $mysql_pool_obj = DI::get(self::$dbschema);
+        $mysql_pool_obj = DI::get(self::$db_schema);
         try {
             if (!$mysql_pool_obj->available) return '';
 
@@ -75,13 +75,13 @@ abstract class AbstractMysql
             task_log(DI::get('server_obj'), $debugInfo, 'sql', 'mysql');
         }
 
-        //只能使用__call方法实现快速回收连接池资源
+        //只能使用 __call方法或子协程 实现快速回收连接池资源, 此方法不能放在finally中
         $mysql_pool_obj->put($this->db);
 
         return $data;
     }
 
-    public static function getInstance()
+    public static function getInstance(): static
     {
         $class_name = static::class;
         $cid        = Coroutine::getCid();

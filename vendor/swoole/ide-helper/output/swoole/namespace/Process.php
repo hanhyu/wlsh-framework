@@ -5,27 +5,27 @@ namespace Swoole;
 class Process
 {
 
-    const IPC_NOWAIT = 256;
+    public const IPC_NOWAIT = 256;
 
-    const PIPE_MASTER = 1;
+    public const PIPE_MASTER = 1;
 
-    const PIPE_WORKER = 2;
+    public const PIPE_WORKER = 2;
 
-    const PIPE_READ = 3;
+    public const PIPE_READ = 3;
 
-    const PIPE_WRITE = 4;
+    public const PIPE_WRITE = 4;
 
-    public $pipe = null;
+    public $pipe;
 
-    public $callback = null;
+    public $msgQueueId;
 
-    public $msgQueueId = null;
+    public $msgQueueKey;
 
-    public $msgQueueKey = null;
+    public $pid;
 
-    public $pid = null;
+    public $id;
 
-    public $id = null;
+    private $callback;
 
     public function __construct(callable $callback, $redirect_stdin_and_stdout = null, $pipe_type = null, $enable_coroutine = null)
     {
@@ -67,13 +67,6 @@ class Process
      * @return mixed
      */
     public static function daemon($nochdir = null, $noclose = null, $pipes = null)
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function setaffinity(array $cpu_settings)
     {
     }
 

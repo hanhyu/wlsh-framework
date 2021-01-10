@@ -9,24 +9,31 @@ class Request
 
     public $streamId = 0;
 
-    public $header = null;
+    public $header;
 
-    public $server = null;
+    public $server;
 
-    public $cookie = null;
+    public $cookie;
 
-    public $get = null;
+    public $get;
 
-    public $files = null;
+    public $files;
 
-    public $post = null;
+    public $post;
 
-    public $tmpfiles = null;
+    public $tmpfiles;
 
     /**
      * @return mixed
      */
     public function rawContent()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContent()
     {
     }
 

@@ -15,9 +15,6 @@
 
 
 declare(strict_types = 1);
-/**
- * Class RegisteredNamespaceInterface
- */
 
 namespace Elasticsearch\Namespaces;
 

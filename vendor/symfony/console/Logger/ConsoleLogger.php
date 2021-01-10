@@ -26,8 +26,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleLogger extends AbstractLogger
 {
-    const INFO = 'info';
-    const ERROR = 'error';
+    public const INFO = 'info';
+    public const ERROR = 'error';
 
     private $output;
     private $verbosityLevelMap = [
@@ -61,6 +61,8 @@ class ConsoleLogger extends AbstractLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function log($level, $message, array $context = [])
     {

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * MonologModel error handler
+ * Monolog error handler
  *
  * A facility to enable logging of runtime errors, exceptions and fatal errors.
  *
@@ -58,6 +58,7 @@ class ErrorHandler
      */
     public static function register(LoggerInterface $logger, $errorLevelMap = [], $exceptionLevelMap = [], $fatalLevel = null): self
     {
+        /** @phpstan-ignore-next-line */
         $handler = new static($logger);
         if ($errorLevelMap !== false) {
             $handler->registerErrorHandler($errorLevelMap);
@@ -74,7 +75,9 @@ class ErrorHandler
 
     public function registerExceptionHandler($levelMap = [], $callPrevious = true): self
     {
-        $prev = set_exception_handler([$this, 'handleException']);
+        $prev = set_exception_handler(function (\Throwable $e): void {
+            $this->handleException($e);
+        });
         $this->uncaughtExceptionLevelMap = $levelMap;
         foreach ($this->defaultExceptionLevelMap() as $class => $level) {
             if (!isset($this->uncaughtExceptionLevelMap[$class])) {
@@ -103,7 +106,7 @@ class ErrorHandler
 
     /**
      * @param string|null $level              a LogLevel::* constant, null to use the default LogLevel::ALERT or false to disable fatal error handling
-     * @param int         $reservedMemorySize Amount of KBs to reserve in memory so that it can be freed when handling fatal errors giving MonologModel some room in memory to get its job done
+     * @param int         $reservedMemorySize Amount of KBs to reserve in memory so that it can be freed when handling fatal errors giving Monolog some room in memory to get its job done
      */
     public function registerFatalHandler($level = null, int $reservedMemorySize = 20): self
     {
@@ -145,11 +148,7 @@ class ErrorHandler
         ];
     }
 
-    /**
-     * @private
-     * @param \Exception $e
-     */
-    public function handleException($e)
+    private function handleException(\Throwable $e)
     {
         $level = LogLevel::ERROR;
         foreach ($this->uncaughtExceptionLevelMap as $class => $candidate) {
@@ -166,7 +165,7 @@ class ErrorHandler
         );
 
         if ($this->previousExceptionHandler) {
-            call_user_func($this->previousExceptionHandler, $e);
+            ($this->previousExceptionHandler)($e);
         }
 
         if (!headers_sent() && !ini_get('display_errors')) {
@@ -198,7 +197,7 @@ class ErrorHandler
         if ($this->previousErrorHandler === true) {
             return false;
         } elseif ($this->previousErrorHandler) {
-            return call_user_func($this->previousErrorHandler, $code, $message, $file, $line, $context);
+            return ($this->previousErrorHandler)($code, $message, $file, $line, $context);
         }
 
         return true;

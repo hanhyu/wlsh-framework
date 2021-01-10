@@ -13,11 +13,11 @@ class Client
 
     public $type = 0;
 
-    public $setting = null;
+    public $setting;
 
     public $connected = false;
 
-    public $host = null;
+    public $host;
 
     public $port = 0;
 
@@ -77,6 +77,13 @@ class Client
      * @return mixed
      */
     public function recv($timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function read($timeout = null)
     {
     }
 

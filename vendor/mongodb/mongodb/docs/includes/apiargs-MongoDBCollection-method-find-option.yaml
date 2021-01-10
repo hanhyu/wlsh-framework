@@ -47,6 +47,17 @@ operation: ~
 optional: true
 ---
 arg_name: option
+name: allowDiskUse
+type: boolean
+description: |
+  Enables writing to temporary files. When set to ``true``, queries can write
+  data to the ``_tmp`` sub-directory in the ``dbPath`` directory. The default is
+  ``false``.
+interface: phpmethod
+operation: ~
+optional: true
+---
+arg_name: option
 name: batchSize
 type: integer
 description: |
@@ -87,18 +98,11 @@ interface: phpmethod
 operation: ~
 optional: true
 ---
-arg_name: option
-name: hint
-type: string|array|object
-description: |
-  The index to use. Specify either the index name as a string or the index key
-  pattern as a document. If specified, then the query system will only consider
-  plans using the hinted index.
-
+source:
+  file: apiargs-common-option.yaml
+  ref: hint
+post: |
   .. versionadded:: 1.2
-interface: phpmethod
-operation: ~
-optional: true
 ---
 arg_name: option
 name: maxAwaitTimeMS
@@ -178,6 +182,8 @@ description: |
 
   The :php:`MongoDB\\BSON\\Timestamp <class.mongodb-bson-timestamp>` class
   reference describes how to represent MongoDB's BSON timestamp type with PHP.
+
+  .. deprecated:: 1.7
 interface: phpmethod
 operation: ~
 optional: true

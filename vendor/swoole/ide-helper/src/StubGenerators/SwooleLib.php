@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Swoole\IDEHelper\StubGenerators;
 
+use DirectoryIterator;
 use Swoole\IDEHelper\AbstractStubGenerator;
 use Swoole\IDEHelper\Constant;
 use Swoole\IDEHelper\Exception;
@@ -12,20 +15,16 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @package Swoole\IDEHelper\StubGenerators
  * @see https://github.com/swoole/swoole-src/tree/master/library
+ * @see https://github.com/swoole/swoole-src/blob/v4.5.6/ext-src/php_swoole_library.h#L5
  */
 class SwooleLib extends AbstractStubGenerator
 {
-    const EXTRA_FILES = [
-        "ext",
-        "std",
-        "README.md",
-        "config.inc",
+    private const EXTRA_SRC_FILES = [
+        "src/ext",
+        "src/std",
+        "src/constants.php",
+        "src/functions.php",
     ];
-
-    /**
-     * @var string
-     */
-    protected $libDir;
 
     /**
      * AbstractStubGenerator constructor.
@@ -37,7 +36,7 @@ class SwooleLib extends AbstractStubGenerator
     {
         parent::__construct();
 
-        $this->extension = "swoole_lib";
+        $this->extension = "swoole_library";
         $this->dirOutput = dirname($this->dirOutput) . DIRECTORY_SEPARATOR . $this->extension;
     }
 
@@ -46,11 +45,17 @@ class SwooleLib extends AbstractStubGenerator
      */
     public function export(): void
     {
-        $this->mkdir($this->dirOutput);
+        $this->download("library", $this->rf_version, $this->dirOutput);
 
+        $extraFiles = self::EXTRA_SRC_FILES;
+        /** @var DirectoryIterator $file */
+        foreach (new DirectoryIterator($this->dirOutput) as $file) {
+            if (!$file->isDot() && ($file->getFilename() != 'src')) {
+                $extraFiles[] = $file->getFilename();
+            }
+        }
         $fileSystem = new Filesystem();
-        $fileSystem->mirror($this->libDir, $this->dirOutput);
-        foreach (self::EXTRA_FILES as $file) {
+        foreach ($extraFiles as $file) {
             $fileSystem->remove($this->dirOutput . DIRECTORY_SEPARATOR . $file);
         }
     }
@@ -61,19 +66,8 @@ class SwooleLib extends AbstractStubGenerator
      */
     protected function init(): AbstractStubGenerator
     {
-        $this->extension = Constant::EXT_SWOOLE;
-
-        if (!empty($_SERVER["SWOOLE_LIB_DIR"])) {
-            $this->libDir = $_SERVER["SWOOLE_LIB_DIR"];
-        } elseif (!empty($_SERVER["SWOOLE_SRC_DIR"])) {
-            $this->libDir = $_SERVER["SWOOLE_SRC_DIR"] . DIRECTORY_SEPARATOR . "library";
-        }
-
-        if (empty($this->libDir)) {
-            throw new Exception("Swoole library directory is not specified.");
-        } elseif (!is_dir($this->libDir)) {
-            throw new Exception("Swoole library directory \"{$this->libDir}\" is invalid.");
-        }
+        $this->extension  = Constant::EXT_SWOOLE; // Set to a dummy value temporarily.
+        $this->rf_version = $_SERVER["SWOOLE_LIB_VERSION"] ?? self::DEFAULT_VERSION;
 
         return $this;
     }

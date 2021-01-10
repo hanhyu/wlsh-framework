@@ -29,7 +29,7 @@ use RuntimeException;
  */
 class SystemUserMysql extends AbstractMysql
 {
-    //protected static string $dbschema = 'mysql_user_obj';
+    //protected static string $db_schema = 'mysql_user_obj';
     protected string $table = 'frame_system_user';
 
     /**
@@ -109,7 +109,7 @@ class SystemUserMysql extends AbstractMysql
         if (false === $datas) {
             throw new RuntimeException($this->db->last());
         }
-        return $data->rowCount();;
+        return $data->rowCount();
     }
 
     /**

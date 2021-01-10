@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * This file is part of the MonologModel package.
+ * This file is part of the Monolog package.
  *
  * (c) Jordi Boggiano <j.boggiano@seld.be>
  *
@@ -31,6 +31,7 @@ class FallbackGroupHandler extends GroupHandler
                 // What throwable?
             }
         }
+
         return false === $this->bubble;
     }
 

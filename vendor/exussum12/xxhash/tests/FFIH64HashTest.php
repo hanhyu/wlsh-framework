@@ -8,7 +8,10 @@ class FFIH64HashTest extends TestCase
 {
     protected V64 $hash;
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function bootstrap()
     {
         $this->hash = new V64(0);
     }
@@ -55,6 +58,9 @@ class FFIH64HashTest extends TestCase
     }
     public function testStaticCall()
     {
+        if(version_compare(PHP_VERSION, '7.0', '>=')) {
+            $this->markTestSkipped('Static call is deprecated');
+        }
         $this->assertSame(
             '4fdcca5ddb678139',
             V64::hash('test')

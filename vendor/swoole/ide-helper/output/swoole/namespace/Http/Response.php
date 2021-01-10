@@ -7,13 +7,13 @@ class Response
 
     public $fd = 0;
 
-    public $socket = null;
+    public $socket;
 
-    public $header = null;
+    public $header;
 
-    public $cookie = null;
+    public $cookie;
 
-    public $trailer = null;
+    public $trailer;
 
     /**
      * @return mixed
@@ -25,21 +25,21 @@ class Response
     /**
      * @return mixed
      */
-    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
     {
     }
 
     /**
      * @return mixed
      */
-    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
     {
     }
 
     /**
      * @return mixed
      */
-    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null, $priority = null)
     {
     }
 
@@ -88,6 +88,13 @@ class Response
     /**
      * @return mixed
      */
+    public function goaway()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function write($content)
     {
     }
@@ -123,7 +130,7 @@ class Response
     /**
      * @return mixed
      */
-    public static function create($fd)
+    public static function create($server, $fd = null)
     {
     }
 
@@ -137,7 +144,7 @@ class Response
     /**
      * @return mixed
      */
-    public function push()
+    public function push($data, $opcode = null, $flags = null)
     {
     }
 

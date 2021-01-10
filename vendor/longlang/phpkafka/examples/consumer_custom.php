@@ -7,17 +7,18 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $config = new ConsumerConfig();
 $config->setBroker('127.0.0.1:9092');
-$config->setTopic('test');
+$config->setTopic('test'); // 主题名称
+$config->setGroupId('testGroup'); // 分组ID
+$config->setClientId('test'); // 客户端ID
 $consumer = new Consumer($config);
-while(true)
-{
+while (true) {
     $message = $consumer->consume();
-    if($message)
-    {
+    if ($message) {
         var_dump($message->getKey() . ':' . $message->getValue());
         $consumer->ack($message->getPartition()); // ack
+    } else {
+        usleep(10000);
     }
-    sleep(1);
 }
 
 return;
