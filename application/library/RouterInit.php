@@ -121,8 +121,6 @@ class RouterInit
             return '非法请求';
         } catch (\ReflectionException) {
             throw new ProgramException('请求的接口不存在', 400);
-        } catch (\RuntimeException) {
-            throw new ProgramException('服务路由配置错误', 500);
         }
     }
 

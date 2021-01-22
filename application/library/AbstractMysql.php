@@ -38,7 +38,7 @@ abstract class AbstractMysql
     public function __call(string $method, array $args): mixed
     {
         /** @var $mysql_pool_obj PdoPool */
-        $mysql_pool_obj = DI::get(self::$db_schema);
+        $mysql_pool_obj = DI::get(static::$db_schema);
         try {
             if (!$mysql_pool_obj->available) return '';
 
