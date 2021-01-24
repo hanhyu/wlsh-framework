@@ -58,14 +58,9 @@ class ConsumerConfig extends CommonConfig
     protected $rebalanceTimeout = 60;
 
     /**
-     * @var string
+     * @var string[]
      */
     protected $topic;
-
-    /**
-     * @var int[]
-     */
-    protected $partitions = [0];
 
     /**
      * @var int
@@ -101,6 +96,16 @@ class ConsumerConfig extends CommonConfig
      * @var float
      */
     protected $groupHeartbeat = 3;
+
+    /**
+     * @var bool
+     */
+    protected $autoCreateTopic = true;
+
+    /**
+     * @var string
+     */
+    protected $partitionAssignmentStrategy = \longlang\phpkafka\Consumer\Assignor\RangeAssignor::class;
 
     public function getClient(): ?string
     {
@@ -150,32 +155,20 @@ class ConsumerConfig extends CommonConfig
         return $this;
     }
 
-    public function getTopic(): string
+    /**
+     * @return string[]
+     */
+    public function getTopic(): array
     {
         return $this->topic;
     }
 
-    public function setTopic(string $topic): self
-    {
-        $this->topic = $topic;
-
-        return $this;
-    }
-
     /**
-     * @return int[]
+     * @param string|string[] $topic
      */
-    public function getPartitions(): array
+    public function setTopic($topic): self
     {
-        return $this->partitions;
-    }
-
-    /**
-     * @param int[] $partitions
-     */
-    public function setPartitions(array $partitions): self
-    {
-        $this->partitions = $partitions;
+        $this->topic = (array) $topic;
 
         return $this;
     }
@@ -320,6 +313,30 @@ class ConsumerConfig extends CommonConfig
     public function setGroupHeartbeat(float $groupHeartbeat): self
     {
         $this->groupHeartbeat = $groupHeartbeat;
+
+        return $this;
+    }
+
+    public function getAutoCreateTopic(): bool
+    {
+        return $this->autoCreateTopic;
+    }
+
+    public function setAutoCreateTopic(bool $autoCreateTopic): self
+    {
+        $this->autoCreateTopic = $autoCreateTopic;
+
+        return $this;
+    }
+
+    public function getPartitionAssignmentStrategy(): string
+    {
+        return $this->partitionAssignmentStrategy;
+    }
+
+    public function setPartitionAssignmentStrategy(string $partitionAssignmentStrategy): self
+    {
+        $this->partitionAssignmentStrategy = $partitionAssignmentStrategy;
 
         return $this;
     }

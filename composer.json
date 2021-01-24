@@ -17,13 +17,13 @@
     "ext-swoole": ">=4.5.9",
     "ext-mongodb": ">=1.9.0",
     "ext-redis": ">=5.3.2",
-    "catfan/medoo": "1.7.6",
     "monolog/monolog": "2.2.0",
     "swiftmailer/swiftmailer": "6.2.1",
     "webgeeker/validation": "0.4.4",
     "mongodb/mongodb": "1.8.0",
     "elasticsearch/elasticsearch": "^7.11.x-dev",
-    "longlang/phpkafka": "^1.0"
+    "longlang/phpkafka": "^1.0",
+    "envms/fluentpdo": "2.2.0"
   },
   "repositories": {
     "packagist": {

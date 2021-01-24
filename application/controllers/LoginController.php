@@ -1198,20 +1198,11 @@ class LoginController
     }
 
     #[Router(method: 'GET', auth: false)]
-    public function getUserNameAction(): void
-    {
-        $data = (new UserMysql())->getInfo('ceshi123');
-        $this->response->end(http_response(200, '', $data));
-    }
-
-    #[Router(method: 'GET', auth: false)]
     public function existTokenAction(): string
     {
         $data = $this->validator(SystemUserForms::$existToken);
         $res  = (new LoginDomain())->existToken($data);
-        //$this->response->end(http_response(200, '', ['exist' => $res]));
         return http_response(200, '', ['exist' => $res]);
     }
-
 
 }

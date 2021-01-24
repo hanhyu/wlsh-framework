@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use App\Library\ProgramException;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property  array  $getMenuList
@@ -21,7 +22,7 @@ use RuntimeException;
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class SystemMenuMysql extends AbstractMysql
+class SystemMenuMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_menu';
 
@@ -35,26 +36,13 @@ class SystemMenuMysql extends AbstractMysql
      */
     protected function getMenuList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, '*', $wheres);
-
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
 
     /**
@@ -62,14 +50,11 @@ class SystemMenuMysql extends AbstractMysql
      * Date: 19-6-16
      * Time: 下午8:10
      * @return int
+     * @throws Exception
      */
     protected function getListCount(): int
     {
-        $datas = $this->db->count($this->table);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->count();
     }
 
     /**
@@ -79,21 +64,13 @@ class SystemMenuMysql extends AbstractMysql
      * Date: 19-6-16
      * Time: 下午8:11
      * @return array
+     * @throws Exception
      */
     protected function getMenuInfo(): array
     {
-        $datas = $this->db->select($this->table, [
-            'id',
-            'name',
-            'icon',
-            'url',
-            'up_id',
-            'level',
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->select('id,name,icon,url,up_id,level', true)
+            ->fetchAll();
     }
 
     /**
@@ -102,20 +79,19 @@ class SystemMenuMysql extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function setMenu(array $post): int
     {
-        $datas = $this->db->insert($this->table, [
-            'name'  => $post['name'],
-            'icon'  => $post['icon'],
-            'url'   => $post['url'],
-            'up_id' => $post['up_id'],
-            'level' => $post['level'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'name'  => $post['name'],
+                'icon'  => $post['icon'],
+                'url'   => $post['url'],
+                'up_id' => $post['up_id'],
+                'level' => $post['level'],
+            ])
+            ->execute();
     }
 
     /**
@@ -126,20 +102,14 @@ class SystemMenuMysql extends AbstractMysql
      * @param int $id
      *
      * @return array
+     * @throws Exception
      */
     protected function getMenu(int $id): array
     {
-        $datas = $this->db->select($this->table, [
-            'id',
-            'name',
-            'icon',
-            'url',
-            'up_id',
-        ], ['id' => $id]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->where('id', $id)
+            ->select('id,name,icon,url,up_id', true)
+            ->fetchAll();
     }
 
     /**
@@ -150,22 +120,20 @@ class SystemMenuMysql extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function editMenu(array $post): int
     {
-        $datas = $this->db->update($this->table, [
-            'name'  => $post['name'],
-            'icon'  => $post['icon'],
-            'url'   => $post['url'],
-            'up_id' => $post['up_id'],
-            'level' => $post['level'],
-        ], [
-            'id' => (int)$post['id'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set([
+                'name'  => $post['name'],
+                'icon'  => $post['icon'],
+                'url'   => $post['url'],
+                'up_id' => $post['up_id'],
+                'level' => $post['level'],
+            ])
+            ->where('id', $post['id'])
+            ->execute();
     }
 
     /**
@@ -175,17 +143,14 @@ class SystemMenuMysql extends AbstractMysql
      *
      * @param int $id
      *
-     * @return int
+     * @return bool
+     * @throws Exception
      */
-    protected function delMenu(int $id): int
+    protected function delMenu(int $id): bool
     {
-        $datas = $this->db->delete($this->table, [
-            'id' => $id,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->deleteFrom($this->table)
+            ->where('id', $id)
+            ->execute();
     }
 
     /**
@@ -198,7 +163,7 @@ class SystemMenuMysql extends AbstractMysql
      */
     protected function getVersion(): string
     {
-        return $this->db->info()['version'];
+        return $this->db->getPdo()->query('SELECT version()')->fetchColumn();
     }
 
 }

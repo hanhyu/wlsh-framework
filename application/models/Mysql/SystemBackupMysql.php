@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property array getTables
@@ -19,7 +19,7 @@ use RuntimeException;
  * Date: 18-12-4
  * Time: 上午10:13
  */
-class SystemBackupMysql extends AbstractMysql
+class SystemBackupMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_backup';
 
@@ -29,11 +29,7 @@ class SystemBackupMysql extends AbstractMysql
      */
     protected function getTables(): array
     {
-        $datas = $this->db->query('show  tables')->fetchAll();
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->getPdo()->query('show tables')->fetchAll();
     }
 
     /**
@@ -42,19 +38,18 @@ class SystemBackupMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setBackup(array $data): int
     {
-        $datas = $this->db->insert($this->table, [
-            'file_name' => $data['filename'],
-            'file_size' => $data['size'],
-            'file_md5'  => $data['md5'],
-            'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'file_name' => $data['filename'],
+                'file_size' => $data['size'],
+                'file_md5'  => $data['md5'],
+                'crt_dt'    => date('y-m-d H:i:s', $data['rand']),
+            ])
+            ->execute();
     }
 
     /**
@@ -65,52 +60,32 @@ class SystemBackupMysql extends AbstractMysql
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, [
-            'id',
-            'file_name',
-            'file_size',
-            'crt_dt',
-        ], $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->select('id,file_name,file_size,crt_dt', true)
+            ->fetchAll();
     }
 
     /**
      * @param int $id
      *
      * @return array
+     * @throws Exception
      */
     protected function getFileName(int $id): array
     {
-        $datas = $this->db->select($this->table, [
-            'file_name',
-            'file_size',
-            'file_md5',
-        ], [
-            'id' => $id,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->where('id', $id)
+            ->select('file_name,file_size，file_md5', true)
+            ->fetch();
     }
 
     /**
@@ -120,26 +95,24 @@ class SystemBackupMysql extends AbstractMysql
      *
      * @param int $id
      *
-     * @return int
+     * @return bool
+     * @throws Exception
      */
-    protected function delBackup(int $id): int
+    protected function delBackup(int $id): bool
     {
-        $datas = $this->db->delete($this->table, [
-            'id' => $id,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->deleteFrom($this->table, $id)->execute();
     }
 
+    /**
+     * User: hanhyu
+     * Date: 2021/1/24
+     * Time: 上午10:09
+     * @return int
+     * @throws Exception
+     */
     protected function getListCount(): int
     {
-        $datas = $this->db->count($this->table);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$datas;
+        return $this->db->from($this->table)->count();
     }
 
 }

@@ -28,18 +28,6 @@ class ProducerConfig extends CommonConfig
     protected $brokers;
 
     /**
-     * @var string
-     */
-    protected $bootstrapServer;
-
-    /**
-     * Auto update brokers.
-     *
-     * @var bool
-     */
-    protected $updateBrokers = true;
-
-    /**
      * The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments, 1 for only the leader and -1 for the full ISR.
      *
      * @var int
@@ -60,6 +48,11 @@ class ProducerConfig extends CommonConfig
      * @var int
      */
     protected $partitionLeaderEpoch = -1;
+
+    /**
+     * @var bool
+     */
+    protected $autoCreateTopic = true;
 
     public function getClient(): ?string
     {
@@ -91,18 +84,6 @@ class ProducerConfig extends CommonConfig
         return $this;
     }
 
-    public function getBootstrapServer(): string
-    {
-        return $this->bootstrapServer;
-    }
-
-    public function setBootstrapServer(string $bootstrapServer): self
-    {
-        $this->bootstrapServer = $bootstrapServer;
-
-        return $this;
-    }
-
     public function getSocket(): ?string
     {
         return $this->socket;
@@ -111,18 +92,6 @@ class ProducerConfig extends CommonConfig
     public function setSocket(?string $socket): self
     {
         $this->socket = $socket;
-
-        return $this;
-    }
-
-    public function getUpdateBrokers(): bool
-    {
-        return $this->updateBrokers;
-    }
-
-    public function setUpdateBrokers(bool $updateBrokers): self
-    {
-        $this->updateBrokers = $updateBrokers;
 
         return $this;
     }
@@ -171,6 +140,18 @@ class ProducerConfig extends CommonConfig
     public function setPartitionLeaderEpoch(int $partitionLeaderEpoch): self
     {
         $this->partitionLeaderEpoch = $partitionLeaderEpoch;
+
+        return $this;
+    }
+
+    public function getAutoCreateTopic(): bool
+    {
+        return $this->autoCreateTopic;
+    }
+
+    public function setAutoCreateTopic(bool $autoCreateTopic): self
+    {
+        $this->autoCreateTopic = $autoCreateTopic;
 
         return $this;
     }

@@ -108,10 +108,10 @@ new Vue({
                 .then(function (response) {
                     switch (response.data.code) {
                         case 200:
-                            let id = response.data.data[0].id;
-                            let name = response.data.data[0].name;
-                            let status = response.data.data[0].status;
-                            let remark = response.data.data[0].remark;
+                            let id = response.data.data.id;
+                            let name = response.data.data.name;
+                            let status = response.data.data.status;
+                            let remark = response.data.data.remark;
                             x_admin_show('编辑', "user_edit.html?id=" + id + "&name=" + name + "&status=" + status + "&remark=" + remark, 600, 400);
                             break;
                         case 300:

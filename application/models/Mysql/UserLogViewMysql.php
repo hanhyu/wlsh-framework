@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property array getList
@@ -16,7 +16,7 @@ use RuntimeException;
  * Time: 上午10:09
  *
  */
-class UserLogViewMysql extends AbstractMysql
+class UserLogViewMysql extends AbstractPdo
 {
     protected string $table = 'user_log_view';
 
@@ -25,34 +25,18 @@ class UserLogViewMysql extends AbstractMysql
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, [
-            'id',
-            'user_name',
-            'login_dt',
-            'logout_dt',
-            'login_ip',
-        ],
-            $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->select('id,user_name,login_dt,logout_dt,login_ip')
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
 
     /**
@@ -63,14 +47,11 @@ class UserLogViewMysql extends AbstractMysql
      * @param array $where
      *
      * @return int
+     * @throws Exception
      */
     protected function getListCount(array $where): int
     {
-        $datas = $this->db->count($this->table, $where);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->where($where)->count();
     }
 
 }

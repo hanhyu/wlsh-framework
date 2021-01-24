@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use App\Library\DI;
-use App\Library\ProgramException;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property int         setUser
@@ -27,7 +25,7 @@ use RuntimeException;
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class SystemUserMysql extends AbstractMysql
+class SystemUserMysql extends AbstractPdo
 {
     //protected static string $db_schema = 'mysql_user_obj';
     protected string $table = 'frame_system_user';
@@ -36,48 +34,36 @@ class SystemUserMysql extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function setUser(array $post): int
     {
-        $datas = $this->db->insert($this->table, [
-            'name'   => $post['name'],
-            'pwd'    => password_hash($post['pwd'], PASSWORD_DEFAULT),
-            'status' => 10,
-            'crt_dt' => date('y-m-d H:i:s'),
-            'remark' => $post['remark'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'name'   => $post['name'],
+                'pwd'    => password_hash($post['pwd'], PASSWORD_DEFAULT),
+                'status' => 10,
+                'crt_dt' => date('y-m-d H:i:s'),
+                'remark' => $post['remark'],
+            ])
+            ->execute();
     }
 
     /**
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getUserList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, '*', $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
 
     /**
@@ -85,68 +71,51 @@ class SystemUserMysql extends AbstractMysql
      * Date: 19-6-16
      * Time: 下午9:00
      * @return int
+     * @throws Exception
+     * @todo mysql count 性能下降100倍
      */
     protected function getListCount(): int
     {
-        //todo mysql count 性能下降100倍
-        $datas = $this->db->count($this->table);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->count();
     }
 
     /**
      * @param int $id
      *
-     * @return int
+     * @return bool
+     * @throws Exception
      */
-    protected function delUser(int $id): int
+    protected function delUser(int $id): bool
     {
-        $datas = $data = $this->db->delete($this->table, [
-            'id' => $id,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $data->rowCount();
+        return $this->db->deleteFrom($this->table)->where('id', $id)->execute();
     }
 
     /**
      * @param int $id
      *
      * @return array
+     * @throws Exception
      */
     protected function getUser(int $id): array
     {
-        $datas = $this->db->select($this->table, [
-            'id',
-            'status',
-            'remark',
-        ], ['id' => $id]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->where('id', $id)
+            ->select('id,status,remark', true)
+            ->fetch();
     }
 
     /**
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function editUser(array $post): int
     {
-        $datas = $this->db->update($this->table, [
-            'status' => $post['status'],
-            'remark' => $post['remark'],
-        ], [
-            'id' => (int)$post['id'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set(['status' => $post['status'], 'remark' => $post['remark']])
+            ->where('id', $post['id'])
+            ->execute();
     }
 
     /**
@@ -155,21 +124,14 @@ class SystemUserMysql extends AbstractMysql
      * @param string $name 用户名
      *
      * @return array ['id','name','status','pwd']
+     * @throws Exception
      */
     protected function getInfo(string $name): array
     {
-        $datas = $this->db->select($this->table, [
-            'id',
-            'name',
-            'status',
-            'pwd',
-        ], [
-            'name' => $name,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->where(['name' => $name])
+            ->select('id,name,status,pwd', true)
+            ->fetch();
     }
 
     /**
@@ -180,24 +142,22 @@ class SystemUserMysql extends AbstractMysql
      * @param array $uid
      *
      * @return array
+     * @throws Exception
      */
     protected function getNameById(array $uid): array
     {
-        $datas = $this->db->select($this->table, [
-            'id',
-            'name',
-        ], [
-            'id' => $uid,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)
+            ->where('id', $uid)
+            ->select('id,name', true)
+            ->fetchAll();
     }
 
     protected function testNameById(int $id): ?string
     {
-        return $this->db->get($this->table, 'name', ['id' => $id]);
+        return $this->db->from($this->table)
+            ->where('id', $id)
+            ->select('name', true)
+            ->fetch();
     }
 
     /**
@@ -209,10 +169,14 @@ class SystemUserMysql extends AbstractMysql
      * @param int $uid
      *
      * @return string|null
+     * @throws Exception
      */
     protected function getPwdByUid(int $uid): ?string
     {
-        return $this->db->get($this->table, 'pwd', ['id' => $uid]);
+        return $this->db->from($this->table)
+            ->where('id', $uid)
+            ->select('pwd', true)
+            ->fetch();
     }
 
     /**
@@ -224,18 +188,14 @@ class SystemUserMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function editPwd(array $data): int
     {
-        $datas = $this->db->update($this->table, [
-            'pwd' => password_hash($data['new_pwd'], PASSWORD_DEFAULT),
-        ], [
-            'id' => $data['uid'],
-        ]);
-        if ($datas === false) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set(['pwd' => password_hash($data['new_pwd'], PASSWORD_DEFAULT)])
+            ->where('id', $data['uid'])
+            ->execute();
     }
 
     /**
@@ -247,10 +207,16 @@ class SystemUserMysql extends AbstractMysql
      * @param string $name
      *
      * @return bool
+     * @throws Exception
      */
     protected function existName(string $name): bool
     {
-        return $this->db->has($this->table, ['name' => $name]);
+        $id = $this->db->from($this->table)
+            ->where(['name' => $name])
+            ->select('id', true)
+            ->fetch();
+
+        return $id !== false;
     }
 
 

@@ -6,7 +6,6 @@ namespace App\Library;
 use PDO;
 use PDOException;
 use Swoole\Coroutine\Channel;
-use Medoo\Medoo;
 
 /**
  * Created by PhpStorm.
@@ -49,9 +48,9 @@ class PdoPool
 
     /**
      * 获取mysql连接，如池子内有连接就取一个，连接不够则新建一个。
-     * @return Medoo
+     * @return PDO
      */
-    public function get(): Medoo
+    public function get(): PDO
     {
         $db = $this->ch->pop(3);
         /**
@@ -80,7 +79,7 @@ class PdoPool
         return $db;
     }
 
-    public function put(Medoo $db): void
+    public function put(PDO $db): void
     {
         $this->ch->push($db);
     }
@@ -89,24 +88,16 @@ class PdoPool
      * UserDomain: hanhyu
      * Date: 19-7-5
      * Time: 上午10:52
-     * @return Medoo
+     * @return PDO
      */
-    public function connect(): Medoo
+    public function connect(): PDO
     {
         try {
-            $db = new Medoo([
-                'database_type' => $this->config['driver'],
-                'database_name' => $this->config['database'],
-                'server'        => $this->config['host'],
-                'port'          => $this->config['port'],
-                //'socket' => '/var/run/mysqld/mysqld.sock',
-                'username'      => $this->config['username'],
-                'password'      => $this->config['password'],
-                'charset'       => $this->config['charset'],
-                'prefix'        => $this->config['prefix'],
-                //此参数在连接池功能中必须设置为false，否则会造成内存泄露。
-                'logging'       => false,
-                'option'        => [
+            return new PDO(
+                "{$this->config['driver']}:dbname={$this->config['database']};host={$this->config['host']};port={$this->config['port']};charset={$this->config['charset']}",
+                $this->config['username'] ?? null,
+                $this->config['password'] ?? null,
+                [
                     PDO::ATTR_CASE                     => PDO::CASE_NATURAL,
                     PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
@@ -116,16 +107,11 @@ class PdoPool
                     PDO::ATTR_STRINGIFY_FETCHES        => false,
                     //PDO::ATTR_PERSISTENT               => true,
                     PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES 'utf8';",
-                ],
-                'command'       => [
-                    'SET SQL_MODE=ANSI_QUOTES',
-                ],
-            ]);
+                ]
+            );
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage());
         }
-
-        return $db;
     }
 
     /**

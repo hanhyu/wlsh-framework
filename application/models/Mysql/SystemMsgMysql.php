@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property int   setMsg
@@ -17,7 +17,7 @@ use RuntimeException;
  * Date: 19-2-1
  * Time: 下午5:58
  */
-class SystemMsgMysql extends AbstractMysql
+class SystemMsgMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_msg';
 
@@ -27,18 +27,17 @@ class SystemMsgMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setMsg(array $data): int
     {
-        $datas = $this->db->insert($this->table, [
-            'content' => $data['content'],
-            'crt_dt'  => $data['crt_dt'],
-            'upt_id'  => $data['id'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'content' => $data['content'],
+                'crt_dt'  => $data['crt_dt'],
+                'upt_id'  => $data['id'],
+            ])
+            ->execute();
     }
 
     /**
@@ -47,53 +46,35 @@ class SystemMsgMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setLogoutLog(array $data): int
     {
-        $datas = $this->db->update($this->table, [
-            'logout_dt' => date('Y-m-d H:i:s'),
-        ], [
-            'user_id'  => (int)$data['id'],
-            'login_dt' => date('Y-m-d H:i:s', $data['time']),
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set('logout_dt', date('Y-m-d H:i:s'))
+            ->where([
+                'user_id'  => (int)$data['id'],
+                'login_dt' => date('Y-m-d H:i:s', $data['time']),
+            ])
+            ->execute();
     }
 
     /**
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, [
-            'id',
-            'content',
-            'crt_dt',
-            'upt_dt',
-            'upt_id',
-        ],
-            $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->select('id,content,crt_dt,upt_dt,upt_id', true)
+            ->fetch();
     }
 
     /**
@@ -104,14 +85,11 @@ class SystemMsgMysql extends AbstractMysql
      * @param array $where
      *
      * @return int
+     * @throws Exception
      */
     protected function getListCount(array $where): int
     {
-        $datas = $this->db->count($this->table, $where);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->where($where)->count();
     }
 
 }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property array getList
@@ -17,7 +17,7 @@ use RuntimeException;
  * Class SystemRouterModel
  * @package App\Models\Mysql
  */
-class SystemRouterMysql extends AbstractMysql
+class SystemRouterMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_router';
 
@@ -27,39 +27,28 @@ class SystemRouterMysql extends AbstractMysql
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, ['[>]frame_system_menu' => ['menu_id' => "id"]],
-            [
-                'frame_system_router.id(id)',
-                'frame_system_router.name(name)',
-                'frame_system_router.url(url)',
-                'frame_system_router.auth(auth)',
-                'frame_system_router.method(method)',
-                'frame_system_router.action(action)',
-                'frame_system_router.type(type)',
-                'frame_system_router.menu_id(menu_id)',
-                'frame_system_router.comment(comment)',
-                'frame_system_menu.name(menu_name)',
-            ], $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from("{$this->table} r")
+            ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
+            ->select([
+                'r.id AS id',
+                'r.name AS name',
+                'r.url AS url',
+                'r.auth AS auth',
+                'r.method AS method',
+                'r.action AS action',
+                'r.type AS type',
+                'r.menu_id AS menu_id',
+                'r.comment AS comment',
+                'm.name AS menu_name',
+            ], true)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
 
     /**
@@ -67,14 +56,11 @@ class SystemRouterMysql extends AbstractMysql
      * Date: 19-6-16
      * Time: 下午8:55
      * @return int
+     * @throws Exception
      */
     protected function getListCount(): int
     {
-        $datas = $this->db->count($this->table);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->count();
     }
 
 
@@ -87,23 +73,22 @@ class SystemRouterMysql extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function setRouter(array $post): int
     {
-        $datas = $this->db->insert($this->table, [
-            'name'    => $post['name'],
-            'url'     => $post['url'],
-            'auth'    => $post['auth'],
-            'method'  => $post['method'],
-            'action'  => $post['action'],
-            'type'    => (int)$post['type'],
-            'menu_id' => (int)$post['menu_id'],
-            'comment' => $post['comment'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'name'    => $post['name'],
+                'url'     => $post['url'],
+                'auth'    => $post['auth'],
+                'method'  => $post['method'],
+                'action'  => $post['action'],
+                'type'    => (int)$post['type'],
+                'menu_id' => (int)$post['menu_id'],
+                'comment' => $post['comment'],
+            ])
+            ->execute();
     }
 
     /**
@@ -112,25 +97,23 @@ class SystemRouterMysql extends AbstractMysql
      * @param array $post
      *
      * @return int
+     * @throws Exception
      */
     protected function editRouter(array $post): int
     {
-        $datas = $this->db->update($this->table, [
-            'name'    => $post['name'],
-            'url'     => $post['url'],
-            'auth'    => (int)$post['auth'],
-            'method'  => $post['method'],
-            'action'  => $post['action'],
-            'type'    => (int)$post['type'],
-            'menu_id' => (int)$post['menu_id'],
-            'comment' => $post['comment'],
-        ], [
-            'id' => (int)$post['id'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set([
+                'name'    => $post['name'],
+                'url'     => $post['url'],
+                'auth'    => (int)$post['auth'],
+                'method'  => $post['method'],
+                'action'  => $post['action'],
+                'type'    => (int)$post['type'],
+                'menu_id' => (int)$post['menu_id'],
+                'comment' => $post['comment'],
+            ])
+            ->where('id', $post['id'])
+            ->execute();
     }
 
     /**
@@ -138,17 +121,12 @@ class SystemRouterMysql extends AbstractMysql
      *
      * @param int $id
      *
-     * @return int
+     * @return bool
+     * @throws Exception
      */
-    protected function delRouter(int $id): int
+    protected function delRouter(int $id): bool
     {
-        $datas = $this->db->delete($this->table, [
-            'id' => $id,
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->deleteFrom($this->table, $id)->execute();
     }
 
     /**
@@ -156,20 +134,19 @@ class SystemRouterMysql extends AbstractMysql
      * Date: 19-6-16
      * Time: 下午8:58
      * @return array
+     * @throws Exception
      */
     protected function getInfo(): array
     {
-        $datas = $this->db->select($this->table, ['[>]frame_system_menu' => ['menu_id' => 'id']],
-            [
-                'frame_system_router.id(id)',
-                'frame_system_router.name(name)',
-                'frame_system_router.comment(comment)',
-                'frame_system_menu.name(menu_name)',
-            ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from("{$this->table} r")
+            ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
+            ->select([
+                'r.id AS id',
+                'r.name AS name',
+                'r.comment AS comment',
+                'm.name AS menu_name',
+            ])
+            ->fetchAll();
     }
 
 }

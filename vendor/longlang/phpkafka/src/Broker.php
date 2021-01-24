@@ -9,7 +9,9 @@ use longlang\phpkafka\Client\ClientInterface;
 use longlang\phpkafka\Consumer\ConsumerConfig;
 use longlang\phpkafka\Producer\ProducerConfig;
 use longlang\phpkafka\Protocol\Metadata\MetadataRequest;
+use longlang\phpkafka\Protocol\Metadata\MetadataRequestTopic;
 use longlang\phpkafka\Protocol\Metadata\MetadataResponse;
+use longlang\phpkafka\Protocol\Metadata\MetadataResponseTopic;
 use longlang\phpkafka\Util\KafkaUtil;
 
 class Broker
@@ -29,6 +31,11 @@ class Broker
      */
     protected $clients = [];
 
+    /**
+     * @var MetadataResponseTopic[]
+     */
+    protected $topicsMeta;
+
     public function __construct($config)
     {
         $this->config = $config;
@@ -45,18 +52,25 @@ class Broker
     public function updateBrokers()
     {
         $config = $this->config;
-        $url = parse_url($config->getBootstrapServer());
+
+        $url = null;
+        if ($config instanceof ConsumerConfig) {
+            $url = parse_url(explode(',', $config->getBroker())[0]);
+        }
         if (!$url) {
-            throw new InvalidArgumentException(sprintf('Invalid bootstrapServer %s', $config->getBootstrapServer()));
+            $bootstrapServers = $config->getBootstrapServers();
+            $url = parse_url($bootstrapServers[array_rand($bootstrapServers)]);
+        }
+
+        if (!$url) {
+            throw new InvalidArgumentException(sprintf('Invalid bootstrapServer'));
         }
 
         $clientClass = KafkaUtil::getClientClass($config->getClient());
         /** @var ClientInterface $client */
         $client = new $clientClass($url['host'], $url['port'] ?? 9092, $config, KafkaUtil::getSocketClass($config->getSocket()));
         $client->connect();
-        $request = new MetadataRequest();
-        /** @var MetadataResponse $response */
-        $response = $client->sendRecv($request);
+        $response = $this->updateMetadata([], $client);
         $client->close();
 
         $brokers = [];
@@ -66,36 +80,53 @@ class Broker
         $this->setBrokers($brokers);
     }
 
-    public function getClient(?int $brokerId = null): ClientInterface
+    public function updateMetadata(array $topics = [], ?ClientInterface $client = null): MetadataResponse
     {
-        if (null === $brokerId) {
-            return $this->getRandomClient();
-        } elseif (isset($this->brokers[$brokerId])) {
-            return $this->brokers[$brokerId];
-        } else {
-            throw new InvalidArgumentException(sprintf('Not found brokerId %s', $brokerId));
-        }
-    }
-
-    public function getRandomClient(): ClientInterface
-    {
-        $brokers = $this->getBrokers();
-        $index = array_rand($brokers, 1);
-        $url = parse_url($brokers[$index]);
-        if (!$url) {
-            throw new InvalidArgumentException(sprintf('Invalid bootstrapServer %s', $brokers[$index]));
+        if (null === $client) {
+            $client = $this->getClient();
         }
         $config = $this->config;
-        if (!isset($this->clients[$index])) {
+        $request = new MetadataRequest();
+        $topicsArray = [];
+        foreach ($topics as $topic) {
+            $topicsArray[] = (new MetadataRequestTopic())->setName($topic);
+        }
+        $request->setTopics($topicsArray ?: null);
+        $request->setAllowAutoTopicCreation($config->getAutoCreateTopic());
+        /** @var MetadataResponse $response */
+        $response = $client->sendRecv($request);
+        $this->topicsMeta = $response->getTopics();
+
+        return $response;
+    }
+
+    public function getClient(?int $brokerId = null): ClientInterface
+    {
+        return $this->getClientByBrokerId($brokerId ?? array_rand($this->brokers, 1));
+    }
+
+    public function getClientByBrokerId(int $brokerId): ClientInterface
+    {
+        if (!isset($this->brokers[$brokerId])) {
+            throw new InvalidArgumentException(sprintf('Not found brokerId %s', $brokerId));
+        }
+
+        $url = parse_url($this->brokers[$brokerId]);
+        if (!$url) {
+            throw new InvalidArgumentException(sprintf('Invalid bootstrapServer %s', $this->brokers[$brokerId]));
+        }
+
+        $config = $this->config;
+        if (!isset($this->clients[$brokerId])) {
             $clientClass = KafkaUtil::getClientClass($config->getClient());
 
             /** @var ClientInterface $client */
             $client = new $clientClass($url['host'], $url['port'] ?? 9092, $config, KafkaUtil::getSocketClass($config->getSocket()));
             $client->connect();
-            $this->clients[$index] = $client;
+            $this->clients[$brokerId] = $client;
         }
 
-        return $this->clients[$index];
+        return $this->clients[$brokerId];
     }
 
     /**
@@ -123,10 +154,18 @@ class Broker
     }
 
     /**
-     * @return ProducerConfig
+     * @return @var ProducerConfig|ConsumerConfig
      */
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * @return MetadataResponseTopic[]
+     */
+    public function getTopicsMeta(): array
+    {
+        return $this->topicsMeta;
     }
 }

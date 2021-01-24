@@ -1,0 +1,45 @@
+{
+	"name": "chdemko/sorted-collections",
+	"type": "library",
+	"description": "Sorted Collections for PHP >= 5.5",
+	"keywords": ["collection","set","tree","map","sorted","ordered","iterator","treeset","treemap","avl"],
+	"homepage": "https://php-sorted-collections.readthedocs.io/en/latest/?badge=latest",
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Christophe Demko",
+			"email": "chdemko@gmail.com",
+			"homepage": "http://chdemko.com",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.5.0"
+	},
+	"require-dev": {
+		"php-coveralls/php-coveralls": "^2.0",
+		"joomla/coding-standards": "~2.0@alpha",
+		"phpunit/phpunit": "^7.0",
+		"sphpdox/sphpdox": "dev-master",
+		"phpbench/phpbench": "^1.0@dev"
+	},
+	"autoload": {
+		"psr-4": {
+			"chdemko\\SortedCollection\\": "src/SortedCollection"
+		}
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
+		}
+	},
+	"scripts": {
+		"style": "vendor/bin/phpcs --report=full --extensions=php --standard=ruleset.xml src tests examples benchmarks",
+		"test": "vendor/bin/phpunit",
+		"doc": [
+			"vendor/bin/sphpdox process --output docs chdemko src",
+			"sphinx-build -b html docs/ html/"
+		],
+		"benchmark": "vendor/bin/phpbench run --report=default"
+	}
+}

@@ -9,6 +9,7 @@ use App\Library\ProgramException;
 use App\Models\Forms\SystemUserForms;
 use App\Library\ValidateException;
 use JsonException;
+use phpDocumentor\Reflection\Exception\PcreException;
 
 /**
  * Created by PhpStorm.
@@ -105,7 +106,7 @@ class UserController
      * @throws ProgramException
      * @throws ValidateException|JsonException
      */
-    #[Router(method: 'GET', auth: true)]
+    #[Router(method: 'PUT', auth: true)]
     public function editUserAction(): string
     {
         $data = $this->validator(SystemUserForms::$editUser);
@@ -128,11 +129,11 @@ class UserController
         $data = $this->validator(SystemUserForms::$userLogin);
         $info = $this->user->getInfoByName($data['name']);
         if (!empty($info)) {
-            if ($info[0]['status'] === 0) {
+            if ($info['status'] === 0) {
                 $resp_content = http_response(400, '该用户处于禁用状态');
-            } else if (password_verify($data['pwd'], $info[0]['pwd'])) {
-                $params['id']   = $info[0]['id'];
-                $params['name'] = $info[0]['name'];
+            } else if (password_verify($data['pwd'], $info['pwd'])) {
+                $params['id']   = $info['id'];
+                $params['name'] = $info['name'];
                 $params['time'] = time();
                 $token          = get_token($params);
                 //$this->response->cookie('token', $token);

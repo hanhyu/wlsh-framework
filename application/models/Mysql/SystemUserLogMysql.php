@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Models\Mysql;
 
-use App\Library\AbstractMysql;
-use RuntimeException;
+use App\Library\AbstractPdo;
+use Envms\FluentPDO\Exception;
 
 /**
  * @property int   setLogingLog
@@ -17,7 +17,7 @@ use RuntimeException;
  * Date: 18-9-26
  * Time: 下午3:09
  */
-class SystemUserLogMysql extends AbstractMysql
+class SystemUserLogMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_user_log';
 
@@ -27,18 +27,17 @@ class SystemUserLogMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setLoginLog(array $data): int
     {
-        $datas = $this->db->insert($this->table, [
-            'user_id'  => $data['id'],
-            'login_dt' => date('Y-m-d H:i:s', $data['time']),
-            'login_ip' => $data['ip'],
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return (int)$this->db->id();
+        return (int)$this->db->insertInto($this->table)
+            ->values([
+                'user_id'  => $data['id'],
+                'login_dt' => date('Y-m-d H:i:s', $data['time']),
+                'login_ip' => $data['ip'],
+            ])
+            ->execute();
     }
 
     /**
@@ -47,54 +46,35 @@ class SystemUserLogMysql extends AbstractMysql
      * @param array $data
      *
      * @return int
+     * @throws Exception
      */
     protected function setLogoutLog(array $data): int
     {
-        $datas = $this->db->update($this->table, [
-            'logout_dt' => date('Y-m-d H:i:s'),
-        ], [
-            'user_id'  => (int)$data['id'],
-            'login_dt' => date('Y-m-d H:i:s', $data['time']),
-        ]);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas->rowCount();
+        return $this->db->update($this->table)
+            ->set(['logout_dt' => date('Y-m-d H:i:s')])
+            ->where([
+                'user_id'  => (int)$data['id'],
+                'login_dt' => date('Y-m-d H:i:s', $data['time']),
+            ])
+            ->execute();
     }
 
     /**
      * @param array $data
      *
      * @return array
+     * @throws Exception
      */
     protected function getList(array $data): array
     {
-        if (!empty($data['where'])) {
-            $wheres = [
-                'AND'   => $data['where'],
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        } else {
-            $wheres = [
-                'ORDER' => ['id' => 'DESC'],
-                'LIMIT' => [$data['curr_data'], $data['page_size']],
-            ];
-        }
-
-        $datas = $this->db->select($this->table, [
-            'id',
-            'user_id',
-            'login_dt',
-            'logout_dt',
-            'login_ip',
-            //'login_ip'=>\Medoo\Medoo::raw('INET_NTOA(<login_ip>)'),
-        ],
-            $wheres);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return $this->db->from($this->table)
+            ->where($wheres)
+            ->select('id,user_id,login_dt,logout_dt,login_ip', true)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
 
     /**
@@ -105,14 +85,11 @@ class SystemUserLogMysql extends AbstractMysql
      * @param array $where
      *
      * @return int
+     * @throws Exception
      */
     protected function getListCount(array $where): int
     {
-        $datas = $this->db->count($this->table, $where);
-        if (false === $datas) {
-            throw new RuntimeException($this->db->last());
-        }
-        return $datas;
+        return $this->db->from($this->table)->where($where)->count();
     }
 
 }

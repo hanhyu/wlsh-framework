@@ -27,8 +27,6 @@ class RouterDomain
             $data['curr_data'] = 0;
         }
 
-        $data['where'] = [];
-
         $res['count'] = SystemRouterMysql::getInstance()->getListCount();
         $res['list']  = SystemRouterMysql::getInstance()->getList($data);
 
