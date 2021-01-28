@@ -13,7 +13,7 @@ use App\Models\Redis\UserRedis;
 
 class LoginDomain
 {
-    public function getKey(string $key): ?string
+    public function getKey(string $key): bool|string
     {
         return LoginRedis::getInstance()->getKey($key);
     }

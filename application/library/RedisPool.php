@@ -75,9 +75,9 @@ class RedisPool
         */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
-        /* defer(function () use ($db) {
-             $this->ch->push($db);
-         });*/
+        defer(function () use ($db) {
+            $this->ch->push($db);
+        });
 
         return $db;
     }

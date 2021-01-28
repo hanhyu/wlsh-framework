@@ -680,6 +680,7 @@ class LoginController
     public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
+        //throw new ProgramException('get user info');
         if ($res) {
             return http_response(200, '', $res);
         }

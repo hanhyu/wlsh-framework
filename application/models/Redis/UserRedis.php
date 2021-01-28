@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace App\Models\Redis;
 
 use App\Library\AbstractRedis;
+use RedisException;
 
 /**
- * @property null|string getKey
- * @property bool        existToken
  *
  * Created by PhpStorm.
  * UserDomain: hanhyu
@@ -20,7 +19,7 @@ class UserRedis extends AbstractRedis
      * 此处使用静态延迟绑定，实现选择不同的数据库,如不设置默认为0
      * @var int
      */
-    protected static int $dbindex = 6;
+    protected static int $db_index = 6;
 
     /**
      * UserDomain: hanhyu
@@ -29,24 +28,17 @@ class UserRedis extends AbstractRedis
      *
      * @param string $key
      *
-     * @return string|null
+     * @return bool|string
+     * @throws RedisException
      */
-    protected function getKey(string $key): ?string
+    public function getKey(string $key): bool|string
     {
-        $datas = $this->db->get($key);
-        if (false === $datas) {
-            $datas = null;
-        }
-        return $datas;
+        return $this->getDb()->get($key);
     }
 
-    protected function existToken(array $data): ?bool
+    public function existToken(array $data): bool
     {
-        $datas = $this->db->sIsMember("user_id:{$data['uid']}", $data['token']);
-        if (false === $datas) {
-            $datas = null;
-        }
-        return $datas;
+        return $this->getDb()->sIsMember("user_id:{$data['uid']}", $data['token']);
     }
 
 }

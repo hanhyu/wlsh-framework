@@ -4,18 +4,9 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
-use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
- * @property  array  $getMenuList
- * @property  int    $getListCount
- * @property  array  $getMenuInfo
- * @property  int    $setMenu
- * @property  array  $getMenu
- * @property  int    $editMenu
- * @property  int    $delMenu
- * @property  string $getVersion
  *
  * Created by PhpStorm.
  * User: hanhyu
@@ -34,10 +25,10 @@ class SystemMenuMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getMenuList(array $data): array
+    public function getMenuList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -52,9 +43,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function getListCount(): int
+    public function getListCount(): int
     {
-        return $this->db->from($this->table)->count();
+        return $this->getDb()->from($this->table)->count();
     }
 
     /**
@@ -66,9 +57,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getMenuInfo(): array
+    public function getMenuInfo(): array
     {
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->select('id,name,icon,url,up_id,level', true)
             ->fetchAll();
     }
@@ -81,9 +72,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function setMenu(array $post): int
+    public function setMenu(array $post): int
     {
-        return (int)$this->db->insertInto($this->table)
+        return (int)$this->getDb()->insertInto($this->table)
             ->values([
                 'name'  => $post['name'],
                 'icon'  => $post['icon'],
@@ -104,9 +95,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getMenu(int $id): array
+    public function getMenu(int $id): array
     {
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->where('id', $id)
             ->select('id,name,icon,url,up_id', true)
             ->fetchAll();
@@ -122,9 +113,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function editMenu(array $post): int
+    public function editMenu(array $post): int
     {
-        return $this->db->update($this->table)
+        return $this->getDb()->update($this->table)
             ->set([
                 'name'  => $post['name'],
                 'icon'  => $post['icon'],
@@ -146,9 +137,9 @@ class SystemMenuMysql extends AbstractPdo
      * @return bool
      * @throws Exception
      */
-    protected function delMenu(int $id): bool
+    public function delMenu(int $id): bool
     {
-        return $this->db->deleteFrom($this->table)
+        return $this->getDb()->deleteFrom($this->table)
             ->where('id', $id)
             ->execute();
     }
@@ -161,9 +152,9 @@ class SystemMenuMysql extends AbstractPdo
      * Time: 下午10:50
      * @return string
      */
-    protected function getVersion(): string
+    public function getVersion(): string
     {
-        return $this->db->getPdo()->query('SELECT version()')->fetchColumn();
+        return $this->getDb()->getPdo()->query('SELECT version()')->fetchColumn();
     }
 
 }

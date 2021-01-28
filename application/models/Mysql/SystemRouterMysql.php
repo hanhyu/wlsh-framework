@@ -7,12 +7,6 @@ use App\Library\AbstractPdo;
 use Envms\FluentPDO\Exception;
 
 /**
- * @property array getList
- * @property int   getListCount
- * @property int   setRouter
- * @property int   editRouter
- * @property int   delRouter
- * @property array getInfo
  *
  * Class SystemRouterModel
  * @package App\Models\Mysql
@@ -29,9 +23,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
-        return $this->db->from("{$this->table} r")
+        return $this->getDb()->from("{$this->table} r")
             ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
             ->select([
                 'r.id AS id',
@@ -58,9 +52,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function getListCount(): int
+    public function getListCount(): int
     {
-        return $this->db->from($this->table)->count();
+        return $this->getDb()->from($this->table)->count();
     }
 
 
@@ -75,9 +69,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function setRouter(array $post): int
+    public function setRouter(array $post): int
     {
-        return (int)$this->db->insertInto($this->table)
+        return (int)$this->getDb()->insertInto($this->table)
             ->values([
                 'name'    => $post['name'],
                 'url'     => $post['url'],
@@ -99,9 +93,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function editRouter(array $post): int
+    public function editRouter(array $post): int
     {
-        return $this->db->update($this->table)
+        return $this->getDb()->update($this->table)
             ->set([
                 'name'    => $post['name'],
                 'url'     => $post['url'],
@@ -124,9 +118,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return bool
      * @throws Exception
      */
-    protected function delRouter(int $id): bool
+    public function delRouter(int $id): bool
     {
-        return $this->db->deleteFrom($this->table, $id)->execute();
+        return $this->getDb()->deleteFrom($this->table, $id)->execute();
     }
 
     /**
@@ -136,9 +130,9 @@ class SystemRouterMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getInfo(): array
+    public function getInfo(): array
     {
-        return $this->db->from("{$this->table} r")
+        return $this->getDb()->from("{$this->table} r")
             ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
             ->select([
                 'r.id AS id',

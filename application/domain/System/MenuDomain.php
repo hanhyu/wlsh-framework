@@ -71,7 +71,7 @@ class MenuDomain
         return SystemMenuMysql::getInstance()->delMenu($id);
     }
 
-    public function getRedis(string $key): ?string
+    public function getRedis(string $key): bool|string
     {
         return LoginRedis::getInstance()->getKey($key);
     }

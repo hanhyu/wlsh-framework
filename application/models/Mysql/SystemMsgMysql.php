@@ -7,10 +7,6 @@ use App\Library\AbstractPdo;
 use Envms\FluentPDO\Exception;
 
 /**
- * @property int   setMsg
- * @property int   setLogoutLog
- * @property array getList
- * @property int   getListCount
  *
  * Created by PhpStorm.
  * UserDomain: hanhyu
@@ -29,9 +25,9 @@ class SystemMsgMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function setMsg(array $data): int
+    public function setMsg(array $data): int
     {
-        return (int)$this->db->insertInto($this->table)
+        return (int)$this->getDb()->insertInto($this->table)
             ->values([
                 'content' => $data['content'],
                 'crt_dt'  => $data['crt_dt'],
@@ -48,9 +44,9 @@ class SystemMsgMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function setLogoutLog(array $data): int
+    public function setLogoutLog(array $data): int
     {
-        return $this->db->update($this->table)
+        return $this->getDb()->update($this->table)
             ->set('logout_dt', date('Y-m-d H:i:s'))
             ->where([
                 'user_id'  => (int)$data['id'],
@@ -65,10 +61,10 @@ class SystemMsgMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -87,9 +83,9 @@ class SystemMsgMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function getListCount(array $where): int
+    public function getListCount(array $where): int
     {
-        return $this->db->from($this->table)->where($where)->count();
+        return $this->getDb()->from($this->table)->where($where)->count();
     }
 
 }

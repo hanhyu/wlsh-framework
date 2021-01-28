@@ -7,12 +7,6 @@ use App\Library\AbstractPdo;
 use Envms\FluentPDO\Exception;
 
 /**
- * @property array getTables
- * @property int   setBackup
- * @property array getList
- * @property array getFileName
- * @property int   delBackup
- * @property int   getListCount
  *
  * 数据库备份
  * UserDomain: hanhyu
@@ -27,9 +21,9 @@ class SystemBackupMysql extends AbstractPdo
      * 获取数据库中所有表名
      * @return array
      */
-    protected function getTables(): array
+    public function getTables(): array
     {
-        return $this->db->getPdo()->query('show tables')->fetchAll();
+        return $this->getDb()->getPdo()->query('show tables')->fetchAll();
     }
 
     /**
@@ -40,9 +34,9 @@ class SystemBackupMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function setBackup(array $data): int
+    public function setBackup(array $data): int
     {
-        return (int)$this->db->insertInto($this->table)
+        return (int)$this->getDb()->insertInto($this->table)
             ->values([
                 'file_name' => $data['filename'],
                 'file_size' => $data['size'],
@@ -62,10 +56,10 @@ class SystemBackupMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getList(array $data): array
+    public function getList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -80,9 +74,9 @@ class SystemBackupMysql extends AbstractPdo
      * @return array
      * @throws Exception
      */
-    protected function getFileName(int $id): array
+    public function getFileName(int $id): array
     {
-        return $this->db->from($this->table)
+        return $this->getDb()->from($this->table)
             ->where('id', $id)
             ->select('file_name,file_size，file_md5', true)
             ->fetch();
@@ -98,9 +92,9 @@ class SystemBackupMysql extends AbstractPdo
      * @return bool
      * @throws Exception
      */
-    protected function delBackup(int $id): bool
+    public function delBackup(int $id): bool
     {
-        return $this->db->deleteFrom($this->table, $id)->execute();
+        return $this->getDb()->deleteFrom($this->table, $id)->execute();
     }
 
     /**
@@ -110,9 +104,9 @@ class SystemBackupMysql extends AbstractPdo
      * @return int
      * @throws Exception
      */
-    protected function getListCount(): int
+    public function getListCount(): int
     {
-        return $this->db->from($this->table)->count();
+        return $this->getDb()->from($this->table)->count();
     }
 
 }

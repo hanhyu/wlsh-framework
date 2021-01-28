@@ -72,9 +72,10 @@ class PdoPool
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
         //此处在高并发时会阻塞，需使用put手动快速回收连接对象，
-        /* defer(function () use ($db) {
-             $this->ch->push($db);
-         });*/
+        //只能使用 __call方法或子协程 实现快速回收连接池资源, 此方法不能放在finally中。
+        defer(function () use ($db) {
+            $this->ch->push($db);
+        });
 
         return $db;
     }
