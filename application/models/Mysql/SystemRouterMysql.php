@@ -25,7 +25,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function getList(array $data): array
     {
-        return $this->getDb()->from("{$this->table} r")
+        return self::getDb()->from("{$this->table} r")
             ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
             ->select([
                 'r.id AS id',
@@ -54,7 +54,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function getListCount(): int
     {
-        return $this->getDb()->from($this->table)->count();
+        return self::getDb()->from($this->table)->count();
     }
 
 
@@ -71,7 +71,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function setRouter(array $post): int
     {
-        return (int)$this->getDb()->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'name'    => $post['name'],
                 'url'     => $post['url'],
@@ -95,7 +95,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function editRouter(array $post): int
     {
-        return $this->getDb()->update($this->table)
+        return self::getDb()->update($this->table)
             ->set([
                 'name'    => $post['name'],
                 'url'     => $post['url'],
@@ -120,7 +120,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function delRouter(int $id): bool
     {
-        return $this->getDb()->deleteFrom($this->table, $id)->execute();
+        return self::getDb()->deleteFrom($this->table, $id)->execute();
     }
 
     /**
@@ -132,7 +132,7 @@ class SystemRouterMysql extends AbstractPdo
      */
     public function getInfo(): array
     {
-        return $this->getDb()->from("{$this->table} r")
+        return self::getDb()->from("{$this->table} r")
             ->leftJoin('frame_system_menu m ON r.menu_id=m.id')
             ->select([
                 'r.id AS id',

@@ -27,7 +27,7 @@ class SystemUserLogMysql extends AbstractPdo
      */
     public function setLoginLog(array $data): int
     {
-        return (int)$this->getDb()->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'user_id'  => $data['id'],
                 'login_dt' => date('Y-m-d H:i:s', $data['time']),
@@ -46,7 +46,7 @@ class SystemUserLogMysql extends AbstractPdo
      */
     public function setLogoutLog(array $data): int
     {
-        return $this->getDb()->update($this->table)
+        return self::getDb()->update($this->table)
             ->set(['logout_dt' => date('Y-m-d H:i:s')])
             ->where([
                 'user_id'  => (int)$data['id'],
@@ -64,7 +64,7 @@ class SystemUserLogMysql extends AbstractPdo
     public function getList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where($wheres)
             ->select('id,user_id,login_dt,logout_dt,login_ip', true)
             ->orderBy('id DESC')
@@ -85,7 +85,7 @@ class SystemUserLogMysql extends AbstractPdo
      */
     public function getListCount(array $where): int
     {
-        return $this->getDb()->from($this->table)->where($where)->count();
+        return self::getDb()->from($this->table)->where($where)->count();
     }
 
 }

@@ -33,12 +33,12 @@ class UserRedis extends AbstractRedis
      */
     public function getKey(string $key): bool|string
     {
-        return $this->getDb()->get($key);
+        return self::getDb()->get($key);
     }
 
     public function existToken(array $data): bool
     {
-        return $this->getDb()->sIsMember("user_id:{$data['uid']}", $data['token']);
+        return self::getDb()->sIsMember("user_id:{$data['uid']}", $data['token']);
     }
 
 }

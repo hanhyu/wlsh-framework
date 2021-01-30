@@ -30,7 +30,7 @@ class UserLogViewMysql extends AbstractPdo
     public function getList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where($wheres)
             ->select('id,user_name,login_dt,logout_dt,login_ip')
             ->orderBy('id DESC')
@@ -51,7 +51,7 @@ class UserLogViewMysql extends AbstractPdo
      */
     public function getListCount(array $where): int
     {
-        return $this->getDb()->from($this->table)->where($where)->count();
+        return self::getDb()->from($this->table)->where($where)->count();
     }
 
 }

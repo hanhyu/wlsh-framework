@@ -23,7 +23,7 @@ class PdoPool
     public bool $available;
 
     /**
-     * 每个进程默认生成5个长连接对象,运行中不够则自动扩容
+     * 每个进程默认生成2个长连接对象,运行中不够则自动扩容
      * PdoPool constructor.
      *
      * @param string $db_type  数据库类型：mysql、pgsql等

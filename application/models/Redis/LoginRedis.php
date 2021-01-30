@@ -33,12 +33,12 @@ class LoginRedis extends AbstractRedis
      */
     public function getKey(string $key): bool|string
     {
-        return $this->getDb()->get($key);
+        return self::getDb()->get($key);
     }
 
     public function setKey(string $key, string $value): bool
     {
-        return $this->getDb()->set($key, $value);
+        return self::getDb()->set($key, $value);
     }
 
 }

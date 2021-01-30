@@ -28,7 +28,7 @@ class SystemMenuMysql extends AbstractPdo
     public function getMenuList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -45,7 +45,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function getListCount(): int
     {
-        return $this->getDb()->from($this->table)->count();
+        return self::getDb()->from($this->table)->count();
     }
 
     /**
@@ -59,7 +59,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function getMenuInfo(): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->select('id,name,icon,url,up_id,level', true)
             ->fetchAll();
     }
@@ -74,7 +74,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function setMenu(array $post): int
     {
-        return (int)$this->getDb()->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'name'  => $post['name'],
                 'icon'  => $post['icon'],
@@ -97,7 +97,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function getMenu(int $id): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $id)
             ->select('id,name,icon,url,up_id', true)
             ->fetchAll();
@@ -115,7 +115,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function editMenu(array $post): int
     {
-        return $this->getDb()->update($this->table)
+        return self::getDb()->update($this->table)
             ->set([
                 'name'  => $post['name'],
                 'icon'  => $post['icon'],
@@ -139,7 +139,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function delMenu(int $id): bool
     {
-        return $this->getDb()->deleteFrom($this->table)
+        return self::getDb()->deleteFrom($this->table)
             ->where('id', $id)
             ->execute();
     }
@@ -154,7 +154,7 @@ class SystemMenuMysql extends AbstractPdo
      */
     public function getVersion(): string
     {
-        return $this->getDb()->getPdo()->query('SELECT version()')->fetchColumn();
+        return self::getDb()->getPdo()->query('SELECT version()')->fetchColumn();
     }
 
 }

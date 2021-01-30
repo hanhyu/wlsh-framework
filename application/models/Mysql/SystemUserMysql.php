@@ -25,7 +25,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function setUser(array $post): int
     {
-        return (int)$this->getDb()->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'name'   => $post['name'],
                 'pwd'    => password_hash($post['pwd'], PASSWORD_DEFAULT),
@@ -45,7 +45,7 @@ class SystemUserMysql extends AbstractPdo
     public function getUserList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -63,7 +63,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getListCount(): int
     {
-        return $this->getDb()->from($this->table)->count();
+        return self::getDb()->from($this->table)->count();
     }
 
     /**
@@ -74,7 +74,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function delUser(int $id): bool
     {
-        return $this->getDb()->deleteFrom($this->table)->where('id', $id)->execute();
+        return self::getDb()->deleteFrom($this->table)->where('id', $id)->execute();
     }
 
     /**
@@ -85,7 +85,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getUser(int $id): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $id)
             ->select('id,status,remark', true)
             ->fetch();
@@ -99,7 +99,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function editUser(array $post): int
     {
-        return $this->getDb()->update($this->table)
+        return self::getDb()->update($this->table)
             ->set(['status' => $post['status'], 'remark' => $post['remark']])
             ->where('id', $post['id'])
             ->execute();
@@ -115,7 +115,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getInfo(string $name): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where(['name' => $name])
             ->select('id,name,status,pwd', true)
             ->fetch();
@@ -133,7 +133,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getNameById(array $uid): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $uid)
             ->select('id,name', true)
             ->fetchAll();
@@ -141,7 +141,7 @@ class SystemUserMysql extends AbstractPdo
 
     public function testNameById(int $id): ?string
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $id)
             ->select('name', true)
             ->fetch();
@@ -160,7 +160,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getPwdByUid(int $uid): ?string
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $uid)
             ->select('pwd', true)
             ->fetch();
@@ -179,7 +179,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function editPwd(array $data): int
     {
-        return $this->getDb()->update($this->table)
+        return self::getDb()->update($this->table)
             ->set(['pwd' => password_hash($data['new_pwd'], PASSWORD_DEFAULT)])
             ->where('id', $data['uid'])
             ->execute();
@@ -198,7 +198,7 @@ class SystemUserMysql extends AbstractPdo
      */
     public function existName(string $name): bool
     {
-        $id = $this->getDb()->from($this->table)
+        $id = self::getDb()->from($this->table)
             ->where(['name' => $name])
             ->select('id', true)
             ->fetch();

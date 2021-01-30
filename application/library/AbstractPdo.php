@@ -47,7 +47,7 @@ abstract class AbstractPdo
      *
      * @return string|Query
      */
-    public function getDb($di_db_schema = 'mysql_pool_obj'): string|Query
+    public static function getDb($di_db_schema = 'mysql_pool_obj'): string|Query
     {
         /** @var $mysql_pool_obj PdoPool */
         $mysql_pool_obj = DI::get($di_db_schema);

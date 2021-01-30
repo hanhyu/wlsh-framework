@@ -23,7 +23,7 @@ class SystemBackupMysql extends AbstractPdo
      */
     public function getTables(): array
     {
-        return $this->getDb()->getPdo()->query('show tables')->fetchAll();
+        return self::getDb()->getPdo()->query('show tables')->fetchAll();
     }
 
     /**
@@ -36,7 +36,7 @@ class SystemBackupMysql extends AbstractPdo
      */
     public function setBackup(array $data): int
     {
-        return (int)$this->getDb()->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'file_name' => $data['filename'],
                 'file_size' => $data['size'],
@@ -59,7 +59,7 @@ class SystemBackupMysql extends AbstractPdo
     public function getList(array $data): array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where($wheres)
             ->orderBy('id DESC')
             ->offset($data['curr_data'])
@@ -76,7 +76,7 @@ class SystemBackupMysql extends AbstractPdo
      */
     public function getFileName(int $id): array
     {
-        return $this->getDb()->from($this->table)
+        return self::getDb()->from($this->table)
             ->where('id', $id)
             ->select('file_name,file_size，file_md5', true)
             ->fetch();
@@ -94,7 +94,7 @@ class SystemBackupMysql extends AbstractPdo
      */
     public function delBackup(int $id): bool
     {
-        return $this->getDb()->deleteFrom($this->table, $id)->execute();
+        return self::getDb()->deleteFrom($this->table, $id)->execute();
     }
 
     /**
@@ -106,7 +106,7 @@ class SystemBackupMysql extends AbstractPdo
      */
     public function getListCount(): int
     {
-        return $this->getDb()->from($this->table)->count();
+        return self::getDb()->from($this->table)->count();
     }
 
 }
