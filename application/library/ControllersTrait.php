@@ -32,7 +32,7 @@ trait ControllersTrait
      *
      * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
      *
-     * @throws JsonException|ProgramException
+     * @throws ProgramException
      */
     public function beforeInit(bool $log = true): void
     {

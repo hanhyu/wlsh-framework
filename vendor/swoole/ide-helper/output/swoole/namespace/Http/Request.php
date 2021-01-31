@@ -44,6 +44,34 @@ class Request
     {
     }
 
+    /**
+     * @return mixed
+     */
+    public static function create($options = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function parse($data)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isCompleted()
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMethod()
+    {
+    }
+
     public function __destruct()
     {
     }

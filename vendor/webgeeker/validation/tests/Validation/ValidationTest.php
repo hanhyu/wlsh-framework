@@ -13,13 +13,11 @@
  * elaborate description
  */
 
-namespace WebGeeker\RestTest;
+namespace WebGeeker\ValidationTest;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
 use \WebGeeker\Validation\Validation;
-use WebGeeker\ValidationTest\MyValidation;
-use WebGeeker\ValidationTest\MyValidation2;
 
 /**
  * @class ValidationTest
@@ -1275,6 +1273,18 @@ class ValidationTest extends TestCase
      */
     public function testValidateRegexp()
     {
+        // 正则匹配中文
+        Validation::validate(["param" => "你好"], ["param" => "Regexp:/^[\x{4e00}-\x{9fa5}]+$/",]);
+        Validation::validate(["param" => "abc你好def"], ["param" => 'Regexp:/[\x{4e00}-\x{9fa5}]+/',]);
+        Validation::validate(["param" => "你好def"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+/',]);
+        Validation::validate(["param" => "abc你好"], ["param" => 'Regexp:/[\x{4e00}-\x{9fa5}]+$/',]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["param" => "abc"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        }, '不匹配正则表达式');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            Validation::validate(["param" => "abc"], ["param" => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/|>>>:参数只能是中文',]);
+        }, '参数只能是中文');
+
         $valExps = [
             '0123456789' => '/345/',
             '10.' => '/^[0-9.]+$/',
@@ -1310,6 +1320,14 @@ class ValidationTest extends TestCase
         // 为了提高测试覆盖率: _compileValidator() 方法中的行: else if ($pos === $len - 2)
         Validation::validate(["param" => "abc/"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
         Validation::validate(["param" => "def"], ["param" => 'Regexp:/^(abc\/|def)$/',]);
+
+        // 如果 preg_match() 的传入的正则表达式不合法，会触发warning。
+        // 常用框架会将warning/error等自动转换为Exception。Regexp的中文正则匹配依赖于这种异常处理机制。
+        // 如果没有使用框架，就不会将warning自动转换为Exception。
+        // 下面的代码临时禁用"将warning自动转换为Exception"的机制，以测试Regexp能否在不使用框架的情况下正确处理中文正则
+        $old_error_handler = set_error_handler(null);
+        Validation::validate(['name' => '老王'], ['name' => 'Regexp:/^[\x{4e00}-\x{9fa5}]+$/',]);
+        set_error_handler($old_error_handler);
 
     }
 
@@ -3334,7 +3352,7 @@ class ValidationTest extends TestCase
         // 纯粹为了提高测试覆盖率
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validateValue(123, true);
-        }, '$validator必须是字符串或字符串数组');
+        }, '$validationRule必须是字符串或字符串数组');
         $this->_assertThrowExpectionContainErrorString(function () {
             Validation::validate([], ["param" => "Haha:3"]);
         }, '未知的验证器"Haha"');
@@ -3458,9 +3476,9 @@ class ValidationTest extends TestCase
         // ============================================================
         // 新的“错误描述信息模版”的翻译
         $this->_assertThrowExpectionContainErrorString(function () {
-            MyValidation2::setLangCode("");
+            MyValidation2::setLangCode(""); // 没有设置lang code，不翻译
             MyValidation2::validate(["var" => 1.0], [
-                "var" => "Int", // 没有Alias，不翻译
+                "var" => "Int",
             ]);
         }, '“var”必须是整数');
         $this->_assertThrowExpectionContainErrorString(function () {
@@ -3553,6 +3571,353 @@ class ValidationTest extends TestCase
                 "var" => "Int|>>>:可变量必须是整数",  // 但是翻译表中没有提供“可变量必须是整数”的翻译文本，所以结果是不翻译
             ]);
         }, '可变量必须是整数');
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testValidateCustomValidators()
+    {
+        // CustomInt
+        CustomValidation::validate(['varInt' => '-1'], ['varInt' => 'CustomInt']);
+        CustomValidation::validate(['varInt' => '0'], ['varInt' => 'CustomInt']);
+        CustomValidation::validate(['varInt' => '1'], ['varInt' => 'CustomInt']);
+        CustomValidation::validate(['varInt' => -1], ['varInt' => 'CustomInt']);
+        CustomValidation::validate(['varInt' => 0], ['varInt' => 'CustomInt']);
+        CustomValidation::validate(['varInt' => 1], ['varInt' => 'CustomInt']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => true], ['varInt' => 'CustomInt']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => []], ['varInt' => 'CustomInt']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 0.0], ['varInt' => 'CustomInt']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 'abc'], ['varInt' => 'CustomInt']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => ''], ['varInt' => 'CustomInt']);
+        }, '必须是Custom整数');
+
+        // CustomIntEq
+        CustomValidation::validate(['varInt' => '-1'], ['varInt' => 'CustomIntEq:-1']);
+        CustomValidation::validate(['varInt' => -1], ['varInt' => 'CustomIntEq:-1']);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误1
+            CustomValidation::validate(['varInt' => 'abc'], ['varInt' => 'CustomIntEq:-1']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            // 类型错误2
+            CustomValidation::validate(['varInt' => true], ['varInt' => 'CustomIntEq:-1']);
+        }, '必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => '0'], ['varInt' => 'CustomIntEq:-1']);
+        }, '必须等于 -1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 0], ['varInt' => 'CustomIntEq:-1']);
+        }, '必须等于 -1');
+
+        // 其它
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 'abc'], ['varInt' => 'CustomIntNoErrorTemplate']);
+        }, '验证器 CustomIntNoErrorTemplate 验证失败，并且该验证器没有错误提示信息模版');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 'abc'], ['varInt' => 'CustomNotExist1']);
+        }, '未知的验证器"CustomNotExist1"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 'abc'], ['varInt' => 'CustomNotExist2:1']);
+        }, '未知的验证器"CustomNotExist2"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 1], ['varInt' => 'CustomInt:123']);
+        }, '自定义验证器"CustomInt"应该没有参数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varInt' => 1], ['varInt' => 'CustomIntEq']);
+        }, '自定义验证器"CustomIntEq"应该有 1 个参数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varFloat' => 1], ['varFloat' => 'CustomIntGeLe:1']);
+        }, '自定义验证器"CustomIntGeLe"应该有 2 个参数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varFloat' => 1], ['varFloat' => 'CustomFloatGtLt:1']);
+        }, '自定义验证器 CustomFloatGtLt 格式错误. 正确格式示例: CustomFloatGtLt:1.0,2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varFloat' => 1], ['varFloat' => 'CustomFloatGtLt:1,true']);
+        }, '自定义验证器 CustomFloatGtLt 参数类型错误. 正确的示例: CustomFloatGtLt:1.0,2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varFloat' => 1], ['varFloat' => 'CustomFloatGtLt:1,2,3']);
+        }, '自定义验证器"CustomFloatGtLt"的参数解析方法 parseParamsOfCustomFloatGtLt() 应该返回含有 2 个参数的数组');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            CustomValidation::validate(['varStr' => 'a,b,c'], ['varStr' => 'CustomStrEq:a,b,cd']);
+        }, '自定义验证器"CustomStrEq"应该有 1 个参数');
+
+        // 错误提示信息模版的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode(""); // 没有设置lang code，不翻译
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "CustomInt",
+            ]);
+        }, '“var”必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "CustomInt",
+            ]);
+        }, '“var”必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "CustomInt",
+            ]);
+        }, '“var”必須是Custom整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "CustomInt",
+            ]);
+        }, 'var must be a custom integer');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation2::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation2::validate(["var" => 1.0], [
+                "var" => "CustomStr",  // 但是翻译表中没有提供翻译文本，所以结果是不翻译
+            ]);
+        }, '“var”必须是Custom字符串');
+
+        // ============================================================
+        // （由Alias指定的）参数名称的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("");
+            MyValidation::validate(["var" => 'abc'], [
+                "var" => "CustomFloat", // 没有Alias，不翻译
+            ]);
+        }, '“var”必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation::validate(["var" => 'abc'], [
+                "var" => "CustomFloat|Alias:自定义变量",
+            ]);
+        }, '“自定义变量”必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation::validate(["var" => 'abc'], [
+                "var" => "CustomFloat|Alias:自定义变量",
+            ]);
+        }, '“自定義變量”必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation::validate(["var" => 'abc'], [
+                "var" => "CustomFloat|Alias:自定义变量",
+            ]);
+        }, '“custom variable”必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation::validate(["var" => 'abc'], [
+                "var" => "CustomFloat|Alias:自定义可变量",  // 但是翻译表中没有提供“可变量”的翻译文本，所以结果是不翻译
+            ]);
+        }, '“自定义可变量”必须是浮点数');
+
+        // ============================================================
+        // （由“>>>”指定的）错误描述的翻译
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("");
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "CustomInt", // 没有>>>，不翻译
+            ]);
+        }, '“var”必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("abc"); // 设置了一个无效的lang code，结果就是不翻译
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "CustomInt|>>>:自定义变量必须是Custom整数",
+            ]);
+        }, '自定义变量必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw"); // 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "CustomInt|>>>:自定义变量必须是Custom整数",
+            ]);
+        }, '自定義變量必須是Custom整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("en-us"); // 将翻译为英语（美国）
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "CustomInt|>>>:自定义变量必须是Custom整数",
+            ]);
+        }, 'custom variable must be a custom integer');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation::setLangCode("zh-tw");// 将翻译为繁体中文
+            MyValidation::validate(["var" => 1.0], [
+                "var" => "CustomInt|>>>:自定义可变量必须是Custom整数",  // 但是翻译表中没有提供“自定义可变量必须是Custom整数”的翻译文本，所以结果是不翻译
+            ]);
+        }, '自定义可变量必须是Custom整数');
+
+        // ============================================================
+        // 自定义验证器示例类
+        MyValidation3::setLangCode("");
+
+        // CustomStartWith
+        MyValidation3::validate(["name" => 'heads'], [
+            "name" => "CustomStartWith:head",
+        ]);
+        MyValidation3::validate(["name" => 'head'], [
+            "name" => "CustomStartWith:head",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["name" => 'head'], [
+                "name" => "CustomStartWith:heads",
+            ]);
+        }, '“name”必须以"heads"开头');
+
+        // CustomInt
+        MyValidation3::setLangCode("");
+        MyValidation3::validate(["val" => 1], [
+            "val" => "CustomInt",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => '1.0'], [
+                "val" => "CustomInt",
+            ]);
+        }, '“val”必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("zh-tw");
+            MyValidation3::validate(["val" => '1.0'], [
+                "val" => "CustomInt|>>>:自定义变量必须是整数",
+            ]);
+        }, '變量必須是整數');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("en-us");
+            MyValidation3::validate(["val" => '1.0'], [
+                "val" => "CustomInt|>>>:自定义变量必须是整数",
+            ]);
+        }, 'custom variable must be an integer');
+
+        // CustomIntEq
+        MyValidation3::setLangCode("");
+        MyValidation3::validate(["val" => 1], [
+            "val" => "CustomIntEq:1",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => '1.0'], [
+                "val" => "CustomIntEq:1",
+            ]);
+        }, '“val”必须是Custom整数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => 2], [
+                "val" => "CustomIntEq:1",
+            ]);
+        }, '“val”必须等于 1');
+
+        // CustomIntGeLe
+        MyValidation3::setLangCode("");
+        MyValidation3::validate(["val" => 1], [
+            "val" => "CustomIntGeLe:1,1",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => '1.0'], [
+                "val" => "CustomIntGeLe:1",
+            ]);
+        }, '自定义验证器"CustomIntGeLe"应该有 2 个参数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => 2], [
+                "val" => "CustomIntGeLe:1,1",
+            ]);
+        }, '“val”必须大于等于 1 小于等于 1');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["val" => '2.3'], [
+                "val" => "CustomIntGeLe:1,3",
+            ]);
+        }, '“val”必须是Custom整数');
+
+        // MyValidation3::CustomStrIn
+        MyValidation3::setLangCode("");
+        MyValidation3::validate(["state" => ''], [
+            "state" => "CustomStrIn:",
+        ]);
+        MyValidation3::validate(["state" => 'success'], [
+            "state" => "CustomStrIn:pending,started,success,failed",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["state" => 1.0], [
+                "state" => "CustomStrIn:",
+            ]);
+        }, '“state”必须是Custom字符串');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed",
+            ]);
+        }, '“state”只能取这些值: "pending", "started", "success", "failed"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed|Alias:状态",
+            ]);
+        }, '“状态”只能取这些值: "pending", "started", "success", "failed"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed|>>>:状态可取值为 pending, started, success, failed",
+            ]);
+        }, '状态可取值为 pending, started, success, failed');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("zh-tw");
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed|Alias:状态",
+            ]);
+        }, '“狀態”只能取這些值: "pending", "started", "success", "failed"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("en-us");
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed|Alias:状态",
+            ]);
+        }, 'status can only take these values: "pending", "started", "success", "failed"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("zh-tw");
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed",
+            ]);
+        }, '“state”只能取這些值: "pending", "started", "success", "failed"');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("en-us");
+            MyValidation3::validate(["state" => 'none'], [
+                "state" => "CustomStrIn:pending,started,success,failed",
+            ]);
+        }, 'state can only take these values: "pending", "started", "success", "failed"');
+
+        MyValidation3::setLangCode("");
+
+        // MyValidation3::CustomFloatGtLt
+        MyValidation3::validate(["factor" => 1.5], [
+            "factor" => "CustomFloatGtLt:1.0,2.0",
+        ]);
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["factor" => ""], [
+                "factor" => "CustomFloatGtLt:1.0,2.0",
+            ]);
+        }, '“factor”必须是浮点数');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["factor" => 11], [
+                "factor" => "CustomFloatGtLt:1.0,2.0",
+            ]);
+        }, '“factor”必须大于 1.0 小于 2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["factor" => 11], [
+                "factor" => "CustomFloatGtLt:1.0,2.0|Alias:系数",
+            ]);
+        }, '“系数”必须大于 1.0 小于 2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::validate(["factor" => 11], [
+                "factor" => "CustomFloatGtLt:1.0,2.0|>>>:系数必须大于 1.0 小于 2.0",
+            ]);
+        }, '系数必须大于 1.0 小于 2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("zh-tw");
+            MyValidation3::validate(["factor" => 11], [
+                "factor" => "CustomFloatGtLt:1.0,2.0",
+            ]);
+        }, '“factor”必須大於 1.0 小於 2.0');
+        $this->_assertThrowExpectionContainErrorString(function () {
+            MyValidation3::setLangCode("en-us");
+            MyValidation3::validate(["factor" => 11], [
+                "factor" => "CustomFloatGtLt:1.0,2.0",
+            ]);
+        }, 'factor must be greater than 1.0 and less than 2.0');
 
     }
 }

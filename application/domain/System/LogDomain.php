@@ -44,6 +44,10 @@ class LogDomain
             ];
         }
 
+        if (!empty($data['log_level'])) {
+            $data['where']['level_name'] = $data['log_level'];
+        }
+
         if (!empty($data['channel'])) {
             $data['where']['channel'] = $data['channel'];
         }

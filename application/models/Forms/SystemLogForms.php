@@ -25,6 +25,7 @@ class SystemLogForms
         'page_size'  => 'Required|IntGe:1|Alias:每页显示多少条',
         'start_time' => ['DateTime|Alias:开始时间', 'StrIn:'],
         'end_time'   => ['DateTime|Alias:结束时间', 'StrIn:'],
+        'log_level'  => 'StrIn:,DEBUG,INFO,NOTICE,WARNING,ERROR,CRITICA,ALERT,EMERGENCY|Alias:日志等级',
         'channel'    => ['StrLenGeLe:2,50|Alias:通道类型', 'StrIn:'],
     ];
 

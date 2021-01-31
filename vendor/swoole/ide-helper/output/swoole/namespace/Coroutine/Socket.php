@@ -7,6 +7,12 @@ class Socket
 
     public $fd = -1;
 
+    public $domain = 0;
+
+    public $type = 0;
+
+    public $protocol = 0;
+
     public $errCode = 0;
 
     public $errMsg = '';
@@ -67,6 +73,27 @@ class Socket
     /**
      * @return mixed
      */
+    public function recvAll($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function recvLine($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
+    public function recvWithBuffer($length = null, $timeout = null)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function recvPacket($timeout = null)
     {
     }
@@ -110,13 +137,6 @@ class Socket
      * @return mixed
      */
     public function sendFile($filename, $offset = null, $length = null)
-    {
-    }
-
-    /**
-     * @return mixed
-     */
-    public function recvAll($length = null, $timeout = null)
     {
     }
 

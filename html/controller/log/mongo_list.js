@@ -21,7 +21,7 @@ new Vue({
     beforeMount: function () {
     },
     mounted: function () {
-        layui.use('laydate', function () {
+        layui.use(['laydate', 'form'], function () {
             let laydate = layui.laydate;
             //执行一个laydate实例
             laydate.render({
@@ -63,6 +63,7 @@ new Vue({
                     page_size: self.page_size,
                     start_time: start_time,
                     end_time: end_time,
+                    log_level: $("#log_level").val().trim(),
                     channel: $("#channel").val().trim()
                 }
             })

@@ -39,13 +39,29 @@
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-body">
-                    <div class="layui-input-inline">
-                        <input class="layui-input" id="start_time" name="start" placeholder="开始时间"></div>
-                    <div class="layui-input-inline">
-                        <input class="layui-input" id="end_time" name="end" placeholder="结束时间"></div>
-                    <div class="layui-input-inline">
-                        <input class="layui-input" id="channel" name="channel" placeholder="channel"></div>
-
+                    <form class="layui-form layui-col-space5">
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="start_time" name="start" placeholder="开始时间"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="end_time" name="end" placeholder="结束时间"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <select id="log_level" name="contrller">
+                                <option value="">日志等级</option>
+                                <option value="DEBUG">DEBUG</option>
+                                <option value="INFO">INFO</option>
+                                <option value="NOTICE">NOTICE</option>
+                                <option value="WARNING">WARNING</option>
+                                <option value="ERROR">ERROR</option>
+                                <option value="CRITICA">CRITICA</option>
+                                <option value="ALERT">ALERT</option>
+                                <option value="EMERGENCY">EMERGENCY</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="channel" name="channel" placeholder="channel"></div>
+                    </form>
+                </div>
+                <div class="layui-card-header">
                     <button @click.prevent="mongoList" class="layui-btn" id="search"><i class="layui-icon"></i>查询
                     </button>
                     <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>

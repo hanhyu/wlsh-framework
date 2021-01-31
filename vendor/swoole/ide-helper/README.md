@@ -1,6 +1,6 @@
 # Swoole IDE Helper
 
-[![Build Status](https://travis-ci.org/swoole/ide-helper.svg?branch=master)](https://travis-ci.org/swoole/ide-helper)
+[![Build Status](https://github.com/swoole/ide-helper/workflows/Tests/badge.svg)](https://github.com/swoole/ide-helper/actions)
 [![Latest Stable Version](https://poser.pugx.org/swoole/ide-helper/v/stable.svg)](https://packagist.org/packages/swoole/ide-helper)
 [![License](https://poser.pugx.org/swoole/ide-helper/license)](LICENSE)
 
@@ -46,7 +46,6 @@ Have Docker running first, then use script _./bin/generator.sh_ to generate IDE 
 ./bin/generator.sh 4.4.16   4.4.16
 ./bin/generator.sh 4.4.16   b5c9cede8c6150feba50d0e28d56de355fa69d16
 ./bin/generator.sh 4.5.0RC1 7c913105c3273aab005489d78e0ff9043bfecb54
-#
 ```
 
 The first parameter specifies a stable release of Swoole. The second parameter is optional; it is to specify which
