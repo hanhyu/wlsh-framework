@@ -139,7 +139,7 @@ class SystemUserMysql extends AbstractPdo
             ->fetchAll();
     }
 
-    public function testNameById(int $id): ?string
+    public function testNameById(int $id): array
     {
         return self::getDb()->from($this->table)
             ->where('id', $id)
@@ -155,15 +155,15 @@ class SystemUserMysql extends AbstractPdo
      *
      * @param int $uid
      *
-     * @return string|null
+     * @return string
      * @throws Exception
      */
-    public function getPwdByUid(int $uid): ?string
+    public function getPwdByUid(int $uid): string
     {
         return self::getDb()->from($this->table)
             ->where('id', $uid)
             ->select('pwd', true)
-            ->fetch();
+            ->fetchColumn();
     }
 
     /**

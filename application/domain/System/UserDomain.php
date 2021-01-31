@@ -236,7 +236,7 @@ class UserDomain
 
     public function editPwd(array $data): int
     {
-        $pwd = SystemUserMysql::getInstance()->getPwdByUid($data['uid']);
+        $pwd = SystemUserMysql::getInstance()->getPwdByUid((int)$data['uid']);
 
         if (!password_verify($data['old_pwd'], $pwd)) {
             $res = -1;

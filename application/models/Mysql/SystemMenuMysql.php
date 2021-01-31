@@ -100,7 +100,7 @@ class SystemMenuMysql extends AbstractPdo
         return self::getDb()->from($this->table)
             ->where('id', $id)
             ->select('id,name,icon,url,up_id', true)
-            ->fetchAll();
+            ->fetch();
     }
 
     /**

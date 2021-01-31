@@ -70,7 +70,7 @@ class SystemMsgMysql extends AbstractPdo
             ->offset($data['curr_data'])
             ->limit($data['page_size'])
             ->select('id,content,crt_dt,upt_dt,upt_id', true)
-            ->fetch();
+            ->fetchAll();
     }
 
     /**
