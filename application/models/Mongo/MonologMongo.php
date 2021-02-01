@@ -27,7 +27,7 @@ class MonologMongo extends AbstractMongo
      * @return array
      * @throws Exception
      */
-    protected function getMongoList(array $data): array
+    public function getMongoList(array $data): array
     {
         /*$filter = [
               //'level'=> 200,
@@ -38,8 +38,7 @@ class MonologMongo extends AbstractMongo
             'limit' => (int)$data['page_size'],
             //'projection' => ['_id'=>0],
         ];
-        $res     = $this->db->find($data['where'], $options);
-        return $res->toArray();
+        return self::getDb()->find($data['where'], $options)->toArray();
     }
 
     /**
@@ -49,21 +48,19 @@ class MonologMongo extends AbstractMongo
      * @return int
      * @throws Exception
      */
-    protected function getMongoCount(array $where): int
+    public function getMongoCount(array $where): int
     {
-        return $this->db->countDocuments($where);
+        return self::getDb()->countDocuments($where);
     }
 
     /**
      * @param string $id
      *
-     * @return array
-     * @throws Exception
+     * @return object|null
      */
-    protected function getMongoInfo(string $id): array
+    public function getMongoInfo(string $id): ?object
     {
-        $id = new ObjectId($id);
-        return $this->db->findOne(['_id' => $id])->toArray();
+        return self::getDb()->findOne(['_id' => new ObjectId($id)]);
     }
 
 }

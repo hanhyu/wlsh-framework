@@ -8,20 +8,8 @@ use App\Library\DI;
 
 class BootstrapTest extends TestCase
 {
-    /**
-     * setUp
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->__setUpYafApplication();
-    }
-
-    /**
-     * setup yaf
-     */
-    private function __setUpYafApplication()
-    {
-        $this->__setUpPHPIniVariables();
         // Import application and bootstrap.
 
         define('APP_DEBUG', TRUE);
@@ -52,14 +40,5 @@ class BootstrapTest extends TestCase
 
         require CONF_PATH . DS . 'di.php';
     }
-
-    /**
-     * setup php ini variables
-     */
-    private function __setUpPHPIniVariables()
-    {
-
-    }
-
 
 }

@@ -70,10 +70,9 @@ class LogDomain
      *
      * @param string $id
      *
-     * @return array
-     * @throws Exception
+     * @return object|null
      */
-    public function getMongoById(string $id): array
+    public function getMongoById(string $id): ?object
     {
         return MonologMongo::getInstance()->getMongoInfo($id);
     }

@@ -56,7 +56,7 @@ abstract class AbstractRedis
      * @return Redis
      * @throws RedisException
      */
-    public static function getDb($di_db_schema = 'redis_pool_obj'): Redis
+    public static function getDb(string $di_db_schema = 'redis_pool_obj'): Redis
     {
         /** @var $redis_pool_obj RedisPool */
         $redis_pool_obj = DI::get($di_db_schema);

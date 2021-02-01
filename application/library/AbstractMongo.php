@@ -17,18 +17,17 @@ use Swoole\Coroutine;
  */
 abstract class AbstractMongo
 {
+    /**
+     * @var string 此处使用静态延迟绑定，实现选择不同的集合（数据表）
+     */
     protected static string $col;
     private static array $instance = [];
-    /**
-     * @var Collection
-     */
-    protected Collection $db;
 
     private function __construct()
     {
     }
 
-    public static function getInstance(): AbstractMongo
+    public static function getInstance(): static
     {
         $class_name = static::class;
         $cid        = Coroutine::getCid();
@@ -47,9 +46,16 @@ abstract class AbstractMongo
         return $_instance;
     }
 
-    public function __call(string $method, array $args)
+    /**
+     * php7中mongodb扩展会自动释放连接
+     *
+     * @param string $db_schema
+     *
+     * @return Collection
+     */
+    public static function getDb(string $db_schema = 'log'): Collection
     {
-        $log_arr = DI::get('config_arr')['log'];
+        $log_arr = DI::get('config_arr')[$db_schema];
         try {
             $mongo = new Client($log_arr['mongo'],
                 [
@@ -59,22 +65,11 @@ abstract class AbstractMongo
                 ]);
 
             $col = static::$col ?? $log_arr['collection'];
-
-            $this->db = $mongo->selectCollection($log_arr['database'], $col);
-            $data     = call_user_func_array([$this, $method], $args);
+            return $mongo->selectCollection($log_arr['database'], $col);
         } catch (Exception $e) {
-            co_log($e->getMessage(), '连接mongodb服务端失败。', 'alert');
+            task_log(DI::get('server_obj'), $e->getMessage(), '连接mongodb服务端失败。', level: 'alert');
             throw new RuntimeException('mongodb连接失败', 500);
         }
-
-        return $data;
-    }
-
-    /**
-     * php7中mongodb扩展会自动释放连接
-     */
-    public function getDb(): void
-    {
     }
 
 }

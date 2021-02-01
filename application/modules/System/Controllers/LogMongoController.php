@@ -59,7 +59,7 @@ class LogMongoController
     {
         $data = $this->validator(SystemLogForms::$getMongoInfo);
         $res  = $this->log->getMongoById($data['id']);
-        return http_response(data: $res);
+        return http_response(data: ['info' => $res]);
     }
 
 }

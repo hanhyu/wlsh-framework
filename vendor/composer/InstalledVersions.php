@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '4645e415f97b7e3805690e27a2b90178414d491b',
+    'reference' => 'f8600c88ee37c80d3d95654bf1080cd366f6d9ac',
     'name' => 'wlsh/frame',
   ),
   'versions' => 
@@ -812,7 +812,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '4645e415f97b7e3805690e27a2b90178414d491b',
+      'reference' => 'f8600c88ee37c80d3d95654bf1080cd366f6d9ac',
     ),
   ),
 );

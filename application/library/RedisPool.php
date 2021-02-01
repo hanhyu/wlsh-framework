@@ -49,7 +49,7 @@ class RedisPool
      */
     public function get(): Redis
     {
-        $db = $this->ch->pop(1);
+        $db = $this->ch->pop(3);
         /**
          * 判断此空闲连接是否已被断开，已断开就重新请求连接，
          * 这里使用channel的pop功能就实现了一个判断池子中的连接是否超过空闲时间，如超时redis则会自动断开此连接，
@@ -67,12 +67,10 @@ class RedisPool
          */
         //if ($this->ping($db)) $db = $this->connect();
 
-        /*
-         * 这种合并写法，池子性能降低10%
-         if ($db != false and $this->ping($db)) {
+        //这种合并写法，池子性能降低10%
+        if ($db != false and $this->ping($db)) {
             $db = $this->connect();
         }
-        */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
         defer(function () use ($db) {
@@ -119,9 +117,7 @@ class RedisPool
     {
         try {
             $dbconn->ping();
-        } catch (RedisException $e) {
-            co_log($e->getMessage(), 'redis pool error getMessage：');
-            //co_log($e->getCode(), "redis pool error getCode：");
+        } catch (RedisException) {
             return true;
         }
         return false;

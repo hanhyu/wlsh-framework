@@ -63,12 +63,10 @@ class PdoPool
             $db = $this->connect();
         }
 
-        /*
-         * 这种合并写法，池子性能降低10%
-         if ($db != false and $this->ping($db->pdo)) {
+        //这种合并写法，池子性能降低10%
+        if ($db != false and $this->ping($db)) {
             $db = $this->connect();
         }
-        */
 
         //延迟向连接池中存入连接对象，让后面的客户端可以复用此连接。
         //此处在高并发时会阻塞，需使用put手动快速回收连接对象，
@@ -139,7 +137,6 @@ class PdoPool
         try {
             $dbconn->getAttribute(PDO::ATTR_SERVER_INFO);
         } catch (PDOException $e) {
-            co_log($e->getMessage(), 'pdo pool error getMessage：');
             if (!empty($e->errorInfo) and ($e->errorInfo[1] === 2006 or $e->errorInfo[1] === 2013)) {
                 return true;
             }
