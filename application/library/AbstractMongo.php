@@ -48,6 +48,7 @@ abstract class AbstractMongo
 
     /**
      * php7中mongodb扩展会自动释放连接
+     * mongodb一个连接就是一个连接池
      *
      * @param string $db_schema
      *
