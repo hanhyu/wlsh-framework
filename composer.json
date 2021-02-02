@@ -39,7 +39,8 @@
       "App\\Library\\": "application/library",
       "App\\Controllers\\": "application/controllers",
       "App\\Services\\": "application/services",
-      "Tests\\": "tests/"
+      "Tests\\": "tests/",
+      "Console\\Controllers\\": "console/controllers"
     }
   },
   "require-dev": {

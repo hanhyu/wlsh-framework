@@ -9,12 +9,12 @@
 //php phpunit.php -c phpunit.xml phpunit/domain/UserTest.php
 //php phpunit.php phpunit/domain/UserTest.php
 //php phpunit.php
-
+Swoole\Coroutine::set(['hook_flags' => SWOOLE_HOOK_ALL]);
 Swoole\Coroutine\run(static function () {
     try {
         require_once getcwd() . '/../vendor/bin/phpunit';
-    } catch (Swoole\Exception $e) {
-        print_r($e->getMessage());
+    } catch (Throwable) {
     }
 });
+Swoole\Event::wait();
 

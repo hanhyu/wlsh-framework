@@ -122,6 +122,7 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         ),
         'C' => 
         array (
+            'Console\\Controllers\\' => 20,
             'Composer\\XdebugHandler\\' => 23,
             'Composer\\Semver\\' => 16,
         ),
@@ -330,6 +331,10 @@ class ComposerStaticInitf7d07759d3db353ca946257d45444f35
         'DeepCopy\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
+        ),
+        'Console\\Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/console/controllers',
         ),
         'Composer\\XdebugHandler\\' => 
         array (

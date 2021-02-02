@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+define('APP_DEBUG', TRUE);
+//使用error_reporting来定义哪些级别错误可以触发 -1
+error_reporting(E_ALL);
+
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+ini_set('log_errors', '1');
+define('SWOOLE_LOG_LEVEL', 2);
+//每个PHP进程所吃掉的最大内存
+ini_set('memory_limit', '2048M');
+
+date_default_timezone_set('Asia/Shanghai');
+
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT_PATH', __DIR__);
+define('CONF_PATH', ROOT_PATH . DS . 'conf');
+define('APP_PATH', ROOT_PATH . DS . 'application');
+define('LIBRARY_PATH', APP_PATH . DS . 'library');
+
+Swoole\Coroutine::set(['hook_flags' => SWOOLE_HOOK_ALL]);
+Swoole\Coroutine\run(static function () use ($argv) {
+    try {
+        require_once ROOT_PATH . '/vendor/autoload.php';
+        require_once LIBRARY_PATH . '/common/functions.php';
+
+        $common      = require CONF_PATH . DS . 'common.php';
+        $current_env = require CONF_PATH . DS . 'develop.php';
+        \App\Library\DI::set('config_arr', array_merge($common, $current_env));
+        require_once CONF_PATH . DS . 'di.php';
+
+        if (empty($argv[1])) {
+            throw new RuntimeException('路由参数错误');
+        }
+
+        $request_uri_arr = explode('/', $argv[1]);
+
+        $class  = ucfirst($request_uri_arr[0]);
+        $class  = "\Console\Controllers\\{$class}Controller";
+        $action = "{$request_uri_arr[1]}Action";
+
+        unset($argv[0], $argv[1]);
+
+        $res = (new $class)->$action(...$argv);
+        print_r($res);
+    } catch (Throwable $e) {
+        echo http_response(500, $e->getMessage(), $e->getTrace());
+    }
+});
+Swoole\Event::wait();
+
+

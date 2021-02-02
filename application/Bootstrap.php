@@ -161,13 +161,13 @@ class Bootstrap
         require_once LIBRARY_PATH . '/common/functions.php';
 
         //用inotify监听mvc目录,一有变动就自动重启脚本
-        /*if (0 === $worker_id) {
+        if (0 === $worker_id) {
             $kit = new AutoReload($server->master_pid);
             $kit->watch(CONF_PATH);
             $kit->watch(APP_PATH);
             $kit->addFileType('.php');
             //$kit->run();
-        }*/
+        }
 
         //重命名进程名字
         if ($server->taskworker) {

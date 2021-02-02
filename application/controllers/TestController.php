@@ -13,6 +13,9 @@ use App\Models\Forms\SystemUserForms;
 use App\Models\Mysql\UserMysql;
 use App\Models\Redis\LoginRedis;
 use App\Models\Redis\UserRedis;
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
+use Elasticsearch\ConnectionPool\ConnectionPoolInterface;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swoole\Coroutine;
@@ -26,7 +29,7 @@ use Doctrine\Common\Annotations\Annotation;
  * Date: 18-7-25
  * Time: 上午10:24
  */
-class LoginController
+class TestController
 {
     use ControllersTrait;
 
@@ -1204,6 +1207,39 @@ class LoginController
         $data = $this->validator(SystemUserForms::$existToken);
         $res  = (new LoginDomain())->existToken($data);
         return http_response(200, '', ['exist' => $res]);
+    }
+
+    #[Router(method: 'GET', auth: false)]
+    public function testEsAction()
+    {
+        $client = ClientBuilder::create()
+            ->setHosts(['172.17.0.1:9200'])
+            ->setBasicAuthentication('elastic', '123456')
+            ->build();
+
+        $res = $client->sql()->query([
+            'format' => 'json',
+            'body'   => ['query' => 'select * from index_info where id = 1'],
+        ]);
+
+        return http_response(data: $res);
+    }
+
+    #[Router(method: 'GET', auth: false)]
+    public function testEsInfoAction()
+    {
+        $client = ClientBuilder::create()
+            ->setHosts(['172.17.0.1:9200'])
+            ->setBasicAuthentication('elastic', '123456')
+            ->setConnectionPool('\Elasticsearch\ConnectionPool\StaticNoPingConnectionPool')
+            ->build();
+
+        $res = $client->search([
+            'index' => 'index_info',
+            'body'  => ['query' => ['term' => ['id' => 1]]],
+        ]);
+
+        return http_response(data: $res['hits']['hits'][0]['_source']);
     }
 
 }

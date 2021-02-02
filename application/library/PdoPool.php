@@ -151,9 +151,9 @@ class PdoPool
     public function __destruct()
     {
         $this->available = false;
-        while (!$this->ch->isEmpty()) {
-            $this->ch->pop();
-        }
+        /* while (!$this->ch->isEmpty()) {
+             $this->ch->pop();
+         }*/
     }
 
 }
