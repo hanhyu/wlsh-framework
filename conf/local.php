@@ -1,15 +1,16 @@
 <?php
-//本地开发环境配置
+//本地环境配置
 return [
 
+    //指定Access-Control-Allow-Origin的值
     'origin' => [
         'domain' => 'https://127.0.0.1:9772',
     ],
 
     'mysql' => [
         'driver'    => 'mysql',
-        'host'      => '172.17.0.1',
-        'port'      => 3308,
+        'host'      => 'wlsh-mysql',
+        'port'      => 3306,
         'database'  => 'baseFrame',
         'username'  => 'root',
         'password'  => 'wlsh_mysql',
@@ -19,29 +20,16 @@ return [
         'strict'    => false,
     ],
 
-    'pgsql' => [
-        'driver'    => 'pgsql',
-        'host'      => '172.17.0.1',
-        'port'      => 5432,
-        'database'  => 'baseframe',
-        'username'  => 'postgres',
-        'password'  => 'root',
-        'charset'   => 'utf8',
-        'collation' => 'utf8_general_ci',
-        'prefix'    => '',
-        'strict'    => false,
-    ],
-
     'redis' => [
-        'host' => '172.17.0.1',
-        'port' => 6381,
+        'host' => 'wlsh-redis-master',
+        'port' => 6379,
         'auth' => 'wlsh_redis',
     ],
 
     'log' => [
-        'mongo'      => 'mongodb://172.17.0.1:27018',
-        'username'   => 'test',
-        'pwd'        => 'test',
+        'mongo'      => 'mongodb://wlsh-mongo:27017',
+        'username'   => 'admin',
+        'pwd'        => 'admin',
         'database'   => 'baseFrame',
         'collection' => 'monolog',
     ],
@@ -52,7 +40,7 @@ return [
 
     'backup' => [
         'path'    => ROOT_PATH . '/backup',
-        'downUrl' => 'http://127.0.0.1:9773/',
+        'downUrl' => 'http://127.0.0.1:9770/',
     ],
 
 ];

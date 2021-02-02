@@ -34,9 +34,10 @@ class BootstrapTest extends TestCase
         require ROOT_PATH . '/vendor/autoload.php';
         require LIBRARY_PATH . '/common/functions.php';
 
-        $common      = require CONF_PATH . DS . 'common.php';
-        $current_env = require CONF_PATH . DS . 'develop.php';
-        DI::set('config_arr', array_merge($common, $current_env));
+        DI::set('config_arr', array_merge(
+            require CONF_PATH . DS . 'common.php',
+            require CONF_PATH . DS . 'local.php'
+        ));
 
         require CONF_PATH . DS . 'di.php';
     }

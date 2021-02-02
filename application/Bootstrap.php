@@ -186,27 +186,10 @@ class Bootstrap
             require_once CONF_PATH . DS . 'language.php';
 
             //把配置保存起来
-            $common = require CONF_PATH . DS . 'common.php';
-            switch (CURRENT_ENV) {
-                case 'develop':
-                    $current_env = require CONF_PATH . DS . 'develop.php';
-                    DI::set('config_arr', array_merge($common, $current_env));
-                    break;
-                case 'test':
-                    $current_env = require CONF_PATH . DS . 'test.php';
-                    DI::set('config_arr', array_merge($common, $current_env));
-                    break;
-                case 'devtest':
-                    $current_env = require CONF_PATH . DS . 'devtest.php';
-                    DI::set('config_arr', array_merge($common, $current_env));
-                    break;
-                case 'product':
-                    $current_env = require CONF_PATH . DS . 'product.php';
-                    DI::set('config_arr', array_merge($common, $current_env));
-                    break;
-                default;
-                    throw new RuntimeException('请设置正确的运行环境常量');
-            }
+            DI::set('config_arr', array_merge(
+                require CONF_PATH . DS . 'common.php',
+                require CONF_PATH . DS . CURRENT_ENV . '.php'
+            ));
 
             require_once CONF_PATH . DS . 'di.php';
         } catch (Throwable $e) {

@@ -1,5 +1,6 @@
 #!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
+
 define('APP_DEBUG', TRUE);
 //使用error_reporting来定义哪些级别错误可以触发 -1
 error_reporting(E_ALL);
@@ -24,10 +25,13 @@ Swoole\Coroutine\run(static function () use ($argv) {
     try {
         require_once ROOT_PATH . '/vendor/autoload.php';
         require_once LIBRARY_PATH . '/common/functions.php';
+        require_once CONF_PATH . DS . 'environ.php';
 
-        $common      = require CONF_PATH . DS . 'common.php';
-        $current_env = require CONF_PATH . DS . 'develop.php';
-        \App\Library\DI::set('config_arr', array_merge($common, $current_env));
+        \App\Library\DI::set('config_arr', array_merge(
+            require CONF_PATH . DS . 'common.php',
+            require CONF_PATH . DS . CURRENT_ENV . '.php'
+        ));
+
         require_once CONF_PATH . DS . 'di.php';
 
         if (empty($argv[1])) {
@@ -49,5 +53,3 @@ Swoole\Coroutine\run(static function () use ($argv) {
     }
 });
 Swoole\Event::wait();
-
-
