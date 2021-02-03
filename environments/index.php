@@ -27,6 +27,12 @@
  */
 return [
     'local' => [
-        'path' => 'local',
+        'path'        => 'local',
+        'skipFiles'   => [
+            '/conf/sendEmail.php',
+        ],
+        'setWritable' => [
+            'log',
+        ],
     ],
 ];
