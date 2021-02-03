@@ -38,9 +38,9 @@ class TestController
         $this->beforeInit(false);
     }
 
+    //前置操作，相关权限业务判断
     public function rule(): ?string
     {
-        //todo 前置操作，相关权限业务判断
         $res = false;
         if ($res) {
             //$this->response->end('没有权限访问');
@@ -50,9 +50,9 @@ class TestController
         return null;
     }
 
+    //后置通知第三方接口、后置ack缓存机制等操作
     public function responseLog(): void
     {
-        //todo 后置通知第三方接口、后置ack缓存机制等操作
         $fp = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
         fwrite($fp, '销毁操作');
         fclose($fp);

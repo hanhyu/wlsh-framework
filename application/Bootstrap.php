@@ -463,6 +463,9 @@ class Bootstrap
             DI::del('request_obj' . $cid);
             DI::del('response_obj' . $cid);
         }
+
+        error_clear_last();
+        clearstatcache();
     }
 
     /**

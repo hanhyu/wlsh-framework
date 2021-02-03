@@ -5,6 +5,7 @@ namespace App\Library;
 
 use PDO;
 use PDOException;
+use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
 
 /**
@@ -151,9 +152,11 @@ class PdoPool
     public function __destruct()
     {
         $this->available = false;
-        /* while (!$this->ch->isEmpty()) {
-             $this->ch->pop();
-         }*/
+        if (Coroutine::getCid() > 0) {
+            while (!$this->ch->isEmpty()) {
+                $this->ch->pop();
+            }
+        }
     }
 
 }
