@@ -115,7 +115,7 @@ final class Versions
   'symfony/string' => 'v5.2.2@c95468897f408dd0aca2ff582074423dd0455122',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'webmozart/assert' => '1.9.1@bafc69caeb4d49c39fd0779086c03a3738cbb389',
-  'wlsh/frame' => 'dev-master@9b3eaeaf44141dac4a57f07627845ca73755c4dd',
+  'wlsh/frame' => 'dev-master@c4d1fadecf65733f1bbfc7c7e619336fd3f0d599',
 );
 
     private function __construct()

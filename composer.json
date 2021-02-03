@@ -40,7 +40,8 @@
       "App\\Controllers\\": "application/controllers",
       "App\\Services\\": "application/services",
       "Tests\\": "tests/",
-      "Console\\Controllers\\": "console/controllers"
+      "Console\\Controllers\\": "console/controllers",
+      "Console\\Models\\": "console/models"
     }
   },
   "require-dev": {
