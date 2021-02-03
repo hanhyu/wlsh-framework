@@ -219,7 +219,7 @@ function monolog_by_file($content, string $info, string $channel, string $level)
  */
 function send_email($content, string $info): void
 {
-    $email     = DI::get('email_config_arr')[CURRENT_ENV];
+    $email     = DI::get('email_config_arr');
     $transport = (new Swift_SmtpTransport($email['host'], $email['port']))
         ->setUsername($email['uname'])
         ->setPassword($email['pwd']);
