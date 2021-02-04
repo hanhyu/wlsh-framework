@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Modules\Task\Controllers;
 
 use App\Library\TaskTrait;
+use App\Models\Mysql\RouterLogMysql;
+use Envms\FluentPDO\Exception;
 
 /**
  * 操作日志类
@@ -46,6 +48,18 @@ class LogController
         $tasks['level'] = 'info';
         echo serialize($tasks);
         */
+    }
+
+    /**
+     * User: hanhyu
+     * Date: 2021/2/4
+     * Time: 下午2:59
+     * @throws Exception
+     */
+    #[Router(method: 'CLI', auth: false)]
+    public function routerLogAction(): void
+    {
+        RouterLogMysql::getInstance()->setLog($this->data);
     }
 
 }

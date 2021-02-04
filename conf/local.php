@@ -20,6 +20,19 @@ return [
         'strict'    => false,
     ],
 
+    'wlsh_log' => [
+        'driver'    => 'mysql',
+        'host'      => 'wlsh-mysql',
+        'port'      => 3306,
+        'database'  => 'wlsh_log',
+        'username'  => 'root',
+        'password'  => 'wlsh_mysql',
+        'charset'   => 'utf8mb4',
+        'collation' => 'utf8_general_ci',
+        'prefix'    => '',
+        'strict'    => false,
+    ],
+
     'redis' => [
         'host' => 'wlsh-redis-master',
         'port' => 6379,

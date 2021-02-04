@@ -142,7 +142,7 @@ class UserController
                 $params['ip'] = ip2long($this->request->header['x-real-ip'] ?? get_ip($this->request->server));
                 $this->user->setLoginLog($params);
                 //模拟日志发送邮件
-                //task_log($this->server, $data['name'], '用户登录:', 'alert');
+                //task_monolog($this->server, $data['name'], '用户登录:', 'alert');
             } else {
                 $resp_content = http_response(400, '用户名或密码错误');
             }

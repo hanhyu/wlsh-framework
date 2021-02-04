@@ -30,11 +30,11 @@ trait ControllersTrait
 
     /**
      *
-     * @param bool $log 在请求的数据长度太长时可以手动设置不记录日志，默认true自动记录。
+     * @param bool $log_flag 默认true自动记录，false不记录日志
      *
      * @throws ProgramException
      */
-    public function beforeInit(bool $log = true): void
+    public function beforeInit(bool $log_flag = true): void
     {
         $this->cid      = Coroutine::getCid();
         $this->server   = DI::get('server_obj');
@@ -43,13 +43,10 @@ trait ControllersTrait
         $this->atomic   = DI::get('atomic_obj');
 
         $this->atomic->add(1);
-        $client_ip = get_ip($this->request->server);
-        $server_ip = null;
-        $info      = "【req_uri】{$this->request->server['request_uri']}【client_ip】{$client_ip}【server_ip】{$server_ip}";
 
-        $req_method  = $this->request->server['request_method'];
-        $request_uri = explode('/', $this->request->server['request_uri']);
-        $channel     = $request_uri[1] ?? 'system';
+        DI::set('log_flag' . $this->cid, $log_flag);
+
+        $req_method = $this->request->server['request_method'];
         switch ($req_method) {
             case 'GET':
                 if (!empty($this->request->get)) {
@@ -100,8 +97,7 @@ trait ControllersTrait
             default:
         }
 
-        //HOOK开启状态的协程下不能使用c版的mongodb,需使用task进程模拟
-        if ($log) task_log($this->server, $this->data, $info, $channel);
+        DI::set('req_data' . $this->cid, $this->data);
     }
 
     /**

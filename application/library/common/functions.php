@@ -107,8 +107,8 @@ function ws_response(int $code = 200, string $uri = '', string $msg = '', array 
 
 /**
  * 协程记录日志文件信息
- * 注意：如果是耗时的日志记录，必须使用task_log方法异步处理，
- * 推荐在请求的路由生命周期内都使用task_log记录日志，
+ * 注意：如果是耗时的日志记录，必须使用task_monolog方法异步处理，
+ * 推荐在请求的路由生命周期内都使用task_monolog记录日志，
  * critica、alert、emergency三种日志类型默认添加邮件通知。
  *
  * @param mixed  $content
@@ -237,8 +237,8 @@ function send_email($content, string $info): void
 /**
  * 异步记录日志
  * 耗时的操作需使用此方法来处理，该方法是异步非阻塞模式。
- * 注意：如果是耗时的日志记录，必须使用task_log方法异步处理，
- * 推荐在请求的路由生命周期内都使用task_log记录日志，
+ * 注意：如果是耗时的日志记录，必须使用task_monolog方法异步处理，
+ * 推荐在请求的路由生命周期内都使用task_monolog记录日志，
  * critica、alert、emergency三种日志类型默认添加邮件通知。
  *
  * @param \Swoole\WebSocket\Server $server
@@ -255,7 +255,7 @@ function send_email($content, string $info): void
  *                                        <p>alert (550): 必须立即采取行动。比如整个网站都挂了，数据库不可用了等。这种情况应该发送短信警报，并把你叫醒.</P>
  *                                        <p>emergency (600): 紧急请求：系统不可用了</P>
  */
-function task_log(Swoole\WebSocket\Server $server, $data, string $info, string $channel = 'system', string $level = 'info'): void
+function task_monolog(Swoole\WebSocket\Server $server, $data, string $info, string $channel = 'system', string $level = 'info'): void
 {
     $tasks['uri']     = '/task/log/index';
     $tasks['content'] = $data;

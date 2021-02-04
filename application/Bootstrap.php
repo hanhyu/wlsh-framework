@@ -359,7 +359,7 @@ class Bootstrap
                     }
                 }
 
-                task_log(
+                task_monolog(
                     $server,
                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                     'onRequest Throwable message:',
@@ -441,6 +441,18 @@ class Bootstrap
         try {
             $res = (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
             $response->end($res);
+
+            if (DI::get('log_flag' . $cid)) {
+                $request_data['req_uri']   = $request->server['request_uri'];
+                $request_data['req_data']  = DI::get('req_data' . $cid);
+                $request_data['req_ip']    = get_ip($request->server);
+                $request_data['resp_data'] = $res;
+                $request_data['level']     = 'info';
+                $request_data['uri']       = '/task/log/routerLog';
+                $this->server->task(serialize($request_data));
+            }
+            DI::del('req_data' . $cid);
+            DI::del('log_flag' . $cid);
         } catch (ValidateException $e) { //参数验证手动触发的信息
             $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
         } catch (ProgramException $e) { //程序手动抛出的异常
@@ -452,7 +464,7 @@ class Bootstrap
                 $response->end(http_response(500, '服务异常'));
             }
 
-            task_log(
+            task_monolog(
                 $this->server,
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onRequest Throwable message:',
@@ -491,7 +503,7 @@ class Bootstrap
             $uri_arr = explode('/', $res['uri']);
             (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
-            task_log(
+            task_monolog(
                 $server,
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onReceive Throwable message:',
@@ -518,21 +530,17 @@ class Bootstrap
     public function onTask(Server $server, Task $task): void
     {
         $res = unserialize((string)$task->data);
-        //$req_obj = new Yaf\Request\Http($res['uri'], '/');
-        //unset($res['uri']);
-        //$req_obj->setParam($res);
-        //$request = DI::get('request_obj' . Swoole\Coroutine::getCid());
         DI::set('task_data_arr' . Coroutine::getCid(), $res);
         ob_start();
         try {
             $uri_arr = explode('/', $res['uri']);
             (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
-            co_log(
+            /*co_log(
                 ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
                 'onTask Throwable message:',
                 'task'
-            );
+            );*/
         } finally {
             $result = ob_get_contents();
             DI::del('task_data_arr' . Coroutine::getCid());

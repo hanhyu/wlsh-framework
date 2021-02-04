@@ -68,7 +68,7 @@ abstract class AbstractMongo
             $col = static::$col ?? $log_arr['collection'];
             return $mongo->selectCollection($log_arr['database'], $col);
         } catch (Exception $e) {
-            task_log(DI::get('server_obj'), $e->getMessage(), '连接mongodb服务端失败。', level: 'alert');
+            task_monolog(DI::get('server_obj'), $e->getMessage(), '连接mongodb服务端失败。', level: 'alert');
             throw new RuntimeException('mongodb连接失败', 500);
         }
     }

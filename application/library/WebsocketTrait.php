@@ -36,7 +36,7 @@ trait WebsocketTrait
 
         DI::get('atomic_obj')->add(1);
 
-        if ($log) task_log($this->server, $this->data, 'websocket send data:', 'ws');
+        if ($log) task_monolog($this->server, $this->data, 'websocket send data:', 'ws');
     }
 
     /**

@@ -17,6 +17,8 @@ DI::set('redis_pool_obj', new RedisPool());
 //添加mysql数据库连接池
 DI::set('mysql_pool_obj', new PdoPool('mysql'));
 
+DI::set('log_pool_obj', new PdoPool('wlsh_log'));
+
 //如需主从、读写库请在这里自行配置添加
 //$mysql_master = new PdoPool('mysql_master');
 //$mysql_slave = new PdoPool('mysql_slave');
