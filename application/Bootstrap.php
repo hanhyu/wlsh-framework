@@ -431,32 +431,20 @@ class Bootstrap
         DI::set('request_obj' . $cid, $request);
         DI::set('response_obj' . $cid, $response);
 
-        /* defer(function () use ($cid) {
-             DI::del('request_obj' . $cid);
-             DI::del('response_obj' . $cid);
-         });*/
-
         $response->status(200);
 
         try {
             $res = (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
             $response->end($res);
-
-            if (DI::get('log_flag' . $cid)) {
-                $request_data['req_uri']   = $request->server['request_uri'];
-                $request_data['req_data']  = DI::get('req_data' . $cid);
-                $request_data['req_ip']    = get_ip($request->server);
-                $request_data['resp_data'] = $res;
-                $request_data['level']     = 'info';
-                $request_data['uri']       = '/task/log/routerLog';
-                $this->server->task(serialize($request_data));
-            }
-            DI::del('req_data' . $cid);
-            DI::del('log_flag' . $cid);
+            $this->routerLog($request, 'info', $res);
         } catch (ValidateException $e) { //参数验证手动触发的信息
-            $response->end(http_response($e->getCode(), $e->getMessage(), [], true));
+            $res = http_response($e->getCode(), $e->getMessage(), vail: true);
+            $response->end($res);
+            $this->routerLog($request, 'notice', $res);
         } catch (ProgramException $e) { //程序手动抛出的异常
-            $response->end(http_response($e->getCode(), $e->getMessage()));
+            $res = http_response($e->getCode(), $e->getMessage());
+            $response->end($res);
+            $this->routerLog($request, 'warning', $res);
         } catch (Throwable $e) {
             if (APP_DEBUG) {
                 $response->end(http_response(500, $e->getMessage(), $e->getTrace()));
@@ -464,12 +452,10 @@ class Bootstrap
                 $response->end(http_response(500, '服务异常'));
             }
 
-            task_monolog(
-                $this->server,
-                ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                'onRequest Throwable message:',
-                'http',
-                'error'
+            $this->routerLog(
+                $request,
+                'error',
+                json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320)
             );
         } finally {
             DI::del('request_obj' . $cid);
@@ -654,6 +640,34 @@ class Bootstrap
         $fp      = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
         fwrite($fp, $content);
         fclose($fp);
+    }
+
+    /**
+     * 以mysql记录请求日志
+     *
+     * User: hanhyu
+     * Date: 2021/2/6
+     * Time: 下午5:33
+     *
+     * @param Request $request
+     * @param string  $level
+     * @param string  $resp_data
+     */
+    private function routerLog(Request $request, string $level = info, string $resp_data): void
+    {
+        $cid = Coroutine::getCid();
+        if (DI::get('log_flag' . $cid)) {
+            $request_data['req_method'] = $request->server['request_method'];
+            $request_data['req_uri']    = $request->server['request_uri'];
+            $request_data['req_data']   = DI::get('req_data' . $cid);
+            $request_data['req_ip']     = get_ip($request->server);
+            $request_data['resp_data']  = $resp_data;
+            $request_data['level']      = $level;
+            $request_data['uri']        = '/task/log/routerLog';
+            $this->server->task(serialize($request_data));
+        }
+        DI::del('req_data' . $cid);
+        DI::del('log_flag' . $cid);
     }
 
 }
