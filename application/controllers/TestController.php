@@ -11,6 +11,7 @@ use App\Library\DI;
 use App\Library\ProgramException;
 use App\Models\Es\InfoEs;
 use App\Models\Forms\SystemUserForms;
+use App\Models\Kafka\InfoKafka;
 use App\Models\Mysql\UserMysql;
 use App\Models\Redis\LoginRedis;
 use App\Models\Redis\UserRedis;
@@ -1226,11 +1227,26 @@ class TestController
         return http_response(data: $res);
     }
 
+    //QPS 2800
     #[Router(method: 'GET', auth: false)]
     public function testEsInfoAction()
     {
         $res = InfoEs::getInstance()->getInfoById(1);
         return http_response(data: $res);
+    }
+
+    #[Router(method: 'GET', auth: false)]
+    public function testKafkaProducerAction()
+    {
+        InfoKafka::getInstance()->addInfo();
+        return http_response();
+    }
+
+    #[Router(method: 'GET', auth: false)]
+    public function testKafkaCustomerAction()
+    {
+        $res = InfoKafka::getInstance()->getInfo();
+        return http_response(data: [$res]);
     }
 
 }

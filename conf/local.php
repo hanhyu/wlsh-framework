@@ -53,6 +53,14 @@ return [
         'password' => '123456',
     ],
 
+    'kafka' => [
+        'host'              => '172.17.0.1:9092',
+        'update_brokers'    => true,
+        'group_id'          => 'test_group',
+        'client_id'         => 'test_custom',
+        'group_instance_id' => 'test_custom',
+    ],
+
     'page' => [
         'title' => '本地开发-运维平台',
     ],
