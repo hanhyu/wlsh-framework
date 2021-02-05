@@ -47,6 +47,12 @@ return [
         'collection' => 'monolog',
     ],
 
+    'es' => [
+        'host'     => ['172.17.0.1:9200'],
+        'username' => 'elastic',
+        'password' => '123456',
+    ],
+
     'page' => [
         'title' => '本地开发-运维平台',
     ],

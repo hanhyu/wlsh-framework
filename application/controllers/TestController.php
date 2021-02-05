@@ -9,6 +9,7 @@ use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Library\ProgramException;
+use App\Models\Es\InfoEs;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Mysql\UserMysql;
 use App\Models\Redis\LoginRedis;
@@ -1228,18 +1229,8 @@ class TestController
     #[Router(method: 'GET', auth: false)]
     public function testEsInfoAction()
     {
-        $client = ClientBuilder::create()
-            ->setHosts(['172.17.0.1:9200'])
-            ->setBasicAuthentication('elastic', '123456')
-            ->setConnectionPool('\Elasticsearch\ConnectionPool\StaticNoPingConnectionPool')
-            ->build();
-
-        $res = $client->search([
-            'index' => 'index_info',
-            'body'  => ['query' => ['term' => ['id' => 1]]],
-        ]);
-
-        return http_response(data: $res['hits']['hits'][0]['_source']);
+        $res = InfoEs::getInstance()->getInfoById(1);
+        return http_response(data: $res);
     }
 
 }

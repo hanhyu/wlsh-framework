@@ -522,11 +522,9 @@ class Bootstrap
             $uri_arr = explode('/', $res['uri']);
             (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
-            /*co_log(
-                ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                'onTask Throwable message:',
-                'task'
-            );*/
+            $fp = fopen(ROOT_PATH . '/log/task.log', 'ab+');
+            fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
+            fclose($fp);
         } finally {
             $result = ob_get_contents();
             DI::del('task_data_arr' . Coroutine::getCid());
@@ -559,12 +557,9 @@ class Bootstrap
                 (new RouterInit())->routerStartup($uri_arr, 'Cli');
             } catch (Throwable $e) {
                 if (APP_DEBUG) {
-                    //todo 这里需要改成levelDB记录错误，否则会造成task进程异常死循环
-                    co_log(
-                        ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                        'onFinish Throwable message:',
-                        'finish'
-                    );
+                    $fp = fopen(ROOT_PATH . '/log/finish.log', 'ab+');
+                    fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
+                    fclose($fp);
                 }
             } finally {
                 DI::del('finish_data_arr' . Coroutine::getCid());
@@ -590,12 +585,9 @@ class Bootstrap
              (new RouterInit())->routerStartup($uri_arr, 'Cli');
          } catch (Throwable $e) {
              if (APP_DEBUG) {
-                 //todo 这里需要改成levelDB记录错误，否则会造成task进程异常死循环
-                 co_log(
-                     ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                     'onClose Throwable message:',
-                     'close'
-                 );
+                $fp = fopen(ROOT_PATH . '/log/close.log', 'ab+');
+                fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
+                fclose($fp);
              }
          } finally {
              DI::del('fd_int' . Coroutine::getCid());
@@ -636,9 +628,8 @@ class Bootstrap
      */
     public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
     {
-        $content = "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}";
-        $fp      = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
-        fwrite($fp, $content);
+        $fp = fopen(ROOT_PATH . '/log/workerError.log', 'ab+');
+        fwrite($fp, "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}");
         fclose($fp);
     }
 
