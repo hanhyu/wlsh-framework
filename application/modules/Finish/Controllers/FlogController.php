@@ -24,10 +24,6 @@ class FlogController
     #[Router(method: 'Cli', auth: false)]
     public function IndexAction(): void
     {
-        /*$content = "onFinish content:{$this->data['content']},info:{$this->data['info']},;level:{ $this->data['level']}";
-        $fp      = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
-        fwrite($fp, $content);
-        fclose($fp);*/
     }
 
 }

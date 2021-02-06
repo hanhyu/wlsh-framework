@@ -9,9 +9,7 @@
 function stop(): void
 {
     if (is_file(__DIR__ . '/log/swoolePid.log')) {
-        $fp        = fopen(__DIR__ . '/log/swoolePid.log', 'rb');
-        $masterPid = fgets($fp);
-        fclose($fp);
+        $masterPid = file_get_contents(__DIR__ . '/log/swoolePid.log');
         //使用swoole_process::kill代替posix_kill
         if (\Swoole\Process::kill($masterPid, 0)) {
             \Swoole\Process::kill($masterPid);
@@ -42,9 +40,7 @@ function stop(): void
 function reload(): void
 {
     if (is_file(__DIR__ . '/log/swoolePid.log')) {
-        $fp        = fopen(__DIR__ . '/log/swoolePid.log', 'rb');
-        $masterPid = fgets($fp);
-        fclose($fp);
+        $masterPid = file_get_contents(__DIR__ . '/log/swoolePid.log');
         if (\Swoole\Process::kill($masterPid, 0)) {
             \Swoole\Process::kill($masterPid, SIGUSR1);
             echo '=================== reload  ===================' . PHP_EOL;
@@ -143,7 +139,7 @@ function start(array &$argv): void
             return;
         }
     }
-    if (isset($argv[3]) AND $argv[2] != '-d') {
+    if (isset($argv[3]) and $argv[2] != '-d') {
         if ($argv[3] == '-d') {
             $daemonize = true;
         } else {

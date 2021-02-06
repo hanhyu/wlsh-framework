@@ -55,9 +55,11 @@ class TestController
     //后置通知第三方接口、后置ack缓存机制等操作
     public function responseLog(): void
     {
-        $fp = fopen(ROOT_PATH . '/log/swoole.log', 'ab+');
-        fwrite($fp, '销毁操作');
-        fclose($fp);
+        file_put_contents(
+            ROOT_PATH . '/log/swoole.log',
+            '销毁操作',
+            FILE_APPEND
+        );
     }
 
     /**

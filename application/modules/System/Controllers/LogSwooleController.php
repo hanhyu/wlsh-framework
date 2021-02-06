@@ -32,12 +32,10 @@ class LogSwooleController
     #[Router(method: 'GET', auth: true)]
     public function getInfoAction(): string
     {
-        $data      = $this->validator(SystemLogForms::$info);
-        $file_path = ROOT_PATH . '/log/' . $data['name'];
-        $fp        = fopen($file_path, 'rb');
-        $content   = fread($fp, filesize($file_path));
-        fclose($fp);
-        return http_response(data: ['content' => $content]);
+        $data = $this->validator(SystemLogForms::$info);
+        return http_response(data: [
+            'content' => file_get_contents(ROOT_PATH . '/log/' . $data['name']),
+        ]);
     }
 
     /**
@@ -75,10 +73,9 @@ class LogSwooleController
                 return http_response(400, "文件太大：{$filesize} kb，请直接查看。");
             }
 
-            $fp      = fopen($file, 'rb');
-            $content = fread($fp, filesize($file));
-            fclose($fp);
-            return http_response(data: ['content' => $content]);
+            return http_response(data: [
+                'content' => file_get_contents($file),
+            ]);
         }
 
         return http_response(data: ['content' => '查询目录不存在']);

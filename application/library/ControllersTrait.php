@@ -46,8 +46,8 @@ trait ControllersTrait
 
         DI::set('log_flag' . $this->cid, $log_flag);
 
-        $req_method = $this->request->server['request_method'];
-        switch ($req_method) {
+        //$req_method = $this->request->server['request_method'];
+        switch ($this->request->getMethod()) {
             case 'GET':
                 if (!empty($this->request->get)) {
                     $this->data = $this->request->get;
@@ -58,9 +58,9 @@ trait ControllersTrait
                 $let          = stristr($content_type, 'json');
 
                 if ($let) {
-                    if (!empty($this->request->rawContent())) {
+                    if (!empty($this->request->getContent())) {
                         try {
-                            $this->data = json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                            $this->data = json_decode($this->request->getContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                         } catch (JsonException) {
                             throw new ProgramException('无法处理请求内容', 422);
                         }
@@ -78,9 +78,9 @@ trait ControllersTrait
                 $let          = stristr($content_type, 'json');
 
                 if ($let) {
-                    if (!empty($this->request->rawContent())) {
+                    if (!empty($this->request->getContent())) {
                         try {
-                            $this->data += json_decode($this->request->rawContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                            $this->data += json_decode($this->request->getContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
                         } catch (JsonException) {
                             throw new ProgramException('无法处理请求内容', 422);
                         }

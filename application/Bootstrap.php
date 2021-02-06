@@ -92,6 +92,7 @@ class Bootstrap
             'hook_flags'                 => SWOOLE_HOOK_ALL,
             'user'                       => 'root',
             'group'                      => 'root',
+            'http_compression_level'     => 4,
         ]);
 
         $this->table = new Table(1024);
@@ -434,7 +435,7 @@ class Bootstrap
         $response->status(200);
 
         try {
-            $res = (new RouterInit())->routerStartup($request_uri_arr, $request->server['request_method']);
+            $res = (new RouterInit())->routerStartup($request_uri_arr, $request->getMethod());
             $response->end($res);
             $this->routerLog($request, 'info', $res);
         } catch (ValidateException $e) { //参数验证手动触发的信息
@@ -516,18 +517,21 @@ class Bootstrap
     public function onTask(Server $server, Task $task): void
     {
         $res = unserialize((string)$task->data);
-        DI::set('task_data_arr' . Coroutine::getCid(), $res);
+        DI::set('task_obj' . Coroutine::getCid(), $task);
         ob_start();
         try {
             $uri_arr = explode('/', $res['uri']);
             (new RouterInit())->routerStartup($uri_arr, 'Cli');
         } catch (Throwable $e) {
-            $fp = fopen(ROOT_PATH . '/log/task.log', 'ab+');
-            fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
-            fclose($fp);
+            file_put_contents(
+                ROOT_PATH . '/log/task.log',
+                microtime() . ':' . json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320),
+                FILE_APPEND
+            );
         } finally {
             $result = ob_get_contents();
-            DI::del('task_data_arr' . Coroutine::getCid());
+            //DI::del('task_data_arr' . Coroutine::getCid());
+            DI::del('task_obj' . Coroutine::getCid());
         }
         ob_end_clean();
 
@@ -549,23 +553,6 @@ class Bootstrap
      */
     public function onFinish(Server $server, int $task_id, string $data): void
     {
-        /*if (!empty($data)) {
-            $res        = unserialize($data);
-            DI::set('finish_data_arr' . Coroutine::getCid(), $res);
-            try {
-                $uri_arr = explode('/', '/finish/flog/index');
-                (new RouterInit())->routerStartup($uri_arr, 'Cli');
-            } catch (Throwable $e) {
-                if (APP_DEBUG) {
-                    $fp = fopen(ROOT_PATH . '/log/finish.log', 'ab+');
-                    fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
-                    fclose($fp);
-                }
-            } finally {
-                DI::del('finish_data_arr' . Coroutine::getCid());
-            }
-
-        }*/
     }
 
     /**
@@ -585,9 +572,11 @@ class Bootstrap
              (new RouterInit())->routerStartup($uri_arr, 'Cli');
          } catch (Throwable $e) {
              if (APP_DEBUG) {
-                $fp = fopen(ROOT_PATH . '/log/close.log', 'ab+');
-                fwrite($fp, json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320));
-                fclose($fp);
+                file_put_contents(
+                    ROOT_PATH . '/log/close.log',
+                    microtime() . ':' . json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320),
+                    FILE_APPEND
+                );
              }
          } finally {
              DI::del('fd_int' . Coroutine::getCid());
@@ -628,9 +617,11 @@ class Bootstrap
      */
     public function onWorkerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal): void
     {
-        $fp = fopen(ROOT_PATH . '/log/workerError.log', 'ab+');
-        fwrite($fp, "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}");
-        fclose($fp);
+        file_put_contents(
+            ROOT_PATH . '/log/workerError.log',
+            microtime() . ':' . "onWorkerError: pid:{$worker_pid},code:{$exit_code},signal:{$signal}",
+            FILE_APPEND
+        );
     }
 
     /**
