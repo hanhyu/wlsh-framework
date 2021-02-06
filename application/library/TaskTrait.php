@@ -14,9 +14,8 @@ trait TaskTrait
 
     public function beforeInit(): void
     {
-        $this->cid = Coroutine::getCid();
-        //$this->data   = unserialize((string)DI::get('task_obj' . $this->cid)->data);
-        $this->data   = (string)DI::get('task_obj' . $this->cid)->data;
+        $this->cid    = Coroutine::getCid();
+        $this->data   = unserialize((string)DI::get('task_obj' . $this->cid)->data);
         $this->server = DI::get('server_obj');
     }
 

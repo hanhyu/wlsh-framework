@@ -402,8 +402,8 @@ class Bootstrap
         $request_uri_arr = explode('/', $request_uri_str);
         if (isset($request_uri_arr[1]) and !empty($request_uri_arr[1])) {
             $response->header('Access-Control-Allow-Methods', 'POST,DELETE,PUT,GET,OPTIONS');
-            $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-            $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign,Language');
+            $response->header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Traceid');
+            $response->header('Access-Control-Expose-Headers', 'Timestamp,Sign,Language,Traceid');
             $response->header('Access-Control-Allow-Credentials', 'true');
             $response->header('Access-Control-Max-Age', '8388608');
             $response->header('Access-Control-Allow-Origin', DI::get('config_arr')['origin']['domain']);
@@ -431,8 +431,10 @@ class Bootstrap
         $cid = Coroutine::getCid();
         DI::set('request_obj' . $cid, $request);
         DI::set('response_obj' . $cid, $response);
+        DI::set('trace_id' . $cid, $request->header['Traceid'] ?? $this->generalTraceId(get_ip($request->server)));
 
         $response->status(200);
+        $response->header('Traceid', DI::get('trace_id' . $cid));
 
         try {
             $res = (new RouterInit())->routerStartup($request_uri_arr, $request->getMethod());
@@ -461,6 +463,7 @@ class Bootstrap
         } finally {
             DI::del('request_obj' . $cid);
             DI::del('response_obj' . $cid);
+            DI::del('trace_id' . $cid);
         }
 
         error_clear_last();
@@ -525,7 +528,7 @@ class Bootstrap
         } catch (Throwable $e) {
             file_put_contents(
                 ROOT_PATH . '/log/task.log',
-                microtime() . ':' . json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320),
+                PHP_EOL . microtime() . ':' . json_encode(['message' => $e->getMessage(), 'trace' => $e->getTrace()], JSON_THROW_ON_ERROR | 320),
                 FILE_APPEND
             );
         } finally {
@@ -639,10 +642,14 @@ class Bootstrap
     {
         $cid = Coroutine::getCid();
         if (DI::get('log_flag' . $cid)) {
+            $request_data['trace_id']   = DI::get('trace_id' . $cid);
             $request_data['req_method'] = $request->server['request_method'];
             $request_data['req_uri']    = $request->server['request_uri'];
             $request_data['req_data']   = DI::get('req_data' . $cid);
             $request_data['req_ip']     = get_ip($request->server);
+            $request_data['fd_time']    = $this->server->getClientInfo($request->fd)['last_time'];
+            $request_data['req_time']   = $request->server['request_time'];
+            $request_data['resp_time']  = time();
             $request_data['resp_data']  = $resp_data;
             $request_data['level']      = $level;
             $request_data['uri']        = '/task/log/routerLog';
@@ -650,6 +657,11 @@ class Bootstrap
         }
         DI::del('req_data' . $cid);
         DI::del('log_flag' . $cid);
+    }
+
+    private function generalTraceId($ip_address): string
+    {
+        return ip2long($ip_address) . "_" . getmypid() . "_" . (microtime(true) - 1609430400) . "_" . mt_rand(0, 255);
     }
 
 }

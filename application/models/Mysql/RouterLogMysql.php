@@ -25,11 +25,15 @@ class RouterLogMysql extends AbstractPdo
     {
         return (int)self::getDb('log_pool_obj')->insertInto($this->table)
             ->values([
+                'trace_id'   => $data['trace_id'],
                 'level'      => $data['level'],
                 'req_method' => $data['req_method'],
                 'req_uri'    => $data['req_uri'],
                 'req_data'   => json_encode($data['req_data'], JSON_THROW_ON_ERROR | 320),
                 'req_ip'     => $data['req_ip'],
+                'fd_time'    => $data['fd_time'],
+                'req_time'   => $data['req_time'],
+                'resp_time'  => $data['resp_time'],
                 'resp_data'  => $data['resp_data'],
             ])
             ->execute();
