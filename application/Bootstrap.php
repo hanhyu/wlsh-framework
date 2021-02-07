@@ -661,7 +661,7 @@ class Bootstrap
 
     private function generalTraceId($ip_address): string
     {
-        return ip2long($ip_address) . "_" . getmypid() . "_" . (microtime(true) - 1609430400) . "_" . mt_rand(0, 255);
+        return $ip_address . "_" . getmypid() . "_" . (microtime(true) - 1609430400) . "_" . mt_rand(0, 255);
     }
 
 }

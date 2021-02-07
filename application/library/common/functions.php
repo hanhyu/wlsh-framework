@@ -284,9 +284,9 @@ function get_ip(array $server): string
     } else {
         $cip = '';
     }
-    preg_match("/[\d\.]{7,15}/", $cip, $cips);
+    /*preg_match("/[\d\.]{7,15}/", $cip, $cips);
     $cip = $cips[0] ?? 'unknown';
-    unset($cips);
+    unset($cips);*/
 
     return $cip;
 }
