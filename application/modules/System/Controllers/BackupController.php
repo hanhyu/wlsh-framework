@@ -17,6 +17,7 @@ use App\Library\ValidateException;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Forms\SystemBackupForms;
 use App\Domain\System\BackupDomain;
+use Envms\FluentPDO\Exception;
 use Swoole\Coroutine;
 use JsonException;
 
@@ -110,7 +111,7 @@ class BackupController
     /**
      * 下载数据库备份的文件
      * @throws ProgramException
-     * @throws ValidateException|JsonException
+     * @throws ValidateException|JsonException|Exception
      */
     //todo 下载链接直接在前端拼接，无需在后端操作，但是在后端操作有个好处是需要登录认证后才能下载，否则不能用url直接下载。
     #[Router(method: 'POST', auth: true)]

@@ -56,7 +56,7 @@ class MenuDomain
         return SystemMenuMysql::getInstance()->setMenu($data);
     }
 
-    public function getMenuById(int $id): array
+    public function getMenuById(int $id): array|bool
     {
         return SystemMenuMysql::getInstance()->getMenu($id);
     }

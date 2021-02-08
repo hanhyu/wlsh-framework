@@ -92,10 +92,10 @@ class SystemMenuMysql extends AbstractPdo
      *
      * @param int $id
      *
-     * @return array
+     * @return array|bool
      * @throws Exception
      */
-    public function getMenu(int $id): array
+    public function getMenu(int $id): array|bool
     {
         return self::getDb()->from($this->table)
             ->where('id', $id)

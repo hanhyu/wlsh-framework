@@ -3,21 +3,19 @@
 
 namespace Tests\phpunit\domain;
 
-
 use App\Domain\System\LogDomain;
 use App\Models\Mysql\RouterLogMysql;
-use phpDocumentor\Reflection\Types\Self_;
-use Tests\BootstrapTest;
+use PHPUnit\Framework\TestCase;
 
 //php phpunit.php phpunit/domain/LogTest.php
-final class LogTest extends BootstrapTest
+final class LogTest extends TestCase
 {
-    /* public function testGetMongoById(): void
-     {
-         $id  = '6017dd259fb5573e224e3152';
-         $res = (new LogDomain())->getMongoById($id);
-         self::assertEquals($id, $res->_id);
-     }*/
+    public function testGetMongoById(): void
+    {
+        $id  = '6017dd259fb5573e224e3152';
+        $res = (new LogDomain())->getMongoById($id);
+        self::assertEquals($id, $res->_id);
+    }
 
     public function testGetRouterLog(): void
     {

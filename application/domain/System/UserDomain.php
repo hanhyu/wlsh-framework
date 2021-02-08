@@ -16,7 +16,7 @@ use Swoole\Coroutine\Channel;
  */
 class UserDomain
 {
-    public function getInfoByName(string $name): array
+    public function getInfoByName(string $name): array|bool
     {
         return SystemUserMysql::getInstance()->getInfo($name);
     }
@@ -93,7 +93,7 @@ class UserDomain
         return SystemUserMysql::getInstance()->delUser($id);
     }
 
-    public function getUserById(int $id): array
+    public function getUserById(int $id): array|bool
     {
         return SystemUserMysql::getInstance()->getUser($id);
     }

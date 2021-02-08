@@ -80,10 +80,10 @@ class SystemUserMysql extends AbstractPdo
     /**
      * @param int $id
      *
-     * @return array
+     * @return array|bool
      * @throws Exception
      */
-    public function getUser(int $id): array
+    public function getUser(int $id): array|bool
     {
         return self::getDb()->from($this->table)
             ->where('id', $id)
@@ -110,10 +110,10 @@ class SystemUserMysql extends AbstractPdo
      *
      * @param string $name 用户名
      *
-     * @return array ['id','name','status','pwd']
+     * @return array|bool ['id','name','status','pwd']
      * @throws Exception
      */
-    public function getInfo(string $name): array
+    public function getInfo(string $name): array|bool
     {
         return self::getDb()->from($this->table)
             ->where(['name' => $name])
@@ -139,7 +139,7 @@ class SystemUserMysql extends AbstractPdo
             ->fetchAll();
     }
 
-    public function testNameById(int $id): array
+    public function testNameById(int $id): array|bool
     {
         return self::getDb()->from($this->table)
             ->where('id', $id)

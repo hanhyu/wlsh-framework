@@ -5,6 +5,7 @@ namespace App\Domain\System;
 
 use App\Models\Mysql\SystemBackupMysql;
 use App\Models\MysqlFactory;
+use Envms\FluentPDO\Exception;
 
 class BackupDomain
 {
@@ -65,9 +66,10 @@ class BackupDomain
      *
      * @param int $id
      *
-     * @return array
+     * @return array|bool
+     * @throws Exception
      */
-    public function getFileName(int $id): array
+    public function getFileName(int $id): array|bool
     {
         return SystemBackupMysql::getInstance()->getFileName($id);
     }

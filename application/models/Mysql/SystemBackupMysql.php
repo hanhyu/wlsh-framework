@@ -71,10 +71,10 @@ class SystemBackupMysql extends AbstractPdo
     /**
      * @param int $id
      *
-     * @return array
+     * @return array|bool
      * @throws Exception
      */
-    public function getFileName(int $id): array
+    public function getFileName(int $id): array|bool
     {
         return self::getDb()->from($this->table)
             ->where('id', $id)
