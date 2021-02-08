@@ -100,15 +100,14 @@ class PdoPool
                 [
                     PDO::ATTR_CASE                     => PDO::CASE_NATURAL,
                     PDO::ATTR_ERRMODE                  => PDO::ERRMODE_EXCEPTION,
-                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                     PDO::ATTR_ORACLE_NULLS             => PDO::NULL_NATURAL,
                     PDO::ATTR_TIMEOUT                  => 3,
                     PDO::ATTR_DEFAULT_FETCH_MODE       => PDO::FETCH_ASSOC,
                     PDO::ATTR_STRINGIFY_FETCHES        => false,
                     //PDO::ATTR_PERSISTENT               => true,
+                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                     PDO::MYSQL_ATTR_INIT_COMMAND       => "SET NAMES 'utf8';",
-                ]
-            );
+                ]);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage());
         }
