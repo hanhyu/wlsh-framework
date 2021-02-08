@@ -76,7 +76,7 @@ class Bootstrap
             'pid_file'                   => ROOT_PATH . '/log/swoolePid.log',
             'package_max_length'         => 200000,
             'reload_async'               => true,
-            'max_wait_time'              => 7,
+            'max_wait_time'              => 7, //如果使用supervisorctl管理启动入口时，注意要设置比stopwaitsecs的值更小，否则会产生swoole worker进程退出失败
             'heartbeat_idle_time'        => 600,
             'heartbeat_check_interval'   => 60,
             'buffer_output_size'         => 8 * 1024 * 1024,
