@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
@@ -21,7 +22,7 @@ class SystemRouterMysql extends AbstractPdo
      * @param array $data
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getList(array $data): array
     {
@@ -50,7 +51,7 @@ class SystemRouterMysql extends AbstractPdo
      * Date: 19-6-16
      * Time: 下午8:55
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getListCount(): int
     {
@@ -67,7 +68,7 @@ class SystemRouterMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function setRouter(array $post): int
     {
@@ -91,7 +92,7 @@ class SystemRouterMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function editRouter(array $post): int
     {
@@ -116,7 +117,7 @@ class SystemRouterMysql extends AbstractPdo
      * @param int $id
      *
      * @return bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function delRouter(int $id): bool
     {
@@ -128,7 +129,7 @@ class SystemRouterMysql extends AbstractPdo
      * Date: 19-6-16
      * Time: 下午8:58
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getInfo(): array
     {

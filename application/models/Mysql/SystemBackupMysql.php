@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
@@ -32,7 +33,7 @@ class SystemBackupMysql extends AbstractPdo
      * @param array $data
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function setBackup(array $data): int
     {
@@ -54,7 +55,7 @@ class SystemBackupMysql extends AbstractPdo
      * @param array $data
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getList(array $data): array
     {
@@ -72,7 +73,7 @@ class SystemBackupMysql extends AbstractPdo
      * @param int $id
      *
      * @return array|bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getFileName(int $id): array|bool
     {
@@ -90,7 +91,7 @@ class SystemBackupMysql extends AbstractPdo
      * @param int $id
      *
      * @return bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function delBackup(int $id): bool
     {
@@ -102,7 +103,7 @@ class SystemBackupMysql extends AbstractPdo
      * Date: 2021/1/24
      * Time: 上午10:09
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getListCount(): int
     {

@@ -421,7 +421,7 @@ class TestController
      *
      */
     #[Router(method: 'GET', auth: false)]
-    public function getRedisAction(): string
+    public function getRedisAction(): bool|string
     {
         $value = (new LoginDomain())->getKey('key');
         //return http_response(200, '', ['content' => $value]);

@@ -41,20 +41,6 @@ abstract class AbstractKafka
         return $_instance;
     }
 
-    public static function getDb(string $db_schema = 'es'): Client
-    {
-        $es_arr = DI::get('config_arr')[$db_schema];
-        try {
-            return ClientBuilder::create()
-                ->setHosts($es_arr['host'])
-                ->setBasicAuthentication($es_arr['username'], $es_arr['password'])
-                ->build();
-        } catch (Exception $e) {
-            task_monolog(DI::get('server_obj'), $e->getMessage(), '连接es服务端失败。', level: 'alert');
-            throw new RuntimeException('es连接失败', 500);
-        }
-    }
-
     public static function getProducer(string $db_config = 'kafka'): Producer
     {
         $kafka_arr = DI::get('config_arr')[$db_config];

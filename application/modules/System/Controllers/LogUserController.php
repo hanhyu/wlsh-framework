@@ -40,7 +40,6 @@ class LogUserController
     public function getUserListAction(): string
     {
         $data = $this->validator(SystemLogForms::$getUserList);
-        //$data['uid'] = get_token_params($this->request->header['authorization'])['id'];
         $res = $this->log->getLogList($data);
         return http_response(data: $res);
     }

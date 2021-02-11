@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
@@ -21,7 +22,7 @@ class SystemUserMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function setUser(array $post): int
     {
@@ -40,7 +41,7 @@ class SystemUserMysql extends AbstractPdo
      * @param array $data
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getUserList(array $data): array
     {
@@ -58,7 +59,7 @@ class SystemUserMysql extends AbstractPdo
      * Date: 19-6-16
      * Time: 下午9:00
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      * @todo mysql count 性能下降100倍
      */
     public function getListCount(): int
@@ -70,7 +71,7 @@ class SystemUserMysql extends AbstractPdo
      * @param int $id
      *
      * @return bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function delUser(int $id): bool
     {
@@ -81,7 +82,7 @@ class SystemUserMysql extends AbstractPdo
      * @param int $id
      *
      * @return array|bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getUser(int $id): array|bool
     {
@@ -95,7 +96,7 @@ class SystemUserMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function editUser(array $post): int
     {
@@ -111,7 +112,7 @@ class SystemUserMysql extends AbstractPdo
      * @param string $name 用户名
      *
      * @return array|bool ['id','name','status','pwd']
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getInfo(string $name): array|bool
     {
@@ -129,7 +130,7 @@ class SystemUserMysql extends AbstractPdo
      * @param array $uid
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getNameById(array $uid): array
     {
@@ -156,7 +157,7 @@ class SystemUserMysql extends AbstractPdo
      * @param int $uid
      *
      * @return string
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getPwdByUid(int $uid): string
     {
@@ -175,7 +176,7 @@ class SystemUserMysql extends AbstractPdo
      * @param array $data
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function editPwd(array $data): int
     {
@@ -194,7 +195,7 @@ class SystemUserMysql extends AbstractPdo
      * @param string $name
      *
      * @return bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function existName(string $name): bool
     {

@@ -5,6 +5,7 @@ namespace App\Models\Mysql;
 
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 class RouterLogMysql extends AbstractPdo
@@ -20,6 +21,7 @@ class RouterLogMysql extends AbstractPdo
      *
      * @return int
      * @throws Exception
+     * @throws ProgramException|\JsonException
      */
     public function setLog(array $data): int
     {

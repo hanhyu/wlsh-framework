@@ -1,0 +1,13 @@
+<phpunit backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="false"
+         processIsolation="false"
+         stopOnFailure="false"
+         bootstrap="./BootstrapTest.php"
+>
+    <testsuites>
+        <testsuite name="domain">
+            <directory>./phpunit/domain</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

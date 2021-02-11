@@ -17,17 +17,17 @@ abstract class AbstractPdo
 
     public static function getInstance(): static
     {
-        $class_name = static::class;
-        $cid        = Coroutine::getCid();
-        if (!isset(static::$instance[$class_name][$cid])) {
+        $_class_name = static::class;
+        $_cid        = Coroutine::getCid();
+        if (!isset(static::$instance[$_class_name][$_cid])) {
             //new static()与new static::class一样，但为了IDE友好提示类中的方法，需要用new static()
-            $_instance = static::$instance[$class_name][$cid] = new static();
+            $_instance = static::$instance[$_class_name][$_cid] = new static();
         } else {
-            $_instance = static::$instance[$class_name][$cid];
+            $_instance = static::$instance[$_class_name][$_cid];
         }
 
-        defer(static function () use ($class_name, $cid) {
-            unset(static::$instance[$class_name][$cid]);
+        defer(static function () use ($_class_name, $_cid) {
+            unset(static::$instance[$_class_name][$_cid]);
         });
 
         //为了IDE代码提示功能
@@ -39,24 +39,38 @@ abstract class AbstractPdo
     }
 
     /**
+     * 使用单例可以最大化在协程内利用pdo连接池对象
+     *
      * User: hanhyu
      * Date: 2021/1/30
      * Time: 上午10:19
      *
      * @param string $di_db_schema 数据库对象池名称
      *
-     * @return string|Query
+     * @return Query
+     * @throws ProgramException
      */
-    public static function getDb(string $di_db_schema = 'mysql_pool_obj'): string|Query
+    public static function getDb(string $di_db_schema = 'mysql_pool_obj'): Query
     {
-        /** @var $mysql_pool_obj PdoPool */
-        $mysql_pool_obj = DI::get($di_db_schema);
-        if (!$mysql_pool_obj->available) {
-            return '';
+        $_class_name = static::class;
+        $_cid        = Coroutine::getCid();
+        if (!isset(static::$instance[$_class_name]['pdo'][$_cid])) {
+            /** @var $_pool_obj PdoPool */
+            $_pool_obj = DI::get($di_db_schema);
+            if (!$_pool_obj->available) {
+                //todo 这里返回的结果是否是报错，还是直接返回null
+                throw new ProgramException('服务正在重启中，请稍候重试', 500);
+            }
+            $_instance = static::$instance[$_class_name]['pdo'][$_cid] = new Query($_pool_obj->get());
+        } else {
+            $_instance = static::$instance[$_class_name]['pdo'][$_cid];
         }
-        return new Query($mysql_pool_obj->get());
-    }
 
-    //todo 需要添加一个连接池快速回收与重连机制的注解类
+        defer(static function () use ($_class_name, $_cid) {
+            unset(static::$instance[$_class_name]['pdo'][$_cid]);
+        });
+
+        return $_instance;
+    }
 
 }

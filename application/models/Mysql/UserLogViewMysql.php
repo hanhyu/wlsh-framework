@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
@@ -25,7 +26,7 @@ class UserLogViewMysql extends AbstractPdo
      * @param array $data
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getList(array $data): array
     {
@@ -47,7 +48,7 @@ class UserLogViewMysql extends AbstractPdo
      * @param array $where
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getListCount(array $where): int
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models\Mysql;
 
 use App\Library\AbstractPdo;
+use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
 
 /**
@@ -23,7 +24,7 @@ class SystemMenuMysql extends AbstractPdo
      * @param array $data
      *
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getMenuList(array $data): array
     {
@@ -41,7 +42,7 @@ class SystemMenuMysql extends AbstractPdo
      * Date: 19-6-16
      * Time: 下午8:10
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getListCount(): int
     {
@@ -55,7 +56,7 @@ class SystemMenuMysql extends AbstractPdo
      * Date: 19-6-16
      * Time: 下午8:11
      * @return array
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getMenuInfo(): array
     {
@@ -70,7 +71,7 @@ class SystemMenuMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function setMenu(array $post): int
     {
@@ -93,7 +94,7 @@ class SystemMenuMysql extends AbstractPdo
      * @param int $id
      *
      * @return array|bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function getMenu(int $id): array|bool
     {
@@ -111,7 +112,7 @@ class SystemMenuMysql extends AbstractPdo
      * @param array $post
      *
      * @return int
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function editMenu(array $post): int
     {
@@ -135,7 +136,7 @@ class SystemMenuMysql extends AbstractPdo
      * @param int $id
      *
      * @return bool
-     * @throws Exception
+     * @throws Exception|ProgramException
      */
     public function delMenu(int $id): bool
     {
@@ -151,6 +152,7 @@ class SystemMenuMysql extends AbstractPdo
      * Date: 2019/12/7
      * Time: 下午10:50
      * @return string
+     * @throws ProgramException
      */
     public function getVersion(): string
     {

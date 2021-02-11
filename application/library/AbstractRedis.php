@@ -47,6 +47,8 @@ abstract class AbstractRedis
     }
 
     /**
+     * 使用单例可以最大化在协程内利用pdo连接池对象
+     *
      * User: hanhyu
      * Date: 2021/1/30
      * Time: 下午3:08
@@ -58,12 +60,23 @@ abstract class AbstractRedis
      */
     public static function getDb(string $di_db_schema = 'redis_pool_obj'): Redis
     {
-        /** @var $redis_pool_obj RedisPool */
-        $redis_pool_obj = DI::get($di_db_schema);
+        $_class_name = static::class;
+        $_cid        = Coroutine::getCid();
+        if (!isset(static::$instance[$_class_name]['redis'][$_cid])) {
+            /** @var $_pool_obj RedisPool */
+            $_pool_obj = DI::get($di_db_schema);
+            $_instance = static::$instance[$_class_name]['redis'][$_cid] = $_pool_obj->get();
+        } else {
+            $_instance = static::$instance[$_class_name]['redis'][$_cid];
+        }
 
-        $db = $redis_pool_obj->get();
-        $db->select(static::$db_index);
-        return $db;
+        defer(static function () use ($_class_name, $_cid) {
+            unset(static::$instance[$_class_name]['redis'][$_cid]);
+        });
+
+        $_instance->select(static::$db_index);
+
+        return $_instance;
     }
 
 }
