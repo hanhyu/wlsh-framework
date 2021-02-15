@@ -71,7 +71,7 @@
                     </form>
                 </div>
                 <div class="layui-card-header">
-                    <button @click.prevent="mongoList" class="layui-btn" id="search"><i class="layui-icon"></i>查询
+                    <button @click.prevent="getList" class="layui-btn" id="search"><i class="layui-icon"></i>查询
                     </button>
                     <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>
                     <!--<button type="reset" class="layui-btn"><i class="layui-icon"></i>清空</button>-->
@@ -106,7 +106,7 @@
                             <td width="80px">{{formatDate(item.resp_time)}}</td>
                             <td width="80px">{{item.create_time}}</td>
                             <td class="td-manage">
-                                <button @click.prevent="getMongo(item)" class="layui-btn layui-btn-sm"><i
+                                <button @click.prevent="getInfo(item)" class="layui-btn layui-btn-sm"><i
                                         class="layui-icon">&#xe642;</i>详情
                                 </button>
                             </td>
