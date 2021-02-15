@@ -46,4 +46,15 @@ class SystemLogForms
         'uname'      => ['StrLenGeLe:3,50|Alias:用户名', 'StrIn:'],
     ];
 
+    public static array $getRouterList = [
+        'curr_page'  => 'Required|IntGe:1|Alias:当前页数',
+        'page_size'  => 'Required|IntGe:1|Alias:每页显示多少条',
+        'start_time' => ['DateTime|Alias:开始时间', 'StrIn:'],
+        'end_time'   => ['DateTime|Alias:结束时间', 'StrIn:'],
+        'log_level'  => 'StrIn:,DEBUG,INFO,NOTICE,WARNING,ERROR,CRITICA,ALERT,EMERGENCY|Alias:日志等级',
+        'trace_id'   => ['StrLenGeLe:2,50|Alias:TraceID', 'StrIn:'],
+        'req_uri'    => ['StrLenGeLe:2,50|Alias:请求路由', 'StrIn:'],
+        'req_ip'     => ['StrLenGeLe:2,20|Alias:请求IP', 'StrIn:'],
+    ];
+
 }

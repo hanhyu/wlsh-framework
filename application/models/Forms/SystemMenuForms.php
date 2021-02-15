@@ -22,7 +22,7 @@ class SystemMenuForms
         'name'  => 'Required|StrLenGeLe:3,50|Alias:菜单名',
         'icon'  => 'Required|StrLenGeLe:1,50|Alias:图标',
         'url'   => 'Required|StrLenGeLe:1,50|Alias:菜单链接',
-        'up_id' => 'Required|IntGeLe:0,99|Alias：菜单上级ID',
+        'up_id' => 'Required|IntGeLe:0,99|Alias:菜单上级ID',
         'level' => 'Required|IntGeLe:1,5|Alias:菜单等级',
     ];
 

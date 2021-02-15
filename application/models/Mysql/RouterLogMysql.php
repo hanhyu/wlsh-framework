@@ -11,6 +11,7 @@ use Envms\FluentPDO\Exception;
 class RouterLogMysql extends AbstractPdo
 {
     protected string $table = 'router_log';
+    protected string $db = 'log_pool_obj';
 
     /**
      * User: hanhyu
@@ -25,7 +26,7 @@ class RouterLogMysql extends AbstractPdo
      */
     public function setLog(array $data): int
     {
-        return (int)self::getDb('log_pool_obj')->insertInto($this->table)
+        return (int)self::getDb($this->db)->insertInto($this->table)
             ->values([
                 'trace_id'   => $data['trace_id'],
                 'level'      => $data['level'],
@@ -41,9 +42,37 @@ class RouterLogMysql extends AbstractPdo
             ->execute();
     }
 
-    public function getList(): bool|array
+    /**
+     * 路由日志列表
+     *
+     * User: hanhyu
+     * Date: 2021/2/15
+     * Time: 下午9:15
+     *
+     * @param array $data
+     *
+     * @return bool|array
+     * @throws Exception
+     * @throws ProgramException
+     */
+    public function getList(array $data): bool|array
     {
-        return self::getDb('log_pool_obj')->from($this->table)->fetchAll();
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return self::getDb($this->db)
+            ->from($this->table)
+            ->where($wheres)
+            ->select('id,trace_id,level,req_method,req_uri,req_ip,fd_time,req_time,resp_time,create_time', true)
+            ->orderBy('id DESC')
+            ->offset($data['curr_data'])
+            ->limit($data['page_size'])
+            ->fetchAll();
     }
+
+    public function getListCount(array $data): int
+    {
+        $wheres = !empty($data['where']) ? $data['where'] : null;
+        return self::getDb($this->db)->from($this->table)->where($wheres)->count();
+    }
+
 
 }

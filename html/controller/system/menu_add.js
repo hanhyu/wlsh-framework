@@ -66,7 +66,7 @@ new Vue({
             let name = this.name;
             let icon = this.icon;
             let url = this.url;
-            let up_id = this.$refs.up_id.value;
+            let up_id = parseInt(this.$refs.up_id.value);
             let level;
 
             if (!name || !icon || !url) {
