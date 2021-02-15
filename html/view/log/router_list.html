@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>路由日志</title>
+    <!--<link rel="import" href="../../head_js.html">-->
+    <meta content="webkit|ie-comp|ie-stand" name="renderer">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"
+          name="viewport"/>
+    <meta content="no-siteapp" http-equiv="Cache-Control"/>
+
+    <link href="../../favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link href="../../static/css/font.css" rel="stylesheet">
+    <link href="../../static/css/xadmin.css" rel="stylesheet">
+    <script charset="utf-8" src="../../static/lib/layui/layui.js" type="text/javascript"></script>
+    <script src="../../static/js/xadmin.js" type="text/javascript"></script>
+
+    <script src="../../static/js/axios.js" type="text/javascript"></script>
+    <script src="../../conf/axiosConfig.js" type="text/javascript"></script>
+    <script src="../../static/js/vue.js" type="text/javascript"></script>
+</head>
+
+<body>
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">日志中心</a>
+        <a>
+          <cite>路由日志</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-small" href="javascript:location.replace(location.href);"
+       style="line-height:1.6em;margin-top:3px;float:right" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid all">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        ”请求处理时间“ - ”请求服务时间“存在差值，则说明当前请求量超过服务器处理能力；
+                        <br>”响应处理时间“ - ”请求处理时间“的差值，为工作进程（协程）处理服务时间；
+                        <br>”创建日志时间“ - ”响应处理时间“的差值，为异步记录日志处理时间。
+                    </blockquote>
+                    <form class="layui-form layui-col-space5">
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="start_time" name="start" placeholder="请求服务开始时间"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="end_time" name="end" placeholder="请求服务结束时间"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <select id="log_level" name="contrller">
+                                <option value="">日志等级</option>
+                                <option value="DEBUG">DEBUG</option>
+                                <option value="INFO">INFO</option>
+                                <option value="NOTICE">NOTICE</option>
+                                <option value="WARNING">WARNING</option>
+                                <option value="ERROR">ERROR</option>
+                                <option value="CRITICA">CRITICA</option>
+                                <option value="ALERT">ALERT</option>
+                                <option value="EMERGENCY">EMERGENCY</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="trace_id" name="trace_id" placeholder="Trace_id"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="req_uri" name="req_uri" placeholder="请求路由"></div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input class="layui-input" id="req_ip" name="req_ip" placeholder="请求IP"></div>
+                    </form>
+                </div>
+                <div class="layui-card-header">
+                    <button @click.prevent="mongoList" class="layui-btn" id="search"><i class="layui-icon"></i>查询
+                    </button>
+                    <button @click.prevent="cleanSearch" class="layui-btn"><i class="layui-icon"></i>清空</button>
+                    <!--<button type="reset" class="layui-btn"><i class="layui-icon"></i>清空</button>-->
+                </div>
+                <div class="layui-card-body ">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Trace_id</th>
+                            <th>日志等级</th>
+                            <th>请求方法</th>
+                            <th>请求路由</th>
+                            <th>请求IP</th>
+                            <th>请求服务时间</th>
+                            <th>请求处理时间</th>
+                            <th>响应处理时间</th>
+                            <th>创建日志时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in privmessage">
+                            <td>{{item.id}}</td>
+                            <td>{{item.trace_id}}</td>
+                            <td>{{item.level.toUpperCase()}}</td>
+                            <td>{{item.req_method}}</td>
+                            <td>{{item.req_uri}}</td>
+                            <td>{{item.req_ip}}</td>
+                            <td width="80px">{{formatDate(item.fd_time)}}</td>
+                            <td width="80px">{{formatDate(item.req_time)}}</td>
+                            <td width="80px">{{formatDate(item.resp_time)}}</td>
+                            <td width="80px">{{item.create_time}}</td>
+                            <td class="td-manage">
+                                <button @click.prevent="getMongo(item)" class="layui-btn layui-btn-sm"><i
+                                        class="layui-icon">&#xe642;</i>详情
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-card-body " id="list_page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../controller/log/router_list.js"></script>
+</html>
