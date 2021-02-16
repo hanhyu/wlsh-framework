@@ -124,4 +124,9 @@ class LogDomain
         return $res;
     }
 
+    public function getRouterInfo(string $id): array|bool
+    {
+        return RouterLogMysql::getInstance()->getInfoById($id);
+    }
+
 }

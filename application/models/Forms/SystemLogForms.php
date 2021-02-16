@@ -57,4 +57,8 @@ class SystemLogForms
         'req_ip'     => ['StrLenGeLe:2,20|Alias:请求IP', 'StrIn:'],
     ];
 
+    public static array $getRouterInfo = [
+        'id' => 'Required|Str',
+    ];
+
 }

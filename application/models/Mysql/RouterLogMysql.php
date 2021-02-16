@@ -74,5 +74,25 @@ class RouterLogMysql extends AbstractPdo
         return self::getDb($this->db)->from($this->table)->where($wheres)->count();
     }
 
+    /**
+     * User: hanhyu
+     * Date: 2021/2/15
+     * Time: 下午9:49
+     *
+     * @param string $id
+     *
+     * @return array|bool
+     * @throws Exception
+     * @throws ProgramException
+     */
+    public function getInfoById(string $id): array|bool
+    {
+        return self::getDb($this->db)
+            ->from($this->table)
+            ->where('id', $id)
+            ->select('id, req_data, resp_data', true)
+            ->fetch();
+    }
+
 
 }
