@@ -6,6 +6,7 @@ namespace App\Models\Mysql;
 use App\Library\AbstractPdo;
 use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
+use phpDocumentor\Reflection\Types\Self_;
 
 /**
  *
@@ -64,7 +65,12 @@ class SystemUserMysql extends AbstractPdo
      */
     public function getListCount(): int
     {
-        return self::getDb()->from($this->table)->count();
+        //return self::getDb()->from($this->table)->count();
+        return (int)self::getDb()
+            ->from('information_schema.`TABLES`')
+            ->where('TABLE_NAME', $this->table)
+            ->select('TABLE_ROWS', true)
+            ->fetchColumn();
     }
 
     /**
