@@ -6,7 +6,6 @@ namespace App\Models\Mysql;
 use App\Library\AbstractPdo;
 use App\Library\ProgramException;
 use Envms\FluentPDO\Exception;
-use phpDocumentor\Reflection\Types\Self_;
 
 /**
  *
