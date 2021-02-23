@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\System\Controllers\V1;
 
 use App\Library\ProgramException;
+use App\Library\Router;
 use App\Library\ValidateException;
 use App\Modules\System\Controllers\MenuController as BaseMenu;
 use App\Models\Forms\SystemMenuForms;

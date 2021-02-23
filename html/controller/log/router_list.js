@@ -123,7 +123,7 @@ new Vue({
                     jump: function (obj, first) {
                         if (!first) {
                             self.curr_page = obj.curr;
-                            self.mongoList();
+                            self.getList();
                         }
                     }
                 });

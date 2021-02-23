@@ -57,14 +57,14 @@ class RouterInit
             /**
              * @var $ref_arg Router
              */
-            $ref_arg = $ref->getAttributes()[0]?->newInstance();
+            $ref_arg = $ref->getAttributes(Router::class)[0]?->newInstance();
 
             if (empty($ref_arg)) {
                 throw new ProgramException('请求的接口不存在', 500);
             }
 
             if ('CLI' === $ref_arg->method) {
-                $ref_arg['method'] = 'Cli';
+                $ref_arg->method = 'Cli';
             }
 
             if ($method !== $ref_arg->method) {

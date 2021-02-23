@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Modules\Close\Controllers;
 
 use App\Library\CloseTrait;
+use App\Library\Router;
 
 /**
  * Created by PhpStorm.
