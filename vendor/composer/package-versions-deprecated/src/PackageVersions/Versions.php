@@ -49,6 +49,7 @@ final class Versions
   'monolog/monolog' => '2.2.0@1cb1cde8e8dd0f70cc0fe51354a59acad9302084',
   'psr/log' => '1.1.3@0f73288fd15629204f9d42b7055f72dacbe811fc',
   'react/promise' => 'v2.8.0@f3cff96a19736714524ca0dd1d4130de73dbbbc4',
+  'smi2/phpclickhouse' => '1.4.1@17aea5a0c90f7aa9541d74f7567849938eccfcce',
   'swiftmailer/swiftmailer' => 'v6.2.5@698a6a9f54d7eb321274de3ad19863802c879fb7',
   'symfony/polyfill-iconv' => 'v1.22.0@b34bfb8c4c22650ac080d2662ae3502e5f2f4ae6',
   'symfony/polyfill-intl-idn' => 'v1.22.0@0eb8293dbbcd6ef6bf81404c9ce7d95bcdf34f44',
@@ -115,7 +116,7 @@ final class Versions
   'symfony/string' => 'v5.2.2@c95468897f408dd0aca2ff582074423dd0455122',
   'theseer/tokenizer' => '1.2.0@75a63c33a8577608444246075ea0af0d052e452a',
   'webmozart/assert' => '1.9.1@bafc69caeb4d49c39fd0779086c03a3738cbb389',
-  'wlsh/frame' => 'dev-master@c4d1fadecf65733f1bbfc7c7e619336fd3f0d599',
+  'wlsh/frame' => 'dev-master@c3c87dc87136ffe68198319f71db4c3979f2a34d',
 );
 
     private function __construct()

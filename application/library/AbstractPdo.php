@@ -58,7 +58,6 @@ abstract class AbstractPdo
             /** @var $_pool_obj PdoPool */
             $_pool_obj = DI::get($di_db_schema);
             if (!$_pool_obj->available) {
-                //todo 这里返回的结果是否是报错，还是直接返回null
                 throw new ProgramException('服务正在重启中，请稍候重试', 500);
             }
             $_instance = static::$instance[$_class_name]['pdo'][$_cid] = new Query($_pool_obj->get());

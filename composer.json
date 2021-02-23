@@ -23,7 +23,8 @@
     "mongodb/mongodb": "1.8.0",
     "elasticsearch/elasticsearch": "^7.11.x-dev",
     "longlang/phpkafka": "1.1.1",
-    "envms/fluentpdo": "2.2.0"
+    "envms/fluentpdo": "2.2.0",
+    "smi2/phpclickhouse": "^1.4"
   },
   "repositories": {
     "packagist": {

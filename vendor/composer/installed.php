@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'f8600c88ee37c80d3d95654bf1080cd366f6d9ac',
+    'reference' => 'c3c87dc87136ffe68198319f71db4c3979f2a34d',
     'name' => 'wlsh/frame',
   ),
   'versions' => 
@@ -541,6 +541,15 @@
       ),
       'reference' => 'c6c1022351a901512170118436c764e473f6de8c',
     ),
+    'smi2/phpclickhouse' => 
+    array (
+      'pretty_version' => '1.4.1',
+      'version' => '1.4.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '17aea5a0c90f7aa9541d74f7567849938eccfcce',
+    ),
     'swiftmailer/swiftmailer' => 
     array (
       'pretty_version' => 'v6.2.5',
@@ -789,7 +798,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'f8600c88ee37c80d3d95654bf1080cd366f6d9ac',
+      'reference' => 'c3c87dc87136ffe68198319f71db4c3979f2a34d',
     ),
   ),
 );

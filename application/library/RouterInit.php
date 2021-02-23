@@ -13,20 +13,6 @@ use Swoole\Coroutine;
 
 class RouterInit
 {
-    /**
-     * 格式：
-     * @router auth=false&method=get
-     *
-     * 参数说明：
-     * auth 值是需要使用authorization进行token认证的路由，false不需要，true需要
-     * method 值是请求的http方法
-     * rate-limit 值代表该接口服务限流参数 使用nginx配置代替
-     * circuit-breaker 值代表该接口服务超时熔断参数  使用nginx配置代替
-     * before 请求方法之前执行,一般是权限检查动作，用户登录日志，重要数据查询日志，数据删除日志，重要数据变更日志 （如密码变更，权限变更，数据修改等）
-     * after 请求方法之后执行
-     *
-     * 可以按不同项目、团队、需求、个人喜好等对uri增加加密key
-     */
 
     /**
      * User: hanhyu

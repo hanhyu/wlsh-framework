@@ -9,6 +9,7 @@ use App\Domain\System\UserDomain;
 use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Library\ProgramException;
+use App\Models\Clickhouse\InfoClickhouse;
 use App\Models\Es\InfoEs;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Kafka\InfoKafka;
@@ -22,7 +23,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swoole\Coroutine;
 use Exception;
-use Doctrine\Common\Annotations\Annotation;
+use App\Library\Router;
 
 /**
  * @Annotation
@@ -683,7 +684,7 @@ class TestController
         return http_response(500, '查询失败');
     }
 
-    #[Router(method: 'GET', auth: false)]
+    #[Router(method: 'GET', auth: true)]
     public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
@@ -1214,7 +1215,7 @@ class TestController
     }
 
     #[Router(method: 'GET', auth: false)]
-    public function testEsAction()
+    public function testEsAction(): string
     {
         $client = ClientBuilder::create()
             ->setHosts(['172.17.0.1:9200'])
@@ -1231,23 +1232,30 @@ class TestController
 
     //QPS 2800
     #[Router(method: 'GET', auth: false)]
-    public function testEsInfoAction()
+    public function testEsInfoAction(): string
     {
         $res = InfoEs::getInstance()->getInfoById(1);
         return http_response(data: $res);
     }
 
     #[Router(method: 'GET', auth: false)]
-    public function testKafkaProducerAction()
+    public function testKafkaProducerAction(): string
     {
         InfoKafka::getInstance()->addInfo();
         return http_response();
     }
 
     #[Router(method: 'GET', auth: false)]
-    public function testKafkaCustomerAction()
+    public function testKafkaCustomerAction(): string
     {
         $res = InfoKafka::getInstance()->getInfo();
+        return http_response(data: [$res]);
+    }
+
+    #[Router(method: 'GET', auth: false)]
+    public function getClickhouseInfoAction(): string
+    {
+        $res = InfoClickhouse::getInstance()->getInfoById(1);
         return http_response(data: [$res]);
     }
 

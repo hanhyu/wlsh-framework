@@ -58,6 +58,7 @@ return array(
     'Console\\Controllers\\' => array($baseDir . '/console/controllers'),
     'Composer\\XdebugHandler\\' => array($vendorDir . '/composer/xdebug-handler/src'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
+    'ClickHouseDB\\' => array($vendorDir . '/smi2/phpclickhouse/src'),
     'App\\Services\\' => array($baseDir . '/application/services'),
     'App\\Modules\\' => array($baseDir . '/application/modules'),
     'App\\Models\\' => array($baseDir . '/application/models'),

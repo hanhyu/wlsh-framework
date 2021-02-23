@@ -57,6 +57,7 @@ class LogController
      * Time: 下午2:59
      * @throws Exception
      * @throws ProgramException
+     * @todo 流量日志如果需要进行分析，可以使用ClickHouse替换
      */
     #[Router(method: 'CLI', auth: false)]
     public function routerLogAction(): void

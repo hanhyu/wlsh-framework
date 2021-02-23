@@ -61,6 +61,13 @@ return [
         'group_instance_id' => 'test_custom',
     ],
 
+    'clickhouse' => [
+        'host'     => 'wlsh-clickhouse',
+        'port'     => '8123',
+        'username' => 'default',
+        'password' => '123456',
+    ],
+
     'page' => [
         'title' => '本地开发-运维平台',
     ],
