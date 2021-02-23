@@ -53,41 +53,33 @@ class RouterInit
         }
 
         try {
-            //$ref            = new \ReflectionClass($ctrl);
-            // $ref_method_doc = $ref->getMethod($action)->getDocComment();
-            // $flag           = preg_match_all('/@router(.*?)\n/', $ref_method_doc, $ref_method_doc);
-
-            $ref     = new \ReflectionMethod($ctrl, $action);
-            $ref_arg = $ref->getAttributes()[0]?->getArguments();
+            $ref = new \ReflectionMethod($ctrl, $action);
+            /**
+             * @var $ref_arg Router
+             */
+            $ref_arg = $ref->getAttributes()[0]?->newInstance();
 
             if (empty($ref_arg)) {
                 throw new ProgramException('请求的接口不存在', 500);
             }
 
-            $ref_arg['method']          = strtoupper($ref_arg['method']) ?? 'GET';
-            $ref_arg['auth']            = $ref_arg['auth'] ?? true;
-            $ref_arg['rate-limit']      = $ref_arg['rate-limit'] ?? 0;
-            $ref_arg['circuit-breaker'] = $ref_arg['circuit-breaker'] ?? 0;
-            $ref_arg['before']          = $ref_arg['before'] ?? '';
-            $ref_arg['after']           = $ref_arg['after'] ?? '';
-
-            if ('CLI' === ucfirst($ref_arg['method'])) {
+            if ('CLI' === $ref_arg->method) {
                 $ref_arg['method'] = 'Cli';
             }
 
-            if ($method !== $ref_arg['method']) {
+            if ($method !== $ref_arg->method) {
                 throw new ProgramException('请求方法不正确', 405);
             }
 
-            if (true === $ref_arg['auth']) {
+            if (true === $ref_arg->auth) {
                 $this->authToken();
             }
 
             if (class_exists($ctrl)) {
                 $class = new $ctrl();
                 if (method_exists($class, $action)) {
-                    if (!empty($ref_arg['before'])) {
-                        $before_action = $ref_arg['before'];
+                    if (!empty($ref_arg->before)) {
+                        $before_action = $ref_arg->before;
                         if ($before_res = $class->$before_action()) {
                             return $before_res;
                         }
@@ -95,8 +87,8 @@ class RouterInit
 
                     $res = $class->$action();
 
-                    if (!empty($ref_arg['after'])) {
-                        $after_action = $ref_arg['after'];
+                    if (!empty($ref_arg->after)) {
+                        $after_action = $ref_arg->after;
                         $class->$after_action();
                     }
 

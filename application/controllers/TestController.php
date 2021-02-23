@@ -684,7 +684,7 @@ class TestController
         return http_response(500, '查询失败');
     }
 
-    #[Router(method: 'GET', auth: true)]
+    #[Router(method: 'GET', auth: false)]
     public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');
@@ -1245,14 +1245,14 @@ class TestController
         return http_response();
     }
 
-    #[Router(method: 'GET', auth: false)]
+    #[Router(auth: false)]
     public function testKafkaCustomerAction(): string
     {
         $res = InfoKafka::getInstance()->getInfo();
         return http_response(data: [$res]);
     }
 
-    #[Router(method: 'GET', auth: false)]
+    #[Router(auth: false)]
     public function getClickhouseInfoAction(): string
     {
         $res = InfoClickhouse::getInstance()->getInfoById(1);

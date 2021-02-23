@@ -16,7 +16,15 @@ namespace App\Library;
      * @param string $before          请求方法之前执行,一般是权限检查动作，用户登录日志，重要数据查询日志，数据删除日志，重要数据变更日志 （如密码变更，权限变更，数据修改等）
      * @param string $after           请求方法之后执行
      */
-    public function __construct(string $method, bool $auth, int $rate_limit, int $circuit_breaker, string $before, string $after)
+    public function __construct(
+        public string $method = 'GET',
+        public bool $auth = true,
+        public int $rate_limit = 0,
+        public int $circuit_breaker = 0,
+        public string $before = '',
+        public string $after = ''
+    )
     {
+        $this->method = strtoupper($method);
     }
 }
