@@ -55,31 +55,31 @@ class RouterInit
         try {
             $ref = new \ReflectionMethod($ctrl, $action);
             /**
-             * @var $ref_arg Router
+             * @var $ref_router Router
              */
-            $ref_arg = $ref->getAttributes(Router::class)[0]?->newInstance();
+            $ref_router = $ref->getAttributes(Router::class)[0]?->newInstance();
 
-            if (empty($ref_arg)) {
+            if (empty($ref_router)) {
                 throw new ProgramException('请求的接口不存在', 500);
             }
 
-            if ('CLI' === $ref_arg->method) {
-                $ref_arg->method = 'Cli';
+            if ('CLI' === $ref_router->method) {
+                $ref_router->method = 'Cli';
             }
 
-            if ($method !== $ref_arg->method) {
+            if ($method !== $ref_router->method) {
                 throw new ProgramException('请求方法不正确', 405);
             }
 
-            if (true === $ref_arg->auth) {
+            if (true === $ref_router->auth) {
                 $this->authToken();
             }
 
             if (class_exists($ctrl)) {
                 $class = new $ctrl();
                 if (method_exists($class, $action)) {
-                    if (!empty($ref_arg->before)) {
-                        $before_action = $ref_arg->before;
+                    if (!empty($ref_router->before)) {
+                        $before_action = $ref_router->before;
                         if ($before_res = $class->$before_action()) {
                             return $before_res;
                         }
@@ -87,8 +87,8 @@ class RouterInit
 
                     $res = $class->$action();
 
-                    if (!empty($ref_arg->after)) {
-                        $after_action = $ref_arg->after;
+                    if (!empty($ref_router->after)) {
+                        $after_action = $ref_router->after;
                         $class->$after_action();
                     }
 
