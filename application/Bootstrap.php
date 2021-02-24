@@ -96,8 +96,7 @@ class Bootstrap
         ]);
 
         $this->table = new Table(1024);
-        $this->table->column('key', Table::TYPE_STRING, 20);
-        $this->table->column('value', Table::TYPE_INT, 128);
+        $this->table->column('rate_limit', Table::TYPE_INT, 128);
         $this->table->create();
 
         $this->atomic = new Atomic();
@@ -433,6 +432,9 @@ class Bootstrap
         DI::set('response_obj' . $cid, $response);
         DI::set('trace_id' . $cid, $request->header['Traceid'] ?? $this->generalTraceId(get_ip($request->server)));
 
+        //限流功能，该接口请求次数加1
+        $this->table->incr($request_uri_str, 'rate_limit', 1);
+
         $response->status(200);
         $response->header('Traceid', DI::get('trace_id' . $cid));
 
@@ -466,6 +468,8 @@ class Bootstrap
             DI::del('trace_id' . $cid);
         }
 
+        //限流功能，该接口请求次数减1
+        $this->table->decr($request_uri_str, 'rate_limit', 1);
         error_clear_last();
         clearstatcache();
     }

@@ -346,7 +346,7 @@ class TestController
      *
      * @router auth=false&method=get
      */
-    #[Router(method: 'GET', auth: false)]
+    #[Router(method: 'GET', auth: false, rate_limit: 60000)]
     public function testAction(): string
     {
         return 'hello world';
@@ -665,12 +665,12 @@ class TestController
      *
      * @throws \JsonException
      */
-    #[Router(method: 'GET', auth: false)]
+    #[Router(method: 'GET', auth: false, rate_limit: 3000)]
     public function getUserListAction(): string
     {
         $data['curr_page'] = 1;
         $data['page_size'] = 7;
-        //print_r('4567');
+
         $res = (new UserDomain())->getInfoList($data);
 
         //压测使用两个协程并行执行，结果与不使用并行一样。
@@ -684,7 +684,7 @@ class TestController
         return http_response(500, '查询失败');
     }
 
-    #[Router(method: 'GET', auth: false)]
+    #[Router(method: 'GET', auth: false, rate_limit: 5000)]
     public function getUserInfoAction(): string
     {
         $res = (new UserDomain())->getInfoByName('ceshi123');

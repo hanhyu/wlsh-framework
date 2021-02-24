@@ -56,4 +56,19 @@ class ServerStatusController
         return http_response(data: $data);
     }
 
+    #[Router()]
+    public function getUriRateLimitAction(): string
+    {
+        $res   = [];
+        $table = DI::get('table_obj');
+
+        $table->rewind();
+        while ($table->valid()) {
+            $res[$table->key()] = $table->current();
+            $table->next();
+        }
+        //{"code":200,"msg":"success","data":{"/test/getUserList":{"rate_limit":10000},"/test/getTableList":{"rate_limit":1},"/test/getUserInfo":{"rate_limit":10000}}}
+        return http_response(data: $res);
+    }
+
 }

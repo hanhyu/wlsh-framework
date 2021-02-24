@@ -75,6 +75,9 @@ class RouterInit
                 $this->authToken();
             }
 
+            //接口限流
+            $this->rateLimit(implode('/', $uri_arr), $ref_router->rate_limit);
+
             if (class_exists($ctrl)) {
                 $class = new $ctrl();
                 if (method_exists($class, $action)) {
@@ -120,4 +123,28 @@ class RouterInit
             throw new ProgramException($res['msg'], $res['code']);
         }
     }
+
+    /**
+     * 接口限流
+     *
+     * User: hanhyu
+     * Date: 2021/2/24
+     * Time: 下午9:47
+     *
+     * @param string $uri_str    请求的接口uri值
+     * @param int    $rate_limit 该接口最大Qps|Tps
+     *
+     * @throws ProgramException
+     */
+    private function rateLimit(string $uri_str, int $rate_limit): void
+    {
+        if (
+            ('prod' === CURRENT_ENV)
+            and $rate_limit > 0
+            and (DI::get('table_obj')->get($uri_str, 'rate_limit') > $rate_limit)
+        ) {
+            throw new ProgramException('服务繁忙中，请稍候再试！', 500);
+        }
+    }
+
 }
