@@ -6,6 +6,7 @@ namespace App\Modules\Task\Controllers;
 use App\Library\ProgramException;
 use App\Library\Router;
 use App\Library\TaskTrait;
+use App\Models\Clickhouse\RouterLogClickhouse;
 use App\Models\Mysql\RouterLogMysql;
 use Envms\FluentPDO\Exception;
 
@@ -63,7 +64,8 @@ class LogController
     #[Router(method: 'CLI', auth: false)]
     public function routerLogAction(): void
     {
-        RouterLogMysql::getInstance()->setLog($this->data);
+        //RouterLogMysql::getInstance()->setLog($this->data);
+        RouterLogClickhouse::getInstance()->setLog($this->data);
     }
 
 }

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace App\Domain\System;
 
+use App\Library\ProgramException;
+use App\Models\Clickhouse\RouterLogClickhouse;
 use App\Models\Mongo\MonologMongo;
 use App\Models\Mysql\RouterLogMysql;
 use MongoDB\BSON\UTCDateTime;
@@ -119,8 +121,8 @@ class LogDomain
             $data['where']['req_ip'] = $data['req_ip'];
         }
 
-        $res['count'] = RouterLogMysql::getInstance()->getListCount($data);
-        $res['list']  = RouterLogMysql::getInstance()->getList($data);
+        $res['count'] = RouterLogClickhouse::getInstance()->getListCount($data);
+        $res['list']  = RouterLogClickhouse::getInstance()->getList($data);
         return $res;
     }
 

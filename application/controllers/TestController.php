@@ -10,6 +10,7 @@ use App\Library\ControllersTrait;
 use App\Library\DI;
 use App\Library\ProgramException;
 use App\Models\Clickhouse\InfoClickhouse;
+use App\Models\Clickhouse\RouterLogClickhouse;
 use App\Models\Es\InfoEs;
 use App\Models\Forms\SystemUserForms;
 use App\Models\Kafka\InfoKafka;
@@ -1255,7 +1256,8 @@ class TestController
     #[Router(auth: false)]
     public function getClickhouseInfoAction(): string
     {
-        $res = InfoClickhouse::getInstance()->getInfoById(1);
+        //$res = InfoClickhouse::getInstance()->getInfoById(1);
+        $res = RouterLogClickhouse::getInstance()->getInfoById('172.23.0.2_25_3237183.1931541_181');
         return http_response(data: [$res]);
     }
 
