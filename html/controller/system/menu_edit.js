@@ -68,11 +68,11 @@ new Vue({
                 .then(function (response) {
                     switch (response.data.code) {
                         case 200:
-                            self.id = response.data.data[0].id;
-                            self.name = response.data.data[0].name;
-                            self.icon = response.data.data[0].icon;
-                            self.url = response.data.data[0].url;
-                            self.up_id = response.data.data[0].up_id;
+                            self.id = response.data.data.id;
+                            self.name = response.data.data.name;
+                            self.icon = response.data.data.icon;
+                            self.url = response.data.data.url;
+                            self.up_id = response.data.data.up_id;
                             break;
                         case 300:
                             location.href = 'login.html';

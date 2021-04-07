@@ -3,23 +3,26 @@
 namespace App\Models\Clickhouse;
 
 use App\Library\AbstractClickhouse;
+use ClickHouseDB\Statement;
 
 class RouterLogClickhouse extends AbstractClickhouse
 {
     protected string $table = 'router_log';
 
-    public function getInfoById(string $trace_id)
+    public function getInfoById(string $trace_id): ?array
     {
         return self::getDb()->select("SELECT * FROM {$this->table} WHERE trace_id = '{$trace_id}'")->fetchOne();
     }
 
-    public function setLog(array $data): int
+    public function setLog(array $data): Statement
     {
-        return (int)self::getDb()->insert($this->table,
+        return self::getDb()->insert($this->table,
             [
-                $data['trace_id'], $data['level'], $data['req_method'], $data['req_uri'],
-                json_encode($data['req_data'], JSON_THROW_ON_ERROR | 320),
-                $data['req_ip'], $data['fd_time'], $data['req_time'], $data['resp_time'], $data['resp_data'],
+                [
+                    $data['trace_id'], $data['level'], $data['req_method'], $data['req_uri'],
+                    json_encode($data['req_data'], JSON_THROW_ON_ERROR | 320),
+                    $data['req_ip'], $data['fd_time'], $data['req_time'], $data['resp_time'], $data['resp_data'],
+                ],
             ],
             [
                 'trace_id', 'level', 'req_method', 'req_uri', 'req_data', 'req_ip', 'fd_time', 'req_time', 'resp_time', 'resp_data',

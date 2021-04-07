@@ -95,8 +95,8 @@ new Vue({
                 });
         },
         //显示详细信息
-        getInfo(id) {
-            x_admin_show('详细信息', "router_info.html?id=" + id, 800, 700);
+        getInfo(trace_id) {
+            x_admin_show('详细信息', "router_info.html?trace_id=" + trace_id, 800, 700);
         },
         //清空查询条件
         cleanSearch() {

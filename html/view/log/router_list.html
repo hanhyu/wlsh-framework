@@ -80,7 +80,6 @@
                     <table class="layui-table layui-form">
                         <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Trace_id</th>
                             <th>日志等级</th>
                             <th>请求方法</th>
@@ -95,7 +94,6 @@
                         </thead>
                         <tbody>
                         <tr v-for="item in privmessage">
-                            <td>{{item.id}}</td>
                             <td>{{item.trace_id}}</td>
                             <td>{{item.level.toUpperCase()}}</td>
                             <td>{{item.req_method}}</td>
@@ -106,7 +104,7 @@
                             <td width="80px">{{formatDate(item.resp_time)}}</td>
                             <td width="80px">{{item.create_time}}</td>
                             <td class="td-manage">
-                                <button @click.prevent="getInfo(item.id)" class="layui-btn layui-btn-sm"><i
+                                <button @click.prevent="getInfo(item.trace_id)" class="layui-btn layui-btn-sm"><i
                                         class="layui-icon">&#xe642;</i>详情
                                 </button>
                             </td>

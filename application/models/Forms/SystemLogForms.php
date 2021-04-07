@@ -58,7 +58,7 @@ class SystemLogForms
     ];
 
     public static array $getRouterInfo = [
-        'id' => 'Required|Str',
+        'trace_id' => 'Required|Str',
     ];
 
 }

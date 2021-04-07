@@ -36,10 +36,10 @@ class LogController
         }
 
         if (APP_DEBUG) {
-            $let = monolog_by_mongodb($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
-            if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
-                monolog_by_file($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
-            }
+            //$let = monolog_by_mongodb($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
+            //if (!$let) { //如果使用mongodb记录日志失败，则使用文件存储日志。
+            monolog_by_file($this->data['content'], $this->data['info'], $this->data['channel'], $this->data['level']);
+            //}
         }
 
         /*
@@ -59,13 +59,14 @@ class LogController
      * Time: 下午2:59
      * @throws Exception
      * @throws ProgramException
+     * @throws \JsonException
      * @todo 流量日志如果需要进行分析，可以使用ClickHouse替换
      */
     #[Router(method: 'CLI', auth: false)]
     public function routerLogAction(): void
     {
-        //RouterLogMysql::getInstance()->setLog($this->data);
-        RouterLogClickhouse::getInstance()->setLog($this->data);
+        RouterLogMysql::getInstance()->setLog($this->data);
+        //RouterLogClickhouse::getInstance()->setLog($this->data);
     }
 
 }

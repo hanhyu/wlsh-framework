@@ -135,10 +135,11 @@ class SystemMenuMysql extends AbstractPdo
      *
      * @param int $id
      *
-     * @return bool
-     * @throws Exception|ProgramException
+     * @return int|bool
+     * @throws Exception
+     * @throws ProgramException
      */
-    public function delMenu(int $id): bool
+    public function delMenu(int $id): int|bool
     {
         return self::getDb()->deleteFrom($this->table)
             ->where('id', $id)

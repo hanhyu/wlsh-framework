@@ -79,18 +79,18 @@ class RouterLogMysql extends AbstractPdo
      * Date: 2021/2/15
      * Time: 下午9:49
      *
-     * @param string $id
+     * @param string $trace_id
      *
      * @return array|bool
      * @throws Exception
      * @throws ProgramException
      */
-    public function getInfoById(string $id): array|bool
+    public function getInfoByTraceId(string $trace_id): array|bool
     {
         return self::getDb($this->db)
             ->from($this->table)
-            ->where('id', $id)
-            ->select('id, req_data, resp_data', true)
+            ->where('trace_id', $trace_id)
+            ->select('trace_id, req_data, resp_data', true)
             ->fetch();
     }
 

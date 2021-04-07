@@ -44,7 +44,7 @@ class LogRouterController
     public function getInfoAction(): string
     {
         $data = $this->validator(SystemLogForms::$getRouterInfo);
-        return http_response(data: $this->log->getRouterInfo($data['id']));
+        return http_response(data: $this->log->getRouterInfo($data['trace_id']));
     }
 
 }

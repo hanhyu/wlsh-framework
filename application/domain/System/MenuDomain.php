@@ -66,7 +66,7 @@ class MenuDomain
         return SystemMenuMysql::getInstance()->editMenu($data);
     }
 
-    public function delMenu(int $id): int
+    public function delMenu(int $id): int|bool
     {
         return SystemMenuMysql::getInstance()->delMenu($id);
     }

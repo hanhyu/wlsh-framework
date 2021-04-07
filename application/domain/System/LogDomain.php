@@ -121,14 +121,14 @@ class LogDomain
             $data['where']['req_ip'] = $data['req_ip'];
         }
 
-        $res['count'] = RouterLogClickhouse::getInstance()->getListCount($data);
-        $res['list']  = RouterLogClickhouse::getInstance()->getList($data);
+        $res['count'] = RouterLogMysql::getInstance()->getListCount($data);
+        $res['list']  = RouterLogMysql::getInstance()->getList($data);
         return $res;
     }
 
-    public function getRouterInfo(string $id): array|bool
+    public function getRouterInfo(string $trace_id): array|bool
     {
-        return RouterLogMysql::getInstance()->getInfoById($id);
+        return RouterLogMysql::getInstance()->getInfoByTraceId($trace_id);
     }
 
 }

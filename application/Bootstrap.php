@@ -89,7 +89,7 @@ class Bootstrap
             //'open_mqtt_protocol'         => true,
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
-            'hook_flags'                 => SWOOLE_HOOK_ALL,
+            'hook_flags'                 => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_CURL | SWOOLE_HOOK_NATIVE_CURL,
             'user'                       => 'root',
             'group'                      => 'root',
             'http_compression_level'     => 4,
@@ -642,7 +642,7 @@ class Bootstrap
      * @param string  $level
      * @param string  $resp_data
      */
-    private function routerLog(Request $request, string $level = info, string $resp_data): void
+    private function routerLog(Request $request, string $level = info, string $resp_data = ''): void
     {
         $cid = Coroutine::getCid();
         if (DI::get('log_flag' . $cid)) {

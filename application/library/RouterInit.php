@@ -49,7 +49,7 @@ class RouterInit
                 break;
             default:
                 $ctrl   = 'App\Controllers\\' . ucfirst($uri_arr[1]) . 'Controller';
-                $action = $uri_arr[2] . 'Action';
+                $action = ($uri_arr[2] ?? '') . 'Action';
         }
 
         try {

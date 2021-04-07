@@ -423,11 +423,10 @@ class TestController
      *
      */
     #[Router(method: 'GET', auth: false)]
-    public function getRedisAction(): bool|string
+    public function getRedisAction(): string
     {
         $value = (new LoginDomain())->getKey('key');
-        //return http_response(200, '', ['content' => $value]);
-        return $value;
+        return http_response(200, '', ['content' => $value]);
     }
 
     #[Router(method: 'GET', auth: false)]

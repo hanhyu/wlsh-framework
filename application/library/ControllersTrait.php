@@ -111,25 +111,23 @@ trait ControllersTrait
      */
     public function validator(array $validations): array
     {
-        if (empty($this->data)) {
-            throw new ProgramException('参数错误', 400);
-        }
-
-        //如果是登录接口，则需解密接口数据
-        //todo 优化到路由参数中sign的值控制是否需要进行解密操作
-        if ($this->request->server['request_uri'] === '/system/user/login') {
-            if (!isset($this->data['login_data']) or !is_string($this->data['login_data'])) {
-                throw new ProgramException('参数错误', 400);
+        if (!empty($this->data)) {
+            //如果是登录接口，则需解密接口数据
+            //todo 优化到路由参数中sign的值控制是否需要进行解密操作
+            if ($this->request->server['request_uri'] === '/system/user/login') {
+                if (!isset($this->data['login_data']) or !is_string($this->data['login_data'])) {
+                    throw new ProgramException('参数错误', 400);
+                }
+                $decrypt    = private_decrypt($this->data['login_data'], DI::get('config_arr')['sign']['prv_key']);
+                $this->data = json_decode($decrypt, true, 512, JSON_THROW_ON_ERROR);
             }
-            $decrypt    = private_decrypt($this->data['login_data'], DI::get('config_arr')['sign']['prv_key']);
-            $this->data = json_decode($decrypt, true, 512, JSON_THROW_ON_ERROR);
-        }
 
-        $lang_code = $this->request->header['language'] ?? 'zh-cn';
-        if (empty($lang_code)) {
-            FormsVali::setLangCode('zh-cn');
-        } else {
-            FormsVali::setLangCode($lang_code);
+            $lang_code = $this->request->header['language'] ?? 'zh-cn';
+            if (empty($lang_code)) {
+                FormsVali::setLangCode('zh-cn');
+            } else {
+                FormsVali::setLangCode($lang_code);
+            }
         }
 
         try {

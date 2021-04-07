@@ -22,7 +22,7 @@ new Vue({
                 method: 'get',
                 url: 'system/logRouter/getInfo',
                 params: {
-                    id: getUrlParam('id')
+                    trace_id: getUrlParam('trace_id')
                 }
             })
                 .then(function (response) {
