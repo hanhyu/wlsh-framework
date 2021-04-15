@@ -18,6 +18,11 @@ class SystemMsgMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_msg';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      * 添加内容
      *

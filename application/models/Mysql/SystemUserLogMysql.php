@@ -18,6 +18,11 @@ class SystemUserLogMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_user_log';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      * 添加用户登录记录
      *

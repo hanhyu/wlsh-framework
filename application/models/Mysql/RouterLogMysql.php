@@ -11,7 +11,11 @@ use Envms\FluentPDO\Exception;
 class RouterLogMysql extends AbstractPdo
 {
     protected string $table = 'router_log';
-    protected string $db = 'log_pool_obj';
+
+    public static function getPool(): string
+    {
+        return 'log_pool_obj';
+    }
 
     /**
      * User: hanhyu
@@ -26,7 +30,7 @@ class RouterLogMysql extends AbstractPdo
      */
     public function setLog(array $data): int
     {
-        return (int)self::getDb($this->db)->insertInto($this->table)
+        return (int)self::getDb()->insertInto($this->table)
             ->values([
                 'trace_id'   => $data['trace_id'],
                 'level'      => $data['level'],
@@ -58,7 +62,7 @@ class RouterLogMysql extends AbstractPdo
     public function getList(array $data): bool|array
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return self::getDb($this->db)
+        return self::getDb()
             ->from($this->table)
             ->where($wheres)
             ->select('id,trace_id,level,req_method,req_uri,req_ip,fd_time,req_time,resp_time,create_time', true)
@@ -71,7 +75,7 @@ class RouterLogMysql extends AbstractPdo
     public function getListCount(array $data): int
     {
         $wheres = !empty($data['where']) ? $data['where'] : null;
-        return self::getDb($this->db)->from($this->table)->where($wheres)->count();
+        return self::getDb()->from($this->table)->where($wheres)->count();
     }
 
     /**
@@ -87,7 +91,7 @@ class RouterLogMysql extends AbstractPdo
      */
     public function getInfoByTraceId(string $trace_id): array|bool
     {
-        return self::getDb($this->db)
+        return self::getDb()
             ->from($this->table)
             ->where('trace_id', $trace_id)
             ->select('trace_id, req_data, resp_data', true)

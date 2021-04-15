@@ -21,6 +21,11 @@ class UserLogViewMysql extends AbstractPdo
 {
     protected string $table = 'user_log_view';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      *
      * @param array $data

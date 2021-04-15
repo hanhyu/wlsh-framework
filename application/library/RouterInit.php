@@ -27,8 +27,6 @@ class RouterInit
      */
     public function routerStartup(array $uri_arr, string $method): ?string
     {
-        //todo 使用atomic做接口限流
-
         /*可以在这个钩子函数routerShutdown中做拦截处理，获取当前URI，以当前URI做KEY，判断是否存在该KEY的缓存，
          若存在则停止解析，直接输出页面，缓存数据页。
          或做防重复操作提交*/

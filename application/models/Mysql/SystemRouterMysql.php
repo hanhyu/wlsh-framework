@@ -16,6 +16,11 @@ class SystemRouterMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_router';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      * 获取列表信息
      *

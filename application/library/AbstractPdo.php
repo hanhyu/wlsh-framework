@@ -45,18 +45,16 @@ abstract class AbstractPdo
      * Date: 2021/1/30
      * Time: 上午10:19
      *
-     * @param string $di_db_schema 数据库对象池名称
-     *
      * @return Query
      * @throws ProgramException
      */
-    public static function getDb(string $di_db_schema = 'mysql_pool_obj'): Query
+    public static function getDb(): Query
     {
         $_class_name = static::class;
         $_cid        = Coroutine::getCid();
         if (!isset(static::$instance[$_class_name]['pdo'][$_cid])) {
             /** @var $_pool_obj PdoPool */
-            $_pool_obj = DI::get($di_db_schema);
+            $_pool_obj = DI::get(static::getPool());
             if (!$_pool_obj->available) {
                 throw new ProgramException('服务正在重启中，请稍候重试', 500);
             }

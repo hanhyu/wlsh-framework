@@ -18,9 +18,15 @@ class SystemBackupMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_backup';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      * 获取数据库中所有表名
      * @return array
+     * @throws ProgramException
      */
     public function getTables(): array
     {

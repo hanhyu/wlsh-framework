@@ -18,6 +18,11 @@ class SystemUserMysql extends AbstractPdo
 {
     protected string $table = 'frame_system_user';
 
+    public static function getPool(): string
+    {
+        return 'mysql_pool_obj';
+    }
+
     /**
      * @param array $post
      *

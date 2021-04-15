@@ -1,3 +1,3 @@
 <?php declare(strict_types=1);
 
-define('CURRENT_ENV', 'pre');
+const CURRENT_ENV = 'pre';

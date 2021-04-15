@@ -146,6 +146,7 @@ class Bootstrap
      */
     public function onWorkerStart(Server $server, int $worker_id): void
     {
+        opcache_reset();
         /* array(3) {
                  [0]=>
            string(26) "/home/baseFrame/swoole.php"
