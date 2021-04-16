@@ -68,18 +68,17 @@ function http_response(int $code = 200, string $msg = 'success', array $data = [
  * ws协议以固定json格式返回信息
  *
  * @param int    $code
- * @param string $uri
  * @param string $msg
  * @param array  $data
  * @param bool   $vail
  *
  * @return string
  */
-function ws_response(int $code = 200, string $uri = '', string $msg = '', array $data = [], bool $vail = false): string
+function ws_response(int $code = 200, string $msg = 'success', array $data = [], bool $vail = false): string
 {
     $result         = [];
     $result['code'] = $code;
-    $result['uri']  = $uri;
+    $result['uri']  = DI::get('ws_data_arr' . Coroutine::getCid())['uri'] ?? '';
 
     $lang_code = DI::get('ws_language_str');
     if ('zh-cn' === $lang_code) {

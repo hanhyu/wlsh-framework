@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 
+use App\Library\Router;
 use App\Library\WebsocketTrait;
 
 class ImController
@@ -16,12 +17,10 @@ class ImController
         $this->beforeInit();
     }
 
-    /**
-     * @router auth=false&method=cli
-     */
-    public function getInfoAction(): void
+    #[Router(method: 'CLI', auth: false, rate_limit: 60000)]
+    public function getInfoAction(): string
     {
-        $this->server->push($this->fd, ws_response(200, 'im/get_info', 'success'));
+        return ws_response();
     }
 
 }

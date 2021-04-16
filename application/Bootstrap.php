@@ -323,54 +323,58 @@ class Bootstrap
         } else {
             try {
                 $res = json_decode($frame->data, true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-            } catch (JsonException $j) {
+            } catch (JsonException) {
                 if ($server->isEstablished($frame->fd)) {
-                    $server->push($frame->fd, ws_response(422, '', '无法处理请求内容'));
+                    $server->push($frame->fd, ws_response(422, '无法处理请求内容'));
                 }
             }
 
             if (!isset($res['uri']) and empty($res['uri'])) {
                 if ($server->isEstablished($frame->fd)) {
-                    $server->push($frame->fd, ws_response(400, '', '非法访问'));
+                    $server->push($frame->fd, ws_response(400, '非法访问'));
                 }
                 $server->close($frame->fd, true);
                 return;
             }
 
-            DI::set('fd_int' . Coroutine::getCid(), $frame->fd);
-            DI::set('ws_data_arr' . Coroutine::getCid(), $res);
+            $cid = Coroutine::getCid();
+            DI::set('fd_int' . $cid, $frame->fd);
+            DI::set('ws_data_arr' . $cid, $res);
+
+            //限流功能，该接口请求次数加1
+            $this->table->incr($res['uri'], 'rate_limit', 1);
 
             try {
                 $uri_arr = explode('/', $res['uri']);
-                (new RouterInit())->routerStartup($uri_arr, 'Cli');
+                $res     = (new RouterInit())->routerStartup($uri_arr, 'Cli');
+                if ($server->isEstablished($frame->fd)) {
+                    $server->push($frame->fd, $res);
+                }
             } catch (ValidateException $e) { //参数验证手动触发的信息
                 if ($server->isEstablished($frame->fd)) {
-                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage(), [], true));
+                    $server->push($frame->fd, ws_response($e->getCode(), $e->getMessage(), [], true));
                 }
             } catch (ProgramException $e) { //程序手动抛出的异常
                 if ($server->isEstablished($frame->fd)) {
-                    $server->push($frame->fd, ws_response($e->getCode(), '', $e->getMessage()));
+                    $server->push($frame->fd, ws_response($e->getCode(), $e->getMessage()));
                 }
             } catch (Throwable $e) {
                 if ($server->isEstablished($frame->fd)) {
                     if (APP_DEBUG) {
-                        $server->push($frame->fd, ws_response(500, '', $e->getMessage(), $e->getTrace()));
+                        $server->push($frame->fd, ws_response(500, $e->getMessage(), $e->getTrace()));
                     } else {
-                        $server->push($frame->fd, ws_response(500, '', '服务异常'));
+                        $server->push($frame->fd, ws_response(500, '服务异常'));
                     }
                 }
-
-                task_monolog(
-                    $server,
-                    ['message' => $e->getMessage(), 'trace' => $e->getTrace()],
-                    'onRequest Throwable message:',
-                    'websocket',
-                    'error'
-                );
             } finally {
-                DI::del('fd_int' . Coroutine::getCid());
-                DI::del('ws_data_arr' . Coroutine::getCid());
+                DI::del('fd_int' . $cid);
+                DI::del('ws_data_arr' . $cid);
             }
+
+            //限流功能，该接口请求次数减1
+            $this->table->decr($res['uri'], 'rate_limit', 1);
+            error_clear_last();
+            clearstatcache();
         }
     }
 
