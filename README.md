@@ -6,8 +6,8 @@
 
 | 分类 | 说明 |
 | :------ | :------ |
-官网|https://www.wlsh.xyz
-文档|https://doc.wlsh.xyz
+官网|http://www.wlsh.xyz
+文档|http://doc-v2.wlsh.xyz
 联系邮箱|hanhyu@qq.com
 
 ### 使用基本要求

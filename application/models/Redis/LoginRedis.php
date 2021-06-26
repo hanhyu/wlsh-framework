@@ -20,6 +20,11 @@ class LoginRedis extends AbstractRedis
      * @var int
      */
     protected static int $db_index = 1;
+    
+    public static function getPool(): string
+    {
+        return 'redis_pool_obj';
+    }
 
     /**
      * UserDomain: hanhyu

@@ -102,6 +102,7 @@ new Vue({
             $("#start_time").val('');
             $("#end_time").val('');
             $("#channel").val('');
+            layui.form.render('select');
         }
     },
     watch: {

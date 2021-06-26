@@ -106,6 +106,7 @@ new Vue({
             $("#trace_id").val('');
             $("#req_uri").val('');
             $("#req_ip").val('');
+            layui.form.render('select');
         },
         formatDate: formatDate
     },

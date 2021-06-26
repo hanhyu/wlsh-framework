@@ -14,7 +14,7 @@ use Redis;
 use RedisException;
 use Swoole\Coroutine;
 
-abstract class AbstractRedis
+abstract class AbstractRedis implements ModelInterface
 {
     private static array $instance = [];
     /**
@@ -53,18 +53,17 @@ abstract class AbstractRedis
      * Date: 2021/1/30
      * Time: 下午3:08
      *
-     * @param string $di_db_schema 数据库对象池名称
      *
      * @return Redis
      * @throws RedisException
      */
-    public static function getDb(string $di_db_schema = 'redis_pool_obj'): Redis
+    public static function getDb(): Redis
     {
         $_class_name = static::class;
         $_cid        = Coroutine::getCid();
         if (!isset(static::$instance[$_class_name]['redis'][$_cid])) {
             /** @var $_pool_obj RedisPool */
-            $_pool_obj = DI::get($di_db_schema);
+            $_pool_obj = DI::get(static::getPool());
             $_instance = static::$instance[$_class_name]['redis'][$_cid] = $_pool_obj->get();
         } else {
             $_instance = static::$instance[$_class_name]['redis'][$_cid];

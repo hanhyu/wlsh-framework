@@ -11,7 +11,7 @@ use Swoole\Coroutine;
  * Date: 18-10-28
  * Time: 下午3:34
  */
-abstract class AbstractPdo
+abstract class AbstractPdo implements ModelInterface
 {
     private static array $instance = [];
 

@@ -21,6 +21,11 @@ class UserRedis extends AbstractRedis
      */
     protected static int $db_index = 6;
 
+    public static function getPool(): string
+    {
+        return 'redis_pool_obj';
+    }
+
     /**
      * UserDomain: hanhyu
      * Date: 19-6-23
