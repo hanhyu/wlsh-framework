@@ -13,11 +13,17 @@ use longlang\phpkafka\Protocol\AbstractResponse;
 use longlang\phpkafka\Protocol\ApiKeys;
 use longlang\phpkafka\Protocol\ApiVersions\ApiVersionsRequest;
 use longlang\phpkafka\Protocol\ApiVersions\ApiVersionsResponse;
+use longlang\phpkafka\Protocol\ApiVersions\ApiVersionsResponseKey;
 use longlang\phpkafka\Protocol\ErrorCode;
 use longlang\phpkafka\Protocol\KafkaRequest;
 use longlang\phpkafka\Protocol\RequestHeader\RequestHeader;
 use longlang\phpkafka\Protocol\ResponseHeader\ResponseHeader;
+use longlang\phpkafka\Protocol\SaslAuthenticate\SaslAuthenticateRequest;
+use longlang\phpkafka\Protocol\SaslAuthenticate\SaslAuthenticateResponse;
+use longlang\phpkafka\Protocol\SaslHandshake\SaslHandshakeRequest;
+use longlang\phpkafka\Protocol\SaslHandshake\SaslHandshakeResponse;
 use longlang\phpkafka\Protocol\Type\Int32;
+use longlang\phpkafka\Sasl\SaslInterface;
 use longlang\phpkafka\Socket\SocketInterface;
 use longlang\phpkafka\Socket\StreamSocket;
 
@@ -29,7 +35,7 @@ class SyncClient implements ClientInterface
     protected $socket;
 
     /**
-     * @var \longlang\phpkafka\Protocol\ApiVersions\ApiKeys[]
+     * @var ApiVersionsResponseKey[]
      */
     protected $apiKeys;
 
@@ -69,7 +75,7 @@ class SyncClient implements ClientInterface
     }
 
     /**
-     * @param \longlang\phpkafka\Protocol\ApiVersions\ApiKeys[] $apiKeys
+     * @param ApiVersionsResponseKey[] $apiKeys
      */
     public function setApiKeys(array $apiKeys): ClientInterface
     {
@@ -83,7 +89,7 @@ class SyncClient implements ClientInterface
     }
 
     /**
-     * @return \longlang\phpkafka\Protocol\ApiVersions\ApiKeys[]|null
+     * @return ApiVersionsResponseKey[]|null
      */
     public function getApiKeys(): ?array
     {
@@ -95,6 +101,7 @@ class SyncClient implements ClientInterface
         $this->socket->connect();
         $this->waitResponseMaps = [];
         $this->updateApiVersions();
+        $this->sendAuthInfo();
     }
 
     public function close(): bool
@@ -180,7 +187,7 @@ class SyncClient implements ClientInterface
         return $this->recv($correlationId, $responseHeader);
     }
 
-    protected function updateApiVersions()
+    protected function updateApiVersions(): void
     {
         $request = new ApiVersionsRequest();
         $correlationId = $this->send($request);
@@ -188,5 +195,30 @@ class SyncClient implements ClientInterface
         $response = $this->recv($correlationId);
         ErrorCode::check($response->getErrorCode());
         $this->setApiKeys($response->getApiKeys());
+    }
+
+    protected function sendAuthInfo(): void
+    {
+        $config = $this->getConfig()->getSasl();
+        if (!isset($config['type']) || empty($config['type'])) {
+            return;
+        }
+        $class = new $config['type']($this->getConfig());
+        if (!$class instanceof SaslInterface) {
+            return;
+        }
+        $handshakeRequest = new SaslHandshakeRequest();
+        $handshakeRequest->setMechanism($class->getName());
+        $correlationId = $this->send($handshakeRequest);
+        /** @var SaslHandshakeResponse $handshakeResponse */
+        $handshakeResponse = $this->recv($correlationId);
+        ErrorCode::check($handshakeResponse->getErrorCode());
+
+        $authenticateRequest = new SaslAuthenticateRequest();
+        $authenticateRequest->setAuthBytes($class->getAuthBytes());
+        $correlationId = $this->send($authenticateRequest);
+        /** @var SaslAuthenticateResponse $authenticateResponse */
+        $authenticateResponse = $this->recv($correlationId);
+        ErrorCode::check($authenticateResponse->getErrorCode());
     }
 }

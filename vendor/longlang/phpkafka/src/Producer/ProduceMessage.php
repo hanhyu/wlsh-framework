@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace longlang\phpkafka\Producer;
 
+use longlang\phpkafka\Protocol\RecordBatch\RecordHeader;
+
 class ProduceMessage
 {
     /**
@@ -22,16 +24,19 @@ class ProduceMessage
     protected $key;
 
     /**
-     * @var array
+     * @var RecordHeader[]|array
      */
     protected $headers;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $partitionIndex;
 
-    public function __construct(string $topic, ?string $value, ?string $key = null, array $headers = [], int $partitionIndex = 0)
+    /**
+     * @param RecordHeader[]|array $headers
+     */
+    public function __construct(string $topic, ?string $value, ?string $key = null, array $headers = [], ?int $partitionIndex = null)
     {
         $this->topic = $topic;
         $this->value = $value;
@@ -40,42 +45,30 @@ class ProduceMessage
         $this->partitionIndex = $partitionIndex;
     }
 
-    /**
-     * @return string
-     */
-    public function getTopic()
+    public function getTopic(): string
     {
         return $this->topic;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getKey()
+    public function getKey(): ?string
     {
         return $this->key;
     }
 
     /**
-     * @return array
+     * @return RecordHeader[]|array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @return int
-     */
-    public function getPartitionIndex()
+    public function getPartitionIndex(): ?int
     {
         return $this->partitionIndex;
     }

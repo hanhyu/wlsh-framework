@@ -23,9 +23,9 @@ class ConsumerConfig extends CommonConfig
     protected $socket;
 
     /**
-     * @var string
+     * @var string|string[]|null
      */
-    protected $broker;
+    protected $brokers;
 
     /**
      * @var float|null
@@ -107,6 +107,21 @@ class ConsumerConfig extends CommonConfig
      */
     protected $partitionAssignmentStrategy = \longlang\phpkafka\Consumer\Assignor\RangeAssignor::class;
 
+    /**
+     * @var int
+     */
+    protected $minBytes = 1;
+
+    /**
+     * @var int
+     */
+    protected $maxBytes = 128 * 1024 * 1024;
+
+    /**
+     * @var int
+     */
+    protected $maxWait = 1;
+
     public function getClient(): ?string
     {
         return $this->client;
@@ -173,14 +188,42 @@ class ConsumerConfig extends CommonConfig
         return $this;
     }
 
-    public function getBroker(): string
+    /**
+     * @return string|string[]
+     */
+    public function getBrokers()
     {
-        return $this->broker;
+        return $this->brokers;
     }
 
-    public function setBroker(string $broker): self
+    /**
+     * @param string|string[] $brokers
+     *
+     * @return $this
+     */
+    public function setBrokers($brokers): self
     {
-        $this->broker = $broker;
+        $this->brokers = $brokers;
+
+        return $this;
+    }
+
+    /**
+     * @return string|string[]|null
+     */
+    public function getBroker()
+    {
+        return $this->brokers;
+    }
+
+    /**
+     * @param string|string[]|null $brokers
+     *
+     * @return $this
+     */
+    public function setBroker($brokers): self
+    {
+        $this->brokers = $brokers;
 
         return $this;
     }
@@ -202,7 +245,7 @@ class ConsumerConfig extends CommonConfig
         return $this->groupInstanceId;
     }
 
-    public function setGroupInstanceId($groupInstanceId): self
+    public function setGroupInstanceId(?string $groupInstanceId): self
     {
         $this->groupInstanceId = $groupInstanceId;
 
@@ -337,6 +380,42 @@ class ConsumerConfig extends CommonConfig
     public function setPartitionAssignmentStrategy(string $partitionAssignmentStrategy): self
     {
         $this->partitionAssignmentStrategy = $partitionAssignmentStrategy;
+
+        return $this;
+    }
+
+    public function getMinBytes(): int
+    {
+        return $this->minBytes;
+    }
+
+    public function setMinBytes(int $minBytes): self
+    {
+        $this->minBytes = $minBytes;
+
+        return $this;
+    }
+
+    public function getMaxBytes(): int
+    {
+        return $this->maxBytes;
+    }
+
+    public function setMaxBytes(int $maxBytes): self
+    {
+        $this->maxBytes = $maxBytes;
+
+        return $this;
+    }
+
+    public function getMaxWait(): int
+    {
+        return $this->maxWait;
+    }
+
+    public function setMaxWait(int $maxWait): self
+    {
+        $this->maxWait = $maxWait;
 
         return $this;
     }

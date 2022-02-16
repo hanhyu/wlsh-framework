@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace longlang\phpkafka\Producer;
 
 use longlang\phpkafka\Config\CommonConfig;
+use longlang\phpkafka\Producer\Partitioner\DefaultPartitioner;
 
 class ProducerConfig extends CommonConfig
 {
@@ -23,7 +24,7 @@ class ProducerConfig extends CommonConfig
     protected $socket;
 
     /**
-     * @var string|string[]
+     * @var string|string[]|null
      */
     protected $brokers;
 
@@ -54,6 +55,23 @@ class ProducerConfig extends CommonConfig
      */
     protected $autoCreateTopic = true;
 
+    /**
+     * The partitioning strategy.
+     *
+     * @var string
+     */
+    protected $partitioner = DefaultPartitioner::class;
+
+    /**
+     * @var int
+     */
+    protected $produceRetry = 3;
+
+    /**
+     * @var float
+     */
+    protected $produceRetrySleep = 0.1;
+
     public function getClient(): ?string
     {
         return $this->client;
@@ -67,7 +85,7 @@ class ProducerConfig extends CommonConfig
     }
 
     /**
-     * @return string|string[]
+     * @return string|string[]|null
      */
     public function getBrokers()
     {
@@ -75,7 +93,7 @@ class ProducerConfig extends CommonConfig
     }
 
     /**
-     * @param string|string[] $brokers
+     * @param string|string[]|null $brokers
      */
     public function setBrokers($brokers): self
     {
@@ -152,6 +170,42 @@ class ProducerConfig extends CommonConfig
     public function setAutoCreateTopic(bool $autoCreateTopic): self
     {
         $this->autoCreateTopic = $autoCreateTopic;
+
+        return $this;
+    }
+
+    public function getPartitioner(): string
+    {
+        return $this->partitioner;
+    }
+
+    public function setPartitioner(string $partitioner): self
+    {
+        $this->partitioner = $partitioner;
+
+        return $this;
+    }
+
+    public function getProduceRetry(): int
+    {
+        return $this->produceRetry;
+    }
+
+    public function setProduceRetry(int $produceRetry): self
+    {
+        $this->produceRetry = $produceRetry;
+
+        return $this;
+    }
+
+    public function getProduceRetrySleep(): float
+    {
+        return $this->produceRetrySleep;
+    }
+
+    public function setProduceRetrySleep(float $produceRetrySleep): self
+    {
+        $this->produceRetrySleep = $produceRetrySleep;
 
         return $this;
     }

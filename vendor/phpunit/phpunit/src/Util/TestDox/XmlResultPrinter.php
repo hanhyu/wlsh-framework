@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
+use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Util\Printer;
 use PHPUnit\Util\Test as TestUtil;
 use ReflectionClass;
@@ -154,13 +155,14 @@ final class XmlResultPrinter extends Printer implements TestListener
      */
     public function endTest(Test $test, float $time): void
     {
-        if (!$test instanceof TestCase) {
+        if (!$test instanceof TestCase || $test instanceof WarningTestCase) {
             return;
         }
 
         $groups = array_filter(
             $test->getGroups(),
-            static function ($group) {
+            static function ($group)
+            {
                 return !($group === 'small' || $group === 'medium' || $group === 'large' || strpos($group, '__phpunit_') === 0);
             }
         );

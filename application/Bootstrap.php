@@ -2,9 +2,7 @@
 declare(strict_types=1);
 
 use App\Library\{
-    AutoReload,
     DI,
-    MongoPool,
     ProgramException,
     RouterInit,
     ValidateException,
@@ -89,7 +87,7 @@ class Bootstrap
             //'open_mqtt_protocol'         => true,
             'open_websocket_close_frame' => true,
             'send_yield'                 => true,
-            'hook_flags'                 => SWOOLE_HOOK_ALL ^ SWOOLE_HOOK_CURL | SWOOLE_HOOK_NATIVE_CURL,
+            'hook_flags'                 => SWOOLE_HOOK_ALL,
             'user'                       => 'root',
             'group'                      => 'root',
             'http_compression_level'     => 4,
@@ -152,23 +150,12 @@ class Bootstrap
            string(26) "/home/baseFrame/swoole.php"
                  [1]=>
            string(46) "/home/baseFrame/application/Bootstrap.php"
-                 [2]=>
-           string(50) "/home/baseFrame/application/library/AutoReload.php"
          }
 
          var_dump(get_included_files());*/
 
         require_once ROOT_PATH . '/vendor/autoload.php';
         require_once LIBRARY_PATH . '/common/functions.php';
-
-        //用inotify监听mvc目录,一有变动就自动重启脚本
-        if (0 === $worker_id) {
-            $kit = new AutoReload($server->master_pid);
-            $kit->watch(CONF_PATH);
-            $kit->watch(APP_PATH);
-            $kit->addFileType('.php');
-            //$kit->run();
-        }
 
         //重命名进程名字
         if ($server->taskworker) {
@@ -177,14 +164,13 @@ class Bootstrap
             swoole_set_process_name('swooleWorkerProcess');
         }
 
-        DI::set('server_obj', $server);
-        DI::set('table_obj', $this->table);
-        DI::set('atomic_obj', $this->atomic);
-
-        //todo 这里当进程达到max_request设置数量
         try {
             require_once CONF_PATH . DS . 'environ.php';
             require_once CONF_PATH . DS . 'language.php';
+
+            DI::set('server_obj', $server);
+            DI::set('table_obj', $this->table);
+            DI::set('atomic_obj', $this->atomic);
 
             //把配置保存起来
             DI::set('config_arr', array_merge(
@@ -197,7 +183,6 @@ class Bootstrap
             print_r($e . PHP_EOL);
             $this->server->shutdown();
         }
-
 
         /*
          * 默认第一个工作进程发送websocket控制流0x9 ping帧，

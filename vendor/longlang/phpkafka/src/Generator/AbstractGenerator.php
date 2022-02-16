@@ -38,11 +38,6 @@ abstract class AbstractGenerator
         return $this->messageGenerator;
     }
 
-    public function getMessageData(): \stdClass
-    {
-        return $this->messageData;
-    }
-
     public function getData(): \stdClass
     {
         return $this->data;
@@ -110,7 +105,7 @@ abstract class AbstractGenerator
             $classProperties .= <<<CODE
 /**
  * {$about}
- * 
+ *
  * @var {$phpCommentType}
  */
 protected \${$propertyName}{$defaultValue};
@@ -139,7 +134,7 @@ public function get{$ucPropertyName}(): {$phpType}
 
 /**
  * @param {$phpCommentType} \${$propertyName}
- * 
+ *
  * @return self
  */
 public function set{$ucPropertyName}({$phpType} \${$propertyName}): self
@@ -169,7 +164,7 @@ CODE;
         return [$classProperties, $constructMethod, $methods];
     }
 
-    protected function save(string $classContent)
+    protected function save(string $classContent): void
     {
         $fileName = $this->getSaveFileName();
         $dir = \dirname($fileName);
@@ -200,6 +195,9 @@ CODE;
         throw new \InvalidArgumentException(sprintf('Invalid versions %s', $versions));
     }
 
+    /**
+     * @param mixed $default
+     */
     protected function parseDefaultValue(string $phpType, $default, bool $allowNull): string
     {
         if (null === $default) {

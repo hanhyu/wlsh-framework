@@ -7,7 +7,9 @@ namespace longlang\phpkafka;
 use InvalidArgumentException;
 use longlang\phpkafka\Client\ClientInterface;
 use longlang\phpkafka\Consumer\ConsumerConfig;
+use longlang\phpkafka\Exception\NoAliveBrokerException;
 use longlang\phpkafka\Producer\ProducerConfig;
+use longlang\phpkafka\Protocol\ErrorCode;
 use longlang\phpkafka\Protocol\Metadata\MetadataRequest;
 use longlang\phpkafka\Protocol\Metadata\MetadataRequestTopic;
 use longlang\phpkafka\Protocol\Metadata\MetadataResponse;
@@ -36,12 +38,20 @@ class Broker
      */
     protected $topicsMeta;
 
+    /**
+     * @var string[]
+     */
+    protected $metaUpdatedTopics = [];
+
+    /**
+     * @param ProducerConfig|ConsumerConfig $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
-    public function close()
+    public function close(): void
     {
         foreach ($this->clients as $client) {
             $client->close();
@@ -49,13 +59,19 @@ class Broker
         $this->clients = [];
     }
 
-    public function updateBrokers()
+    public function updateBrokers(): void
     {
         $config = $this->config;
 
         $url = null;
         if ($config instanceof ConsumerConfig) {
-            $url = parse_url(explode(',', $config->getBroker())[0]);
+            $brokers = $config->getBroker();
+
+            if (\is_array($brokers)) {
+                $url = parse_url($brokers[array_rand($brokers)]);
+            } elseif (\is_string($brokers)) {
+                $url = parse_url(explode(',', $brokers)[0]);
+            }
         }
         if (!$url) {
             $bootstrapServers = $config->getBootstrapServers();
@@ -63,7 +79,7 @@ class Broker
         }
 
         if (!$url) {
-            throw new InvalidArgumentException(sprintf('Invalid bootstrapServer'));
+            throw new InvalidArgumentException('Invalid bootstrapServer');
         }
 
         $clientClass = KafkaUtil::getClientClass($config->getClient());
@@ -77,6 +93,11 @@ class Broker
         foreach ($response->getBrokers() as $broker) {
             $brokers[$broker->getNodeId()] = $broker->getHost() . ':' . $broker->getPort();
         }
+
+        if (empty($brokers)) {
+            throw new NoAliveBrokerException('No brokers are available');
+        }
+
         $this->setBrokers($brokers);
     }
 
@@ -95,7 +116,37 @@ class Broker
         $request->setAllowAutoTopicCreation($config->getAutoCreateTopic());
         /** @var MetadataResponse $response */
         $response = $client->sendRecv($request);
-        $this->topicsMeta = $response->getTopics();
+        $topicsMeta = [];
+        $retryTopics = [];
+        foreach ($response->getTopics() as $topicItem) {
+            $errorCode = $topicItem->getErrorCode();
+            if (ErrorCode::success($errorCode)) {
+                $topicsMeta[] = $topicItem;
+            } else {
+                switch ($topicItem->getErrorCode()) {
+                    case ErrorCode::UNKNOWN_TOPIC_OR_PARTITION:
+                    case ErrorCode::LEADER_NOT_AVAILABLE:
+                        $retryTopics[] = $topicItem->getName();
+                        break;
+                    default:
+                        ErrorCode::check($errorCode);
+                }
+            }
+        }
+        if ($this->topicsMeta) {
+            $this->topicsMeta = array_values(array_merge($this->topicsMeta, $topicsMeta));
+        } else {
+            $this->topicsMeta = $topicsMeta;
+        }
+        if ($this->metaUpdatedTopics) {
+            $this->metaUpdatedTopics = array_values(array_merge($this->metaUpdatedTopics, $topics));
+        } else {
+            $this->metaUpdatedTopics = $topics;
+        }
+
+        if ($retryTopics) {
+            return $this->updateMetadata($retryTopics, $client);
+        }
 
         return $response;
     }
@@ -117,7 +168,12 @@ class Broker
         }
 
         $config = $this->config;
-        if (!isset($this->clients[$brokerId])) {
+        if (isset($this->clients[$brokerId])) {
+            $client = $this->clients[$brokerId];
+            if (!$client->getSocket()->isConnected()) {
+                $client->connect();
+            }
+        } else {
             $clientClass = KafkaUtil::getClientClass($config->getClient());
 
             /** @var ClientInterface $client */
@@ -126,7 +182,7 @@ class Broker
             $this->clients[$brokerId] = $client;
         }
 
-        return $this->clients[$brokerId];
+        return $client;
     }
 
     /**
@@ -147,14 +203,14 @@ class Broker
         } elseif (\is_array($brokers)) {
             $this->brokers = $brokers;
         } else {
-            throw new InvalidArgumentException(sprintf('The type of brokers must be string or array, and the current type is %', \gettype($brokers)));
+            throw new InvalidArgumentException(sprintf('The type of brokers must be string or array, and the current type is %s', \gettype($brokers)));
         }
 
         return $this;
     }
 
     /**
-     * @return @var ProducerConfig|ConsumerConfig
+     * @return ProducerConfig|ConsumerConfig
      */
     public function getConfig()
     {
@@ -162,10 +218,42 @@ class Broker
     }
 
     /**
+     * @param string|string[]|null $topics
+     *
      * @return MetadataResponseTopic[]
      */
-    public function getTopicsMeta(): array
+    public function getTopicsMeta($topics = null): array
     {
+        if ($topics) {
+            $notFoundTopics = [];
+            foreach ((array) $topics as $topic) {
+                if (!\in_array($topic, $this->metaUpdatedTopics)) {
+                    $notFoundTopics[] = $topic;
+                }
+            }
+            if ($notFoundTopics) {
+                $this->updateMetadata($notFoundTopics);
+            }
+        }
+
         return $this->topicsMeta;
+    }
+
+    public function getBrokerIdByTopic(string $topic, int $partition): ?int
+    {
+        if (!\in_array($topic, $this->metaUpdatedTopics)) {
+            $this->updateMetadata([$topic]);
+        }
+        foreach ($this->topicsMeta as $topicMeta) {
+            if ($topicMeta->getName() === $topic) {
+                foreach ($topicMeta->getPartitions() as $topicPartition) {
+                    if ($topicPartition->getPartitionIndex() === $partition) {
+                        return $topicPartition->getLeaderId();
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

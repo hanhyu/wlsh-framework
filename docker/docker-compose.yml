@@ -1,0 +1,192 @@
+version: "3"
+services:
+  wlsh-api-php81:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "hanhyu/wlsh:v81"
+    container_name: wlsh-api81
+    privileged: true
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.3
+    restart: always
+    environment:
+      - APP_ENV=dev
+      - TIMEZONE=Asia/Shanghai
+      - DISABLE_DEFAULT_SERVER=1
+      - ROOT_DIR=/home/wlsh
+      - AUTORELOAD_PROGRAMS=wlsh
+      - AUTORELOAD_ANY_FILES=0
+    volumes:
+      - "/var/www/baseFrame:/home/wlsh"
+    working_dir: /home/wlsh
+    expose:
+      - "9770"
+    depends_on:
+      - wlsh-redis-master
+      - wlsh-mongo
+      - wlsh-mysql
+    ports:
+      - "9770:9770"
+    ulimits:
+      nproc: 262140
+      nofile:
+        soft: 262140
+        hard: 262140
+    tty: true
+
+  wlsh-mysql:
+    image: "mysql:8.0.20"
+    container_name: wlsh-mysql
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.5
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=wlsh_mysql
+      - MYSQL_DATABASE=baseFrame
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - "$PWD/../mysqlData:/var/lib/mysql"
+      - "./init:/docker-entrypoint-initdb.d/"
+    expose:
+      - "3306"
+    restart: always
+    command:
+      #php7.4 caching_sha2_password
+      #--default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb_deadlock_detect=off
+      --innodb_lock_wait_timeout=10
+      --innodb_rollback_on_timeout=on
+      --innodb_log_file_size=4G
+      --innodb_buffer_pool_size=2G
+      --innodb_log_files_in_group=3
+      --open_files_limit=65535
+      --max_allowed_packet=50M
+      --max_connections=10000
+      --max_user_connections=3000
+      --group_concat_max_len=1024000
+      --innodb_flush_neighbors=0
+      --innodb_io_capacity=30000
+      --innodb_io_capacity_max=50
+      --thread_cache_size=64
+      --innodb_flush_log_at_trx_commit=0
+      --sync_binlog=0
+      --skip-name-resolve
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    sysctls:
+      net.unix.max_dgram_qlen: 100
+      net.core.somaxconn: 10000
+      net.ipv4.tcp_syncookies: 1
+      net.ipv4.tcp_max_syn_backlog: 81920
+      net.ipv4.tcp_synack_retries: 3
+      net.ipv4.tcp_syn_retries: 3
+      net.ipv4.tcp_fin_timeout: 30
+      net.ipv4.tcp_keepalive_time: 300
+      net.ipv4.tcp_tw_reuse: 1
+      net.ipv4.ip_local_port_range: 20000 65000
+      net.ipv4.tcp_max_tw_buckets: 200000
+      net.ipv4.tcp_wmem: 4096        16384   4194304
+      net.ipv4.tcp_rmem: 4096          87380   4194304
+
+  wlsh-redis-master:
+    container_name: wlsh-redis-master
+    image: "redis:6.2.2"
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.6
+    restart: always
+    expose:
+      - "6379"
+    volumes:
+      - "$PWD/../redisData:/data"
+    ulimits:
+      nproc: 262140
+      nofile:
+        soft: 262140
+        hard: 262140
+    sysctls:
+      net.core.somaxconn: 65535
+    command: redis-server --appendonly yes --requirepass "wlsh_redis" --io-threads 4 --io-threads-do-reads yes
+
+  wlsh-redis-slave:
+    container_name: wlsh-redis-slave
+    image: "redis:6.2.2"
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.7
+    restart: always
+    expose:
+      - "6379"
+    ulimits:
+      nproc: 262140
+      nofile:
+        soft: 262140
+        hard: 262140
+    sysctls:
+      net.core.somaxconn: 65535
+    command: redis-server --requirepass "wlsh_redis" --slaveof wlsh-redis-master 6379 --masterauth "wlsh_redis" --appendonly yes
+    depends_on:
+      - wlsh-redis-master
+
+  wlsh-mongo:
+    image: "mongo:4.2.3"
+    container_name: wlsh-mongo
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.8
+    environment:
+      TZ: Asia/Shanghai
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "admin"
+    volumes:
+      - "$PWD/../mongoData:/data"
+    expose:
+      - "27017"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    sysctls:
+      net.core.somaxconn: 10000
+    command: --auth
+    restart: always
+
+  wlsh-clickhouse:
+    image: "yandex/clickhouse-server"
+    container_name: wlsh-clickhouse
+    privileged: true
+    networks:
+      wlsh-net:
+        ipv4_address: 172.23.0.9
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - "$PWD/../clickhouseData:/var/lib/clickhouse"
+    expose:
+      - "8123"
+    user: root
+    ulimits:
+      nproc: 262144
+      nofile:
+        soft: 262144
+        hard: 262144
+    sysctls:
+      net.core.somaxconn: 10000
+    restart: always
+
+networks:
+  wlsh-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16

@@ -6,8 +6,14 @@ namespace longlang\phpkafka\Util;
 
 class ObjectKeyArray implements \Iterator, \ArrayAccess
 {
+    /**
+     * @var array
+     */
     protected $keys = [];
 
+    /**
+     * @var array
+     */
     protected $values = [];
 
     public function getKeys(): array
@@ -20,7 +26,10 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         return $this->values;
     }
 
-    public function offsetExists($offset)
+    /**
+     * @param mixed $offset
+     */
+    public function offsetExists($offset): bool
     {
         $hash = $this->__hash($offset);
         if (null === $hash) {
@@ -30,6 +39,11 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         return isset($this->values[$hash]);
     }
 
+    /**
+     * @param mixed $offset
+     *
+     * @return mixed
+     */
     public function &offsetGet($offset)
     {
         $hash = $this->__hash($offset);
@@ -48,7 +62,11 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         return $this->values[$hash];
     }
 
-    public function offsetSet($offset, $value)
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
+    public function offsetSet($offset, $value): void
     {
         $hash = $this->__hash($offset);
         if (null === $hash) {
@@ -58,7 +76,10 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         $this->keys[$hash] = $offset;
     }
 
-    public function offsetUnset($offset)
+    /**
+     * @param mixed $offset
+     */
+    public function offsetUnset($offset): void
     {
         $hash = $this->__hash($offset);
         if (null === $hash) {
@@ -72,11 +93,17 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         unset($this->values[$hash], $this->keys[$hash]);
     }
 
+    /**
+     * @return mixed
+     */
     public function &current()
     {
         return $this->values[key($this->values)];
     }
 
+    /**
+     * @return mixed
+     */
     public function key()
     {
         $hash = key($this->values);
@@ -88,17 +115,23 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         return $this->keys[$hash];
     }
 
+    /**
+     * @return mixed
+     */
     public function next()
     {
         return next($this->values);
     }
 
+    /**
+     * @return mixed
+     */
     public function rewind()
     {
         return reset($this->values);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         $hash = key($this->values);
 
@@ -109,11 +142,14 @@ class ObjectKeyArray implements \Iterator, \ArrayAccess
         return isset($this->keys[$hash]);
     }
 
-    public function size()
+    public function size(): int
     {
         return \count($this->values);
     }
 
+    /**
+     * @param mixed $value
+     */
     private function __hash($value): ?string
     {
         if (!\is_object($value)) {

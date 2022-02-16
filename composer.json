@@ -1,6 +1,6 @@
 {
   "name": "wlsh/frame",
-  "description": "运行环境：php 8.0 / nginx 1.18.0 / swoole 4.5.9 / Mysql 8.0 / Redis 6.0 / inotify",
+  "description": "运行环境：php8 / nginx1.18.0 / swoole4.5.9 / Mysql8 / Redis6",
   "keywords": [
     "swoole",
     "php"
@@ -14,16 +14,16 @@
   ],
   "require": {
     "php": ">=8.0",
-    "ext-swoole": ">=4.6.2",
+    "ext-swoole": ">=4.8.6",
     "ext-mongodb": ">=1.9.0",
     "ext-redis": ">=5.3.2",
     "monolog/monolog": "2.2.0",
-    "swiftmailer/swiftmailer": "6.2.5",
+    "symfony/mailer": "6.0.3",
     "webgeeker/validation": "0.5.2",
     "mongodb/mongodb": "1.8.0",
     "elasticsearch/elasticsearch": "^7.11.x-dev",
-    "longlang/phpkafka": "1.1.1",
-    "envms/fluentpdo": "2.2.0",
+    "longlang/phpkafka": "1.2.1",
+    "envms/fluentpdo": "2.2.4",
     "smi2/phpclickhouse": "^1.4"
   },
   "repositories": {
@@ -47,9 +47,9 @@
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
-    "friendsofphp/php-cs-fixer": "^3.0.x-dev",
+    "friendsofphp/php-cs-fixer": "^3.6.0",
     "phpunit/phpunit": "^9.5.0",
     "hightman/xunsearch": "1.4.13",
-    "swoole/ide-helper": "4.6.2"
+    "swoole/ide-helper": "4.8.6"
   }
 }

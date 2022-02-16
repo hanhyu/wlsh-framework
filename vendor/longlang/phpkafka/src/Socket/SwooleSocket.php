@@ -41,7 +41,7 @@ class SwooleSocket implements SocketInterface
     protected $config;
 
     /**
-     * @var \Swoole\Coroutine\Client
+     * @var \Swoole\Coroutine\Client|null
      */
     protected $socket;
 
@@ -77,19 +77,15 @@ class SwooleSocket implements SocketInterface
 
     public function isConnected(): bool
     {
-        return null !== $this->socket;
+        return $this->socket && $this->socket->isConnected();
     }
 
     public function connect(): void
     {
         $config = $this->config;
-        $client = new Client(\SWOOLE_SOCK_TCP);
-        $client->set([
-            'connect_timeout' => $config->getConnectTimeout(),
-            'read_timeout'    => $config->getRecvTimeout(),
-            'write_timeout'   => $config->getSendTimeout(),
-        ]);
-        if ($client->connect($this->host, $this->port)) {
+        $client = new Client($this->getClientType());
+        $client->set($this->getClientConfig());
+        if ($client->connect($this->host, $this->port, $config->getConnectTimeout())) {
             $this->socket = $client;
         } else {
             throw new ConnectionException(sprintf('Could not connect to tcp://%s:%s (%s [%d])', $this->host, $this->port, $client->errMsg, $client->errCode));
@@ -100,7 +96,6 @@ class SwooleSocket implements SocketInterface
     {
         if ($this->socket) {
             $this->socket->close();
-            $this->socket = null;
             $this->receivedBuffer = '';
 
             return true;
@@ -113,6 +108,7 @@ class SwooleSocket implements SocketInterface
     {
         $result = $this->socket->send($data);
         if (false === $result) {
+            $this->close();
             throw new SocketException(sprintf('Could not write data to stream, %s [%d]', $this->socket->errMsg, $this->socket->errCode));
         }
 
@@ -128,7 +124,8 @@ class SwooleSocket implements SocketInterface
         $leftTime = $timeout;
         while ($this->socket && !isset($this->receivedBuffer[$length - 1]) && (-1 == $timeout || $leftTime > 0)) {
             $buffer = $this->socket->recv($timeout);
-            if (false === $buffer) {
+            if ('' === $buffer || false === $buffer) {
+                $this->close();
                 throw new SocketException(sprintf('Could not recv data from stream, %s [%d]', $this->socket->errMsg, $this->socket->errCode));
             }
             $this->receivedBuffer .= $buffer;
@@ -144,10 +141,34 @@ class SwooleSocket implements SocketInterface
             return $result;
         }
 
-        if ($this->socket) {
+        if ($this->socket->isConnected()) {
+            $this->close();
             throw new SocketException('Could not recv data from stream');
         }
 
         return '';
+    }
+
+    protected function getClientType(): int
+    {
+        $clientType = \SWOOLE_SOCK_TCP;
+        $ssl = $this->getConfig()->getSsl();
+        if ($ssl->getOpen()) {
+            $clientType = $clientType | \SWOOLE_SSL;
+        }
+
+        return $clientType;
+    }
+
+    protected function getClientConfig(): array
+    {
+        $config = $this->getConfig();
+        $clientConfig = [
+            'connect_timeout' => $config->getConnectTimeout(),
+            'read_timeout'    => $config->getRecvTimeout(),
+            'write_timeout'   => $config->getSendTimeout(),
+        ];
+
+        return array_merge($clientConfig, $config->getSsl()->getSwooleConfig($this->getHost()));
     }
 }

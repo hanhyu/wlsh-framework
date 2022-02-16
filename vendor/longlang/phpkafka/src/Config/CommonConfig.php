@@ -47,6 +47,23 @@ class CommonConfig extends AbstractConfig
      */
     protected $updateBrokers = true;
 
+    /**
+     * Exception callback in SwooleClient.
+     *
+     * @var callable|null
+     */
+    protected $exceptionCallback = null;
+
+    /**
+     * @var array
+     */
+    protected $sasl = [];
+
+    /**
+     * @var SslConfig|null
+     */
+    protected $ssl = null;
+
     public function getConnectTimeout(): float
     {
         return $this->connectTimeout;
@@ -135,7 +152,7 @@ class CommonConfig extends AbstractConfig
         } elseif (\is_array($bootstrapServers)) {
             $this->bootstrapServers = $bootstrapServers;
         } else {
-            throw new InvalidArgumentException(sprintf('The bootstrapServers must be string or array, and the current type is %', \gettype($bootstrapServers)));
+            throw new InvalidArgumentException(sprintf('The bootstrapServers must be string or array, and the current type is %s', \gettype($bootstrapServers)));
         }
 
         return $this;
@@ -149,6 +166,55 @@ class CommonConfig extends AbstractConfig
     public function setUpdateBrokers(bool $updateBrokers): self
     {
         $this->updateBrokers = $updateBrokers;
+
+        return $this;
+    }
+
+    public function getExceptionCallback(): ?callable
+    {
+        return $this->exceptionCallback;
+    }
+
+    public function setExceptionCallback(?callable $exceptionCallback): self
+    {
+        $this->exceptionCallback = $exceptionCallback;
+
+        return $this;
+    }
+
+    public function getSasl(): array
+    {
+        return $this->sasl;
+    }
+
+    public function setSasl(array $sasl): self
+    {
+        $this->sasl = $sasl;
+
+        return $this;
+    }
+
+    public function getSsl(): SslConfig
+    {
+        if (null == $this->ssl) {
+            return new SslConfig([]);
+        }
+
+        return $this->ssl;
+    }
+
+    /**
+     * @param SslConfig|array $ssl
+     */
+    public function setSsl($ssl): self
+    {
+        if (\is_array($ssl)) {
+            $this->ssl = new SslConfig($ssl);
+        } elseif ($ssl instanceof SslConfig) {
+            $this->ssl = $ssl;
+        } else {
+            throw new InvalidArgumentException(sprintf('The ssl must be array or SslConfig, and the current type is %s', \gettype($ssl)));
+        }
 
         return $this;
     }

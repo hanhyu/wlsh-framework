@@ -1,3 +1,44 @@
+## Release 7.13.1
+
+- Added port in url for trace and logger messages
+  [#1126](https://github.com/elastic/elasticsearch-php/pull/1126) 
+## Release 7.13.0
+
+- (DOCS) Added the HTTP meta data section
+  [#1143](https://github.com/elastic/elasticsearch-php/pull/1143)
+- Added support for API Compatibility Header
+  [#1142](https://github.com/elastic/elasticsearch-php/pull/1142)
+- (DOCS) Added Helpers section to PHP book
+  [#1129](https://github.com/elastic/elasticsearch-php/pull/1129)
+- Added the API description in phpdoc section for each endpoint
+  [9e05c81](https://github.com/elastic/elasticsearch-php/commit/9e05c8108b638b60cc676b6a4f4be97c7df9eb64)
+- Usage of PHPUnit 9 only + migrated xml configurations
+  [038b5dd](https://github.com/elastic/elasticsearch-php/commit/038b5dd043dc76b20b9f5f265ea914a38d33568d)
+## Release 7.12.0
+
+- Updated the endpoints for ES 7.12 + removed cpliakas/git-wrapper
+  in favor of symplify/git-wrapper
+  [136d5b9](https://github.com/elastic/elasticsearch-php/commit/136d5b9717b3806c6b34ef8a5076bfe7cee8b46e)
+- Fixed warning header as array in YAML tests generator
+  [0d81be1](https://github.com/elastic/elasticsearch-php/commit/0d81be131bfc7eff6ef82468e61c16077a892aab)
+- Refactored TEST_SUITE with free, platinum + removed old YamlRunnerTest
+  [f69d96f](https://github.com/elastic/elasticsearch-php/commit/f69d96fc283580177002b4088c279c3d0c07befe)
+  
+## Release 7.11.0
+
+- Added the `X-Elastic-Client-Meta` header which is used by Elastic Cloud
+  and can be disabled with `ClientBuilder::setElasticMetaHeader(false)`
+  [#1089](https://github.com/elastic/elasticsearch-php/pull/1089)
+- Replaced `array_walk` with `array_map` in `Connection::getURI` for PHP 8
+  compatibility
+  [#1075](https://github.com/elastic/elasticsearch-php/pull/1075)
+- Remove unnecessary `InvalidArgumentExceptions`
+  [#1069](https://github.com/elastic/elasticsearch-php/pull/1069)
+- Introducing PHP 8 compatibility
+  [#1063](https://github.com/elastic/elasticsearch-php/pull/1063) 
+- Replace Sami by Doctum and fix `.gitignore`
+  [#1062](https://github.com/elastic/elasticsearch-php/pull/1062)
+
 ## Release 7.10.0
 
 - Updated endpoints and namespaces for Elasticsearch 7.10

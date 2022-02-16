@@ -23,7 +23,7 @@ abstract class Base implements IteratorAggregate
     /** @var Query */
     protected $fluent;
 
-    /** @var PDOStatement */
+    /** @var PDOStatement|null|bool */
     protected $result;
 
     /** @var array - definition clauses */
@@ -39,7 +39,7 @@ abstract class Base implements IteratorAggregate
     /** @var string */
     protected $message = '';
 
-    /** @var @var int */
+    /** @var int */
     protected $currentFetchMode;
 
     /**
@@ -50,6 +50,7 @@ abstract class Base implements IteratorAggregate
      */
     protected function __construct(Query $fluent, $clauses)
     {
+        $this->currentFetchMode = defined('PDO::FETCH_DEFAULT') ? PDO::FETCH_DEFAULT : PDO::FETCH_BOTH;
         $this->fluent = $fluent;
         $this->clauses = $clauses;
         $this->result = null;
@@ -172,6 +173,7 @@ abstract class Base implements IteratorAggregate
      *
      * @throws Exception
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->execute();
@@ -216,9 +218,9 @@ abstract class Base implements IteratorAggregate
     /**
      * Get PDOStatement result
      *
-     * @return ?PDOStatement
+     * @return PDOStatement|null|bool
      */
-    public function getResult(): ?PDOStatement
+    public function getResult()
     {
         return $this->result;
     }
@@ -575,7 +577,8 @@ abstract class Base implements IteratorAggregate
                     echo $finalString;
                 }
             } else {
-                $this->fluent->debug($this);
+                $debug = $this->fluent->debug;
+                $debug($this);
             }
         }
     }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace longlang\phpkafka\Client;
 
+use Exception;
 use InvalidArgumentException;
 use longlang\phpkafka\Config\CommonConfig;
+use longlang\phpkafka\Exception\SocketException;
 use longlang\phpkafka\Protocol\AbstractRequest;
 use longlang\phpkafka\Protocol\AbstractResponse;
 use longlang\phpkafka\Protocol\ApiKeys;
@@ -26,7 +28,7 @@ class SwooleClient extends SyncClient
     protected $coRecvRunning = false;
 
     /**
-     * @return \Swoole\Coroutine\Channel[]
+     * @var \Swoole\Coroutine\Channel[]
      */
     protected $recvChannels = [];
 
@@ -34,6 +36,11 @@ class SwooleClient extends SyncClient
      * @var int|bool
      */
     private $recvCoId = false;
+
+    /**
+     * @var bool
+     */
+    private $connected = false;
 
     public function __construct(string $host, int $port, ?CommonConfig $config = null, string $socketClass = SwooleSocket::class)
     {
@@ -48,14 +55,10 @@ class SwooleClient extends SyncClient
 
     public function close(): bool
     {
-        if ($this->socket->close()) {
-            $this->connected = false;
-            $this->recvChannels = [];
+        $this->connected = false;
+        $this->recvChannels = [];
 
-            return true;
-        } else {
-            return false;
-        }
+        return $this->socket->close();
     }
 
     /**
@@ -106,7 +109,10 @@ class SwooleClient extends SyncClient
         $data = $channel->pop($this->getConfig()->getRecvTimeout());
         unset($this->recvChannels[$correlationId]);
         if (false === $data) {
-            throw new RuntimeException('Recv data failed');
+            throw new RuntimeException('Recv data timeout');
+        }
+        if ($data instanceof Exception) {
+            throw $data;
         }
 
         $header = new ResponseHeader();
@@ -119,23 +125,34 @@ class SwooleClient extends SyncClient
         return $result;
     }
 
-    private function startRecvCo()
+    private function startRecvCo(): void
     {
         $this->coRecvRunning = true;
         $this->recvCoId = true;
         $this->recvCoId = Coroutine::create(function () {
             while ($this->coRecvRunning) {
-                $data = $this->socket->recv(4, -1);
-                if ('' === $data) {
-                    break;
+                try {
+                    $data = $this->socket->recv(4, -1);
+                    if ('' === $data) {
+                        break;
+                    }
+                    $length = Int32::unpack($data);
+                    $data = $this->socket->recv($length);
+                    $correlationId = Int32::unpack($data);
+                    if (isset($this->recvChannels[$correlationId])) {
+                        $this->recvChannels[$correlationId]->push($data);
+                    }
+                } catch (Exception $e) {
+                    if ($e instanceof SocketException && !$this->connected) {
+                        return;
+                    }
+                    $callback = $this->getConfig()->getExceptionCallback();
+                    if ($callback) {
+                        $callback($e);
+                    } else {
+                        throw $e;
+                    }
                 }
-                $length = Int32::unpack($data);
-                $data = $this->socket->recv($length);
-                $correlationId = Int32::unpack($data);
-                if (!isset($this->recvChannels[$correlationId])) {
-                    continue;
-                }
-                $this->recvChannels[$correlationId]->push($data);
             }
         });
     }

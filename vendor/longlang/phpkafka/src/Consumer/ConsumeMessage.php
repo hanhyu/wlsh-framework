@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace longlang\phpkafka\Consumer;
 
+use longlang\phpkafka\Protocol\RecordBatch\RecordHeader;
+
 class ConsumeMessage
 {
     /**
@@ -22,21 +24,24 @@ class ConsumeMessage
     protected $partition;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     protected $key;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $value;
 
     /**
-     * @var array
+     * @var RecordHeader[]
      */
     protected $headers;
 
-    public function __construct(Consumer $consumer, string $topic, int $partition, ?string $key, string $value, array $headers)
+    /**
+     * @param RecordHeader[] $headers
+     */
+    public function __construct(Consumer $consumer, string $topic, int $partition, ?string $key, ?string $value, array $headers)
     {
         $this->consumer = $consumer;
         $this->topic = $topic;
@@ -94,23 +99,29 @@ class ConsumeMessage
         return $this;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue(string $value): self
+    public function setValue(?string $value): self
     {
         $this->value = $value;
 
         return $this;
     }
 
+    /**
+     * @return RecordHeader[]
+     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
+    /**
+     * @param RecordHeader[] $headers
+     */
     public function setHeaders(array $headers): self
     {
         $this->headers = $headers;

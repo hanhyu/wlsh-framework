@@ -9,11 +9,25 @@ FluentPDO is a PHP SQL query builder using PDO. It's a quick and light library f
 - Ability to build complex SELECT, INSERT, UPDATE & DELETE queries with little code
 - Type hinting for magic methods with code completion in smart IDEs
 
-## Requirements
+## Versions
 
-The latest (2.x) release of FluentPDO officially supports PHP 7.2 to PHP 7.4. v2.x is actively maintained.
+#### Version 2.x
 
-The legacy (1.x) release of FluentPDO works with PHP 5.4 to 7.1. **Note:** v1.x is no longer supported and will not be maintained or updated.
+The stable release of FluentPDO and actively maintained. Officially supports PHP 7.3 to PHP 8.0,
+but it can work with previous versions of PHP 7.
+
+#### Version 1.x
+
+The legacy release of FluentPDO. It is no longer supported and will not be maintained or updated.
+This version works with PHP 5.4 to 7.1.
+
+#### Version 3.x - alpha
+
+This version is a full rewrite of Fluent from the ground up. Its main advantage is
+significantly less memory usage and much greater performance in query building. It also places
+a few additional restrictions to make queries easier to read and maintain. Documentation has also
+been a very common request, and version 3 is being fully documented alongside development.
+Details and metrics will be posted once available.
 
 ## Reference
 
@@ -23,14 +37,13 @@ The legacy (1.x) release of FluentPDO works with PHP 5.4 to 7.1. **Note:** v1.x 
 
 ### Composer
 
-The preferred way to install FluentPDO is via [composer](http://getcomposer.org/). Version 2.0 is now released! Please start using 2.x in your projects
-and let us know of any issues you find, they will be resolved quickly.
+The preferred way to install FluentPDO is via [composer](http://getcomposer.org/).
 
 Add the following line in your `composer.json` file:
 
 	"require": {
 		...
-		"envms/fluentpdo": "^2.1.0"
+		"envms/fluentpdo": "^2.2.0"
 	}
 
 update your dependencies with `composer update`, and you're done!
@@ -40,7 +53,7 @@ update your dependencies with `composer update`, and you're done!
 If you prefer not to use composer, download the latest release, create the directory `Envms/FluentPDO` in your library directory, and drop this repository into it. Finally, add:
 
 ```php
-require "[lib-dir]/Envms/FluentPDO/src/Query.php";
+require '[lib-dir]/Envms/FluentPDO/src/Query.php';
 ```
 
 to the top of your application. **Note:** You will need an autoloader to use FluentPDO without changing its source code.
@@ -50,7 +63,7 @@ to the top of your application. **Note:** You will need an autoloader to use Flu
 Create a new PDO instance, and pass the instance to FluentPDO:
 
 ```php
-$pdo = new PDO("mysql:dbname=fluentdb", "root");
+$pdo = new PDO('mysql:dbname=fluentdb', 'user', 'password');
 $fluent = new \Envms\FluentPDO\Query($pdo);
 ```
 
@@ -78,7 +91,7 @@ To get data from the select, all we do is loop through the returned array:
 
 ```php
 foreach ($query as $row) {
-    echo "$row[title]\n";
+    echo "$row['title']\n";
 }
 ```
 
@@ -130,8 +143,8 @@ $fluent->close();
 ##### SELECT
 
 ```php
-$query = $fluent->from('article')->where('id', 1);
-$query = $fluent->from('user', 1); // shorter version if selecting one row by primary key
+$query = $fluent->from('article')->where('id', 1)->fetch();
+$query = $fluent->from('user', 1)->fetch(); // shorter version if selecting one row by primary key
 ```
 
 ##### INSERT
@@ -160,8 +173,6 @@ $query = $fluent->deleteFrom('article', 1)->execute(); // shorter version if del
 ```
 
 ***Note**: INSERT, UPDATE and DELETE queries will only run after you call `->execute()`*
-
-Full documentation can be found on the [FluentPDO homepage](http://envms.github.io/fluentpdo/)
 
 ## License
 

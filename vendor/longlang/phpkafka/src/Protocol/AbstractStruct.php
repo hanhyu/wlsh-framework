@@ -129,6 +129,9 @@ abstract class AbstractStruct implements \JsonSerializable
         }
     }
 
+    /**
+     * @return mixed
+     */
     protected function unpackItem(int $apiVersion, string $data, ProtocolField $protocolField, ?int &$tmpSize)
     {
         $type = $protocolField->getType();
@@ -136,6 +139,9 @@ abstract class AbstractStruct implements \JsonSerializable
             $arrayType = $this->getArrayType($apiVersion, $protocolField);
             $type = $this->getType($apiVersion, $protocolField);
             $value = $arrayType::unpack($data, $tmpSize, $type, $apiVersion);
+            if (null === $value && !$protocolField->getNullableVersions()) {
+                $value = [];
+            }
         } else {
             $type = $this->getType($apiVersion, $protocolField);
             if (is_subclass_of($type, AbstractType::class)) {
@@ -199,6 +205,7 @@ abstract class AbstractStruct implements \JsonSerializable
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

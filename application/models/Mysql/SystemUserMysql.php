@@ -128,6 +128,7 @@ class SystemUserMysql extends AbstractPdo
     {
         return self::getDb()->from($this->table)
             ->where(['name' => $name])
+            ->limit(1)
             ->select('id,name,status,pwd', true)
             ->fetch();
     }

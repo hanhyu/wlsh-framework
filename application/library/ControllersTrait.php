@@ -55,9 +55,8 @@ trait ControllersTrait
                 break;
             case 'POST':
                 $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
-                $let          = stristr($content_type, 'json');
 
-                if ($let) {
+                if (str_contains($content_type, 'json')) {
                     if (!empty($this->request->getContent())) {
                         try {
                             $this->data = json_decode($this->request->getContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
@@ -75,9 +74,8 @@ trait ControllersTrait
                 }
 
                 $content_type = $this->request->header['content-type'] ?? 'x-www-form-urlencoded';
-                $let          = stristr($content_type, 'json');
 
-                if ($let) {
+                if (str_contains($content_type, 'json')) {
                     if (!empty($this->request->getContent())) {
                         try {
                             $this->data += json_decode($this->request->getContent(), true, 512, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

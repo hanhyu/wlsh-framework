@@ -57,8 +57,7 @@ function http_response(int $code = 200, string $msg = 'success', array $data = [
         $result['code'] = 400;
         $result['msg']  = $e->getMessage();
         $result['data'] = [];
-        $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
-        return $res;
+        return json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
     }
     //debug_print_backtrace();
     return $res;
@@ -97,8 +96,7 @@ function ws_response(int $code = 200, string $msg = 'success', array $data = [],
         $result['code'] = 400;
         $result['msg']  = $e->getMessage();
         $result['data'] = [];
-        $res            = json_encode($result, JSON_UNESCAPED_UNICODE);
-        return $res;
+        return json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
     }
     return $res;
 }
@@ -261,8 +259,7 @@ function task_monolog(Swoole\WebSocket\Server $server, $data, string $info, stri
     $tasks['info']    = $info;
     $tasks['channel'] = $channel;
     $tasks['level']   = $level;
-    $send             = serialize($tasks);
-    $server->task($send);
+    $server->task(serialize($tasks));
 }
 
 /**

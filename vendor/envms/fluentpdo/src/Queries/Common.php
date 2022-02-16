@@ -359,6 +359,11 @@ abstract class Common extends Base
         // don't rewrite table from other databases
         foreach ($this->joins as $join) {
             if (strpos($join, '.') !== false && strpos($statement, $join) === 0) {
+                // rebuild the where statement
+                if ($separator !== null) {
+                    $statement = [$separator, $statement];
+                }
+                
                 return $statement;
             }
         }
@@ -504,4 +509,12 @@ abstract class Common extends Base
         return $joinItem;
     }
 
+    public function __clone()
+    {
+        foreach ($this->clauses as $clause => $value) {
+            if (is_array($value) && $value[0] instanceof Common) {
+                $this->clauses[$clause][0] = $this;
+            }
+        }
+    }
 }

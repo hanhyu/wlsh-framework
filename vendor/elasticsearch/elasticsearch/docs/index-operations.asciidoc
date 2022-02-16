@@ -1,12 +1,12 @@
 [[index_management]]
-== Index management operations
+=== Index management operations
 
 Index management operations allow you to manage the indices in your {es} 
 cluster, such as creating, deleting and updating indices and their 
 mappings/settings.
 
-
-=== Create an index
+[discrete]
+==== Create an index
 
 The index operations are all contained under a distinct namespace, separated 
 from other methods that are on the root client object. As an example, let's 
@@ -60,8 +60,8 @@ $response = $client->indices()->create($params);
 ----
 {zwsp} +
 
-
-=== Create an index (advanced example)
+[discrete]
+==== Create an index (advanced example)
 
 This is a more complicated example of creating an index, showing how to define 
 analyzers, tokenizers, filters and index settings. Although essentially the same 
@@ -138,8 +138,8 @@ char filters and analyzers.
 <3> `mappings` is another element nested inside of `settings`, and contains the 
 mappings for various types.
 
-
-=== Delete an index
+[discrete]
+==== Delete an index
 
 Deleting an index is very simple:
 
@@ -150,7 +150,7 @@ $response = $client->indices()->delete($params);
 ----
 {zwsp} +
 
-
+[discrete]
 === PUT Settings API
 
 The PUT Settings API allows you to modify any index setting that is dynamic:
@@ -171,8 +171,8 @@ $response = $client->indices()->putSettings($params);
 ----
 {zwsp} +
 
-
-=== GET Settings API
+[discrete]
+==== GET Settings API
 
 The GET Settings API shows you the currently configured settings for one or more 
 indices:
@@ -191,8 +191,8 @@ $response = $client->indices()->getSettings($params);
 ----
 {zwsp} +
 
-
-=== PUT Mappings API
+[discrete]
+==== PUT Mappings API
 
 The PUT Mappings API allows you to modify or add to an existing index's mapping.
 
@@ -222,8 +222,8 @@ $client->indices()->putMapping($params);
 ----
 {zwsp} +
 
-
-=== GET Mappings API
+[discrete]
+==== GET Mappings API
 
 The GET Mappings API returns the mapping details about your indices. Depending 
 on the mappings that you wish to retrieve, you can specify one of more indices:
@@ -245,8 +245,8 @@ $response = $client->indices()->getMapping($params);
 ----
 {zwsp} +
 
-
-=== Other APIs in the indices namespace
+[discrete]
+==== Other APIs in the indices namespace
 
 There are a number of other APIs in the indices namespace that allow you to 
 manage your {es} indices (add/remove templates, flush segments, close indices, 

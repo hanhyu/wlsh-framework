@@ -40,7 +40,7 @@ class StreamSocket implements SocketInterface
     protected $config;
 
     /**
-     * @var resource
+     * @var resource|null
      */
     protected $socket;
 
@@ -76,13 +76,14 @@ class StreamSocket implements SocketInterface
 
     public function connect(): void
     {
-        $uri = sprintf('tcp://%s:%s', $this->host, $this->port);
+        $uri = $this->getURI();
         $socket = stream_socket_client(
             $uri,
             $errno,
             $errstr,
             $this->config->getConnectTimeout(),
-            \STREAM_CLIENT_CONNECT
+            \STREAM_CLIENT_CONNECT,
+            $this->getContext()
         );
 
         if (!\is_resource($socket)) {
@@ -120,11 +121,13 @@ class StreamSocket implements SocketInterface
             $writable = $this->select([$this->socket], $timeout, false);
 
             if (false === $writable) {
+                $this->close();
                 throw new SocketException('Could not write ' . $bytesToWrite . ' bytes to stream');
             }
 
             if (0 === $writable) {
                 $res = $this->getMetaData();
+                $this->close();
                 if (!empty($res['timed_out'])) {
                     throw new SocketException('Timed out writing ' . $bytesToWrite . ' bytes to stream after writing ' . $bytesWritten . ' bytes');
                 }
@@ -141,6 +144,7 @@ class StreamSocket implements SocketInterface
             }
 
             if (-1 === $wrote || false === $wrote) {
+                $this->close();
                 throw new SocketException('Could not write ' . \strlen($data) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
             }
 
@@ -149,6 +153,7 @@ class StreamSocket implements SocketInterface
                 ++$failedAttempts;
 
                 if ($failedAttempts > $this->config->getMaxWriteAttempts()) {
+                    $this->close();
                     throw new SocketException('After ' . $failedAttempts . ' attempts could not write ' . \strlen($data) . ' bytes to stream, completed writing only ' . $bytesWritten . ' bytes');
                 }
             } else {
@@ -180,6 +185,7 @@ class StreamSocket implements SocketInterface
 
         if (0 === $readable) { // select timeout
             $res = $this->getMetaData();
+            $this->close();
 
             if (!empty($res['timed_out'])) {
                 throw new SocketException(sprintf('Timed out reading %d bytes from stream', $length));
@@ -203,6 +209,7 @@ class StreamSocket implements SocketInterface
                 // Otherwise wait for bytes
                 $readable = $this->select([$this->socket], $timeout);
                 if (1 !== $readable) {
+                    $this->close();
                     throw new SocketException(sprintf('Timed out while reading %d bytes from stream, %d bytes are still needed', $length, $remainingBytes));
                 }
 
@@ -216,9 +223,12 @@ class StreamSocket implements SocketInterface
         return $data;
     }
 
-    protected function select(array $sockets, float $timeout, bool $isRead = true): int
+    /**
+     * @return int|false
+     */
+    protected function select(array $sockets, float $timeout, bool $isRead = true)
     {
-        $null = null;
+        $null = [];
         $timeoutSec = (int) $timeout;
         if ($timeoutSec < 0) {
             $timeoutSec = null;
@@ -235,5 +245,26 @@ class StreamSocket implements SocketInterface
     protected function getMetaData(): array
     {
         return stream_get_meta_data($this->socket);
+    }
+
+    /**
+     * @return resource
+     */
+    protected function getContext()
+    {
+        return stream_context_create([
+            'ssl' => $this->config->getSsl()->getStreamConfig($this->getHost()),
+        ]);
+    }
+
+    protected function getURI(): string
+    {
+        $protocol = 'tcp';
+        $ssl = $this->getConfig()->getSsl();
+        if ($ssl->getOpen()) {
+            $protocol = 'ssl';
+        }
+
+        return sprintf('%s://%s:%s', $protocol, $this->host, $this->port);
     }
 }

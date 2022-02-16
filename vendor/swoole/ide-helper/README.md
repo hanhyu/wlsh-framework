@@ -1,6 +1,7 @@
 # Swoole IDE Helper
 
-[![Build Status](https://github.com/swoole/ide-helper/workflows/Tests/badge.svg)](https://github.com/swoole/ide-helper/actions)
+[![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/phpswoole)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.swoole.dev)
 [![Latest Stable Version](https://poser.pugx.org/swoole/ide-helper/v/stable.svg)](https://packagist.org/packages/swoole/ide-helper)
 [![License](https://poser.pugx.org/swoole/ide-helper/license)](LICENSE)
 
@@ -8,11 +9,11 @@ This package contains IDE help files for [Swoole](https://github.com/swoole/swoo
 
 ## Install
 
-You may add this package to your project using [Composer](https://getcomposer.org):
+You can add this package to your project using [Composer](https://getcomposer.org):
 
 ```bash
 composer require swoole/ide-helper:@dev
-# or you may install a specific version, like:
+# or you can install a specific version, like:
 composer require swoole/ide-helper:~4.4.7
 ```
 
@@ -20,33 +21,13 @@ It's better to install this package on only development systems by adding the `-
 
 ```bash
 composer require --dev swoole/ide-helper:@dev
-# or you may install a specific version, like:
+# or you can install a specific version, like:
 composer require --dev swoole/ide-helper:~4.4.7
 ```
 
-## Alternatives
+## Notes
 
-The stubs are created by reverse-engineering the Swoole extensions directly; thus there is no documentation included,
-and type hinting is missing in many places. The Swoole team has tried its best to keep the stubs up to date, and we do
-want to add inline documentation and type hinting in the future; however, due to limited resources we don't know when it
-will be ready.
- 
-Here are some alternatives you can consider:
+There are two types of worker processes in use when starting a Swoole server:
 
-* [eaglewu/swoole-ide-helper](https://github.com/wudi/swoole-ide-helper)
-
-## Generate IDE Help Files
-
-Have Docker running first, then use script _./bin/generator.sh_ to generate IDE help files and put them under folder
-`output/` with commands like following:
-
-```bash
-./bin/generator.sh 4.4.16
-./bin/generator.sh 4.4.16   master
-./bin/generator.sh 4.4.16   4.4.16
-./bin/generator.sh 4.4.16   b5c9cede8c6150feba50d0e28d56de355fa69d16
-./bin/generator.sh 4.5.0RC1 7c913105c3273aab005489d78e0ff9043bfecb54
-```
-
-The first parameter specifies a stable release of Swoole. The second parameter is optional; it is to specify which
-version of [Swoole library](https://github.com/swoole/library) to be integrated with (by default it will have the latest Swoole library included).
+1. `event worker`. All requests (HTTP, WebSocket, TCP, UDP, etc.) are handled by this type of processes. It supports coroutine by default; many I/O operations can run asynchronously in it.
+2. `task worker`. This type of processes was introduced to handle blocking I/O operations in PHP. Ideally, it should always work synchronously, although it also supports coroutine and allows asynchronous processing (since Swoole v4.2.12+).

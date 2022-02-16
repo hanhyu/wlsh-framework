@@ -30,7 +30,7 @@ class DI
      *
      * @return mixed
      */
-    public static function get(string $name)
+    public static function get(string $name): mixed
     {
         return self::$arr[$name] ?? '';
     }
