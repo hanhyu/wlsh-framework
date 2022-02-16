@@ -151,7 +151,6 @@ class Bootstrap
                  [1]=>
            string(46) "/home/baseFrame/application/Bootstrap.php"
          }
-
          var_dump(get_included_files());*/
 
         require_once ROOT_PATH . '/vendor/autoload.php';
