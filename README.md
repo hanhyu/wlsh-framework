@@ -43,4 +43,4 @@
 12. 自带独特的运维管理后台：
     ![Alt text](./tests/testImages/router_log.png "路由日志")
 
-### 更多文档，请点击上面的文档链接查看，V2.0版本文档正在更新中。
+### 该版本停止更新，3.0新版本转移到：wlsh-skeleton 仓库
